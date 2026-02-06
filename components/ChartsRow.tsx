@@ -33,15 +33,15 @@ import CustomDropdown from '@/components/ui/CustomDropdown';
 
 export default function ChartsRow() {
   return (
-    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', width: '100%' }}>
+    <div className="flex gap-1 flex-wrap w-full">
       {/* Transaction Volume Bar Chart */}
-      <Card style={{ flex: '2 1 600px', height: '281px', borderRadius: '8px', background: '#FFFFFF', padding: 0 }}>
-        <CardContent style={{ paddingTop: '16px', paddingRight: '16px', paddingBottom: '12px', paddingLeft: '16px', display: 'flex', flexDirection: 'column', gap: '8px', height: '100%' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ fontFamily: 'Neue Montreal', fontSize: '12px', fontWeight: 500, lineHeight: '100%', letterSpacing: '0%', color: '#2B2834' }}>Transaction Volume</h3>
+      <Card className="flex-[2_1_600px] h-[281px] rounded-lg bg-white p-0 border-none shadow-none">
+        <CardContent className="pt-4 pr-4 pb-3 pl-4 flex flex-col gap-2 h-full">
+          <div className="flex justify-between items-center">
+            <h3 className="font-sans text-xs font-medium leading-none tracking-normal text-text-main">Transaction Volume</h3>
             <CustomDropdown options={['Today', 'Yesterday', 'Last 7 days']} defaultLabel="Today" />
           </div>
-          <div style={{ width: '100%', height: '0px', border: '1px solid #EBEBEB' }}></div>
+          <div className="w-full h-0 border border-border-subtle"></div>
           <div className="h-[207px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={barData}>
@@ -87,15 +87,15 @@ export default function ChartsRow() {
       </Card>
 
       {/* Revenue Breakdown Pie Chart */}
-      <Card style={{ flex: '1 1 350px', height: '281px', borderRadius: '8px', padding: 0 }}>
-        <CardContent style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px', height: '100%' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ fontFamily: 'Neue Montreal', fontSize: '12px', fontWeight: 500, lineHeight: '100%', letterSpacing: '0%', color: '#2B2834' }}>Revenue Breakdown by Product Type</h3>
+      <Card className="flex-[1_1_350px] h-[281px] rounded-lg p-0 border-none shadow-none">
+        <CardContent className="p-4 flex flex-col gap-2 h-full">
+          <div className="flex justify-between items-center">
+            <h3 className="font-sans text-xs font-medium leading-none tracking-normal text-text-main">Revenue Breakdown by Product Type</h3>
             <CustomDropdown options={['Today', 'This Week', 'This Month']} defaultLabel="Today" />
           </div>
-          <div style={{ width: '100%', height: '0px', border: '1px solid #EBEBEB' }}></div>
+          <div className="w-full h-0 border border-border-subtle"></div>
           <div className="flex items-center gap-6">
-            <div style={{ width: '187px', height: '187px' }}>
+            <div className="w-[187px] h-[187px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -130,18 +130,11 @@ export default function ChartsRow() {
               {pieLegend.map((item) => (
                 <div key={item.label} className="flex items-center gap-2">
                   <span
-                    className="flex-shrink-0"
-                    style={{ width: '12px', height: '12px', borderRadius: '4px', background: item.color }}
+                    className="flex-shrink-0 w-3 h-3 rounded bg-[var(--item-color)]"
+                    style={{ backgroundColor: item.color } as React.CSSProperties}
                   />
                   <div className="text-sm flex items-center">
-                    <span style={{
-                      fontFamily: 'Neue Montreal',
-                      fontWeight: 400,
-                      fontSize: '12px',
-                      lineHeight: '100%',
-                      letterSpacing: '0%',
-                      color: '#000000'
-                    }} className="mr-2">{item.label}</span>
+                    <span className="mr-2 font-sans font-normal text-xs leading-none tracking-normal text-black">{item.label}</span>
                     <span className="text-[#989898]">{item.value}</span>
                   </div>
                 </div>

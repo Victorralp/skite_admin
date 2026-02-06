@@ -3,104 +3,46 @@
 
 import { topCreators } from '@/data/dashboard';
 import { Mail } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 import CustomDropdown from '@/components/ui/CustomDropdown';
 
 export default function TopCreatorsTable() {
   return (
-    <div style={{
-      width: '100%',
-      height: '346px',
-      padding: '16px',
-      gap: '12px',
-      backgroundColor: '#FFFFFF',
-      border: '1px solid #EBEBEB',
-      borderRadius: '8px',
-      boxSizing: 'border-box',
-      display: 'flex',
-      flexDirection: 'column'
-    }}>
+    <div className="w-full h-[346px] p-4 flex flex-col gap-3 bg-white border border-border-subtle rounded-lg box-border">
       {/* Header */}
-      <div style={{
-        width: '100%',
-        height: '30px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexShrink: 0
-      }}>
-        <h3 style={{
-          fontFamily: 'Neue Montreal',
-          fontWeight: 500,
-          fontSize: '13.5px',
-          lineHeight: '16px',
-          color: '#2B2834'
-        }}>Top Creators</h3>
-
+      <div className="w-full h-[30px] flex justify-between items-center shrink-0">
+        <h3 className="font-sans font-medium text-[13.5px] leading-4 text-text-main">Top Creators</h3>
         <CustomDropdown options={['Today', 'Yesterday', 'Last 7 days']} defaultLabel="Today" />
       </div>
 
       {/* Table Container */}
-      <div style={{
-        width: '100%',
-        height: '272px',
-        padding: '4px',
-        gap: '4px',
-        backgroundColor: '#F9F9FB',
-        borderRadius: '12px',
-        display: 'flex',
-        flexDirection: 'column'
-        // overflowX: 'auto' // Removed scrollbar per user request
-      }}>
+      <div className="w-full h-[272px] p-1 gap-1 bg-surface rounded-xl flex flex-col">
 
         {/* Table Headers */}
-        <div style={{
-          // minWidth: '1062px', // Removed fixed min-width to allow shrinking
-          width: '100%',
-          height: '30px',
-          display: 'flex',
-          alignItems: 'center',
-          padding: '8px 24px',
-          gap: '16px'
-        }}>
-          <div style={{ width: '27px', fontFamily: 'Neue Montreal', fontWeight: 500, fontSize: '12px', color: '#2B2834' }}>Rank</div>
-          <div style={{ flex: 1, fontFamily: 'Neue Montreal', fontWeight: 500, fontSize: '12px', color: '#2B2834' }}>Name</div>
-          <div style={{ width: '166.09px', fontFamily: 'Neue Montreal', fontWeight: 500, fontSize: '12px', color: '#2B2834' }}>Username</div>
-          <div style={{ flex: 1, fontFamily: 'Neue Montreal', fontWeight: 500, fontSize: '12px', color: '#2B2834' }}>Email</div>
-          <div style={{ width: '162.15px', fontFamily: 'Neue Montreal', fontWeight: 500, fontSize: '12px', color: '#2B2834' }}>Revenue Generated</div>
-          <div style={{ width: '44px', fontFamily: 'Neue Montreal', fontWeight: 500, fontSize: '12px', color: '#2B2834' }}>Actions</div>
+        <div className="w-full h-[30px] flex items-center px-6 py-2 gap-4">
+          <div className="w-[27px] font-sans font-medium text-xs text-text-main">Rank</div>
+          <div className="flex-1 font-sans font-medium text-xs text-text-main">Name</div>
+          <div className="w-[166px] font-sans font-medium text-xs text-text-main">Username</div>
+          <div className="flex-1 font-sans font-medium text-xs text-text-main">Email</div>
+          <div className="w-[162px] font-sans font-medium text-xs text-text-main">Revenue Generated</div>
+          <div className="w-11 font-sans font-medium text-xs text-text-main">Actions</div>
         </div>
 
         {/* Rows Container */}
-        <div style={{
-          // minWidth: '1062px', // Removed fixed min-width
-          width: '100%',
-          height: '230px', // Adjusted to fit remaining space? 272 - 4(pad) - 4(gap) - 30(header) - 4(pad bottom?) ~= 230
-          backgroundColor: '#FFFFFF',
-          border: '1px solid #EBEBEB',
-          borderRadius: '8px',
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden'
-        }}>
+        <div className="w-full h-[230px] bg-white border border-border-subtle rounded-lg flex flex-col overflow-hidden">
           {topCreators.map((creator, index) => (
-            <div key={creator.rank} style={{
-              width: '100%',
-              height: '46px',
-              display: 'flex',
-              alignItems: 'center',
-              padding: '14px 24px',
-              gap: '16px',
-              borderBottom: index !== topCreators.length - 1 ? '1px solid #EBEBEB' : 'none',
-              backgroundColor: '#FFFFFF'
-            }}>
-              <div style={{ width: '27px', fontFamily: 'Neue Montreal', fontWeight: 400, fontSize: '13.5px', color: '#2B2834' }}>{creator.rank}</div>
-              <div style={{ flex: 1, fontFamily: 'Neue Montreal', fontWeight: 400, fontSize: '13.5px', color: '#2B2834' }}>{creator.name}</div>
-              <div style={{ width: '166.09px', fontFamily: 'Neue Montreal', fontWeight: 400, fontSize: '13.5px', color: '#2B2834' }}>{creator.username}</div>
-              <div style={{ flex: 1, fontFamily: 'Neue Montreal', fontWeight: 400, fontSize: '13.5px', color: '#2B2834' }}>{creator.email}</div>
-              <div style={{ width: '162.15px', fontFamily: 'Neue Montreal', fontWeight: 400, fontSize: '13.5px', color: '#2B2834' }}>{creator.revenue}</div>
-              <div style={{ width: '44px', display: 'flex', justifyContent: 'center' }}>
-                <Mail style={{ width: '18px', height: '18px', color: '#5F5971' }} />
+            <div key={creator.rank} className={cn(
+              "w-full h-[46px] flex items-center px-6 py-[14px] gap-4 bg-white",
+              index !== topCreators.length - 1 && "border-b border-border-subtle"
+            )}>
+              <div className="w-[27px] font-sans font-normal text-[13.5px] text-text-main">{creator.rank}</div>
+              <div className="flex-1 font-sans font-normal text-[13.5px] text-text-main">{creator.name}</div>
+              <div className="w-[166px] font-sans font-normal text-[13.5px] text-text-main">{creator.username}</div>
+              <div className="flex-1 font-sans font-normal text-[13.5px] text-text-main">{creator.email}</div>
+              <div className="w-[162px] font-sans font-normal text-[13.5px] text-text-main">{creator.revenue}</div>
+              <div className="w-11 flex justify-center">
+                <Mail className="w-[18px] h-[18px] text-text-muted" />
               </div>
             </div>
           ))}

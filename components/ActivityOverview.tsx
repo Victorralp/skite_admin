@@ -1,19 +1,19 @@
 'use client';
 
 const StatPill = ({ label, value }: { label: string; value: string }) => (
-  <span className="flex-1 inline-flex items-center justify-between" style={{ height: '28px', padding: '8px', borderRadius: '4px', background: '#F9F9FB' }}>
-    <span style={{ height: '12px', fontFamily: 'Neue Montreal', fontWeight: 400, fontSize: '10px', lineHeight: '100%', letterSpacing: '0%', color: '#676767' }}>{label}</span>
-    <span style={{ fontFamily: 'Neue Montreal', fontWeight: 500, fontSize: '10px', lineHeight: '100%', letterSpacing: '0%', color: '#2B2834' }}>{value}</span>
+  <span className="flex-1 inline-flex items-center justify-between h-7 p-2 rounded bg-surface">
+    <span className="h-3 font-sans font-normal text-[10px] leading-none tracking-normal text-text-muted">{label}</span>
+    <span className="font-sans font-medium text-[10px] leading-none tracking-normal text-text-main">{value}</span>
   </span>
 );
 
 const ActivityCard = ({ title, value, children }: { title: string; value: string; children: React.ReactNode }) => (
-  <div className="bg-white" style={{ minWidth: '250px', flex: 1, height: '96px', padding: '4px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', borderRadius: '8px', border: '1px solid #EBEBEB', boxSizing: 'border-box' }}>
+  <div className="bg-white min-w-[250px] flex-1 h-24 p-1 flex flex-col justify-between rounded-lg border border-border-subtle box-border">
     <div className="px-2.5 pt-2">
-      <p className="mb-1" style={{ width: '100%', height: '14px', fontFamily: 'Neue Montreal', fontWeight: 400, fontSize: '12px', lineHeight: '100%', color: '#5F5971' }}>{title}</p>
-      <p style={{ width: '100%', height: '22px', fontFamily: 'Neue Montreal', fontWeight: 500, fontSize: '18px', lineHeight: '100%', letterSpacing: '0%', color: '#2B2834' }}>{value}</p>
+      <p className="mb-1 w-full h-[14px] font-sans font-normal text-xs leading-none text-text-muted">{title}</p>
+      <p className="w-full h-[22px] font-sans font-medium text-lg leading-none tracking-normal text-text-main">{value}</p>
     </div>
-    <div className="flex items-center w-full" style={{ gap: '4px' }}>
+    <div className="flex items-center w-full gap-1">
       {children}
     </div>
   </div>
@@ -21,18 +21,9 @@ const ActivityCard = ({ title, value, children }: { title: string; value: string
 
 export default function ActivityOverview() {
   return (
-    <section style={{ width: '100%' }}>
-      <h2 className="mb-4" style={{
-        width: '100%',
-        height: '24px',
-        fontFamily: 'Neue Montreal',
-        fontWeight: 700,
-        fontSize: '20px',
-        lineHeight: '100%',
-        letterSpacing: '-1%',
-        color: '#2B2834'
-      }}>Activity Overview</h2>
-      <div style={{ width: '100%', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+    <section className="w-full">
+      <h2 className="mb-4 w-full h-6 font-sans font-bold text-xl leading-none -tracking-[0.01em] text-text-main">Activity Overview</h2>
+      <div className="w-full flex gap-2 flex-wrap">
 
         {/* Messages Card */}
         <ActivityCard title="Messages" value="12,635">

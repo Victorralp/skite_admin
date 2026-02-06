@@ -128,63 +128,47 @@ type SidebarProps = {
 export default function Sidebar({ activePage = 'dashboard' }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // Width calculation
-  const sidebarWidth = isCollapsed ? '88px' : '210px';
-  const contentWidth = isCollapsed ? '100%' : '162px';
-  const paddingX = isCollapsed ? '12px' : '24px'; // Reduce padding when collapsed to center items
-
   return (
     <aside
-      style={{
-        width: sidebarWidth,
-        minHeight: '100vh',
-        backgroundColor: '#FFFFFF',
-        borderRight: '1px solid #EBEBEB',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        padding: `24px ${paddingX}`,
-        gap: '53px',
-        boxSizing: 'border-box',
-        transition: 'width 0.3s ease, padding 0.3s ease'
-      }}
+      className={cn(
+        "h-screen sticky top-0 bg-white border-r border-border-subtle flex flex-col py-5 transition-[width,padding] duration-300 shrink-0 z-50 overflow-hidden box-border",
+        isCollapsed ? "w-[72px] px-3 gap-6" : "w-[200px] px-4 gap-6"
+      )}
     >
       {/* Top Section: Logo + Navigation */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '40px', width: '100%', alignItems: isCollapsed ? 'center' : 'flex-start' }}>
+      <div className={cn(
+        "no-scrollbar flex flex-col gap-8 w-full flex-1 min-h-0 overflow-y-auto pr-1 items-start",
+        isCollapsed && "items-center"
+      )}>
 
         {/* Logo */}
-        <div style={{ height: '24px', display: 'flex', alignItems: 'center', justifyContent: isCollapsed ? 'center' : 'space-between', width: '100%' }}>
+        <div className={cn(
+          "h-6 flex items-center w-full shrink-0",
+          isCollapsed ? "justify-center" : "justify-between"
+        )}>
           {/* Logo Container - Clip for collapsed state */}
-          <div style={{
-            width: isCollapsed ? '20px' : '121px',
-            overflow: 'hidden',
-            transition: 'width 0.3s ease',
-            display: isCollapsed ? 'none' : 'block' // Ideally we show icon, but for now specific request was "close". 
-            // Actually let's try to keep the icon visible if possible or just hide it if it looks bad.
-            // User requested "close", implies hiding or shrinking.
-            // Let's hide the logo entirely in collapsed mode and just keep the toggle button? 
-            // Or keep the toggle button centered.
-          }}>
+          <div className={cn(
+            "overflow-hidden transition-[width] duration-300",
+            isCollapsed ? "w-0 hidden" : "w-[121px] block"
+          )}>
             <SkiteLogo />
           </div>
           <div
             onClick={() => setIsCollapsed(!isCollapsed)}
-            style={{
-              cursor: 'pointer',
-              transform: isCollapsed ? 'rotate(180deg)' : 'none',
-              transition: 'transform 0.3s ease',
-              // If collapsed, this is the only thing visible in the header
-            }}
+            className={cn(
+              "cursor-pointer transition-transform duration-300",
+              isCollapsed ? "rotate-180 mx-auto" : "ml-0"
+            )}
           >
             <CollapseIcon />
           </div>
         </div>
 
         {/* Navigation Groups Container */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: contentWidth }}>
+        <div className="flex flex-col gap-6 w-full pb-3">
 
           {/* Main Group */}
-          <div style={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: isCollapsed ? 'center' : 'flex-start' }}>
+          <div className={cn("flex flex-col w-full", isCollapsed ? "items-center" : "items-start")}>
             <NavItem icon={<LayoutDashboard size={18} />} label="Dashboard" isActive={activePage === 'dashboard'} isCollapsed={isCollapsed} />
             <NavItem icon={<CreatorsIcon size={18} />} label="Creators" isActive={activePage === 'creators'} isCollapsed={isCollapsed} />
             <NavItem icon={<UsersIcon size={18} />} label="Users" isActive={activePage === 'users'} isCollapsed={isCollapsed} />
@@ -193,9 +177,9 @@ export default function Sidebar({ activePage = 'dashboard' }: SidebarProps) {
           </div>
 
           {/* Operations Group */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%', alignItems: isCollapsed ? 'center' : 'flex-start' }}>
+          <div className={cn("flex flex-col gap-1 w-full", isCollapsed ? "items-center" : "items-start")}>
             {!isCollapsed && (
-              <div style={{ fontFamily: 'Neue Montreal', fontWeight: 400, fontSize: '12px', color: '#A5A1AF', marginBottom: '4px', width: '100%' }}>OPERATIONS</div>
+              <div className="font-sans font-normal text-xs text-text-light mb-1 w-full pl-2">OPERATIONS</div>
             )}
             <NavItem icon={<TrendingUpIcon size={18} />} label="Revenue" isActive={activePage === 'revenue'} isCollapsed={isCollapsed} />
             <NavItem icon={<HeadphonesIcon size={18} />} label="Support Center" isActive={activePage === 'support'} isCollapsed={isCollapsed} />
@@ -203,9 +187,9 @@ export default function Sidebar({ activePage = 'dashboard' }: SidebarProps) {
           </div>
 
           {/* System Group */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%', alignItems: isCollapsed ? 'center' : 'flex-start' }}>
+          <div className={cn("flex flex-col gap-1 w-full", isCollapsed ? "items-center" : "items-start")}>
             {!isCollapsed && (
-              <div style={{ fontFamily: 'Neue Montreal', fontWeight: 400, fontSize: '12px', color: '#A5A1AF', marginBottom: '4px', width: '100%' }}>SYSTEM</div>
+              <div className="font-sans font-normal text-xs text-text-light mb-1 w-full pl-2">SYSTEM</div>
             )}
             <NavItem icon={<BellIcon size={18} />} label="Notifications" isActive={activePage === 'notifications'} isCollapsed={isCollapsed} />
             <NavItem icon={<FileTextIcon size={18} />} label="Logs" isActive={activePage === 'logs'} isCollapsed={isCollapsed} />
@@ -216,50 +200,29 @@ export default function Sidebar({ activePage = 'dashboard' }: SidebarProps) {
       </div>
 
       {/* Bottom Section: User Profile */}
-      <div style={{
-        width: '100%',
-        height: isCollapsed ? 'auto' : '108px',
-        padding: isCollapsed ? '12px' : '16px',
-        gap: '4px',
-        backgroundColor: '#FFFFFF',
-        border: '1px solid #EBEBEB',
-        borderRadius: '16px',
-        display: 'flex',
-        flexDirection: 'column',
-        boxSizing: 'border-box',
-        alignItems: isCollapsed ? 'center' : 'flex-start'
-      }}>
+      <div className={cn(
+        "w-full p-3 gap-1 bg-white border border-border-subtle rounded-xl flex flex-col box-border shrink-0 mt-auto",
+        isCollapsed ? "items-center" : "items-start"
+      )}>
         {/* User Info */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', height: isCollapsed ? 'auto' : '76px', alignItems: 'center', width: '100%' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', height: '30px', justifyContent: isCollapsed ? 'center' : 'flex-start', width: '100%' }}>
-            <div style={{ width: '28px', height: '28px', borderRadius: '100px', backgroundColor: '#eee', overflow: 'hidden', flexShrink: 0 }}>
+        <div className="flex flex-col gap-3 items-center w-full">
+          <div className={cn("flex items-center gap-2.5 h-[30px] w-full", isCollapsed ? "justify-center" : "justify-start")}>
+            <div className="w-7 h-7 rounded-full bg-[#eee] overflow-hidden shrink-0">
               <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face" alt="User" />
             </div>
             {!isCollapsed && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                <span style={{ fontFamily: 'Neue Montreal', fontWeight: 500, fontSize: '13.5px', lineHeight: '16px', color: '#2B2834' }}>User Name</span>
-                <span style={{ fontFamily: 'Neue Montreal', fontWeight: 500, fontSize: '10px', lineHeight: '12px', color: '#5F5971' }}>Super Admin (HQ)</span>
+              <div className="flex flex-col gap-0 overflow-hidden whitespace-nowrap">
+                <span className="font-sans font-medium text-[13px] leading-4 text-text-main">User Name</span>
+                <span className="font-sans font-medium text-[10px] leading-[12px] text-text-muted">Super Admin (HQ)</span>
               </div>
             )}
           </div>
 
           {/* Logout Button */}
-          <button style={{
-            width: isCollapsed ? '34px' : '130px',
-            height: '34px',
-            padding: isCollapsed ? '8px' : '8px',
-            gap: '8px',
-            backgroundColor: '#F9F9FB',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: isCollapsed ? 'center' : 'flex-start',
-            border: 'none',
-            cursor: 'pointer'
-          }}>
-            <LogOut size={18} color="#CD110A" />
+          <button className="w-full h-8 p-0 bg-surface rounded-lg flex items-center justify-center gap-2 border-none cursor-pointer">
+            <LogOut size={16} className="text-danger-text" />
             {!isCollapsed && (
-              <span style={{ fontFamily: 'Neue Montreal', fontWeight: 400, fontSize: '13.5px', lineHeight: '16px', color: '#2B2834' }}>Log Out</span>
+              <span className="font-sans font-normal text-[12.5px] text-text-main">Log Out</span>
             )}
           </button>
         </div>
@@ -269,40 +232,18 @@ export default function Sidebar({ activePage = 'dashboard' }: SidebarProps) {
 }
 
 function NavItem({ icon, label, isActive, isCollapsed }: { icon: ReactNode; label: string; isActive: boolean; isCollapsed: boolean }) {
-  const activeStyle = isActive ? {
-    color: '#5F2EFC',
-    fontWeight: 500,
-  } : {
-    color: '#5F5971',
-    fontWeight: 500,
-  };
-
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: isCollapsed ? 'center' : 'flex-start',
-      gap: '8px',
-      padding: '8px 0px',
-      height: '34px',
-      cursor: 'pointer',
-      width: '100%',
-      ...activeStyle
-    }}>
-      <span style={{ color: isActive ? '#5F2EFC' : 'currentColor', display: 'flex', alignItems: 'center' }}>{icon}</span>
+    <div className={cn(
+      "flex items-center gap-2.5 p-2 h-9 cursor-pointer w-full rounded-lg transition-colors duration-200",
+      isCollapsed ? "justify-center" : "justify-start",
+      isActive ? "bg-active text-brand-primary font-medium" : "bg-transparent text-text-muted font-medium hover:bg-surface"
+    )}>
+      <span className={cn("flex items-center", isActive ? "text-brand-primary" : "text-currentColor")}>{icon}</span>
       {!isCollapsed && (
-        <span style={{
-          fontFamily: 'Neue Montreal',
-          fontSize: '13.5px',
-          lineHeight: '16px',
-          color: isActive ? '#5F2EFC' : '#5F5971',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden'
-        }}>{label}</span>
-      )}
-      {isActive && !isCollapsed && (
-        // Optional active indicator logic
-        null
+        <span className={cn(
+          "font-sans text-[13px] leading-4 whitespace-nowrap overflow-hidden transition-colors",
+          isActive ? "text-brand-primary font-medium" : "text-text-muted font-medium"
+        )}>{label}</span>
       )}
     </div>
   );

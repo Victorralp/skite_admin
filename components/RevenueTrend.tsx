@@ -10,6 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer
 } from 'recharts';
+import { cn } from '@/lib/utils';
 
 const revenueData = [
   { day: '1', revenue: 2400000 },
@@ -39,77 +40,36 @@ const formatCurrency = (value: number) => {
 
 export default function RevenueTrend() {
   return (
-    <section style={{ width: '100%' }}>
-      <Card style={{ width: '100%', minHeight: '285px', borderRadius: '8px', padding: 0 }}>
-        <CardContent style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px', height: '100%' }}>
-          <div style={{ width: '100%', height: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ fontFamily: 'Neue Montreal', fontSize: '12px', fontWeight: 500, lineHeight: '100%', letterSpacing: '0%', color: '#2B2834' }}>Daily Revenue</div>
+    <section className="w-full">
+      <Card className="w-full min-h-[285px] rounded-lg p-0 bg-white border-none shadow-none">
+        <CardContent className="p-4 flex flex-col gap-2 h-full">
+          <div className="w-full h-[30px] flex justify-between items-center">
+            <div className="font-sans text-xs font-medium leading-none tracking-normal text-text-main">Daily Revenue</div>
 
             {/* Custom Dropdown Trigger & Menu */}
             <div className="relative group">
               {/* Trigger Button */}
-              <button style={{
-                width: '69px', // Approx width based on text 'Today' + icon
-                height: '30px',
-                display: 'flex',
-                alignItems: 'center',
-                padding: '5px 7px 5px 10px',
-                backgroundColor: '#FFFFFF',
-                border: '1px solid #EBEBEB',
-                borderRadius: '8px',
-                boxShadow: '0px 1px 4.8px rgba(0, 0, 0, 0.03)',
-                cursor: 'pointer',
-                gap: '4px'
-              }}>
-                <span style={{
-                  fontFamily: 'Neue Montreal',
-                  fontWeight: 400,
-                  fontSize: '12px',
-                  lineHeight: '14px',
-                  color: '#5F5971',
-                  whiteSpace: 'nowrap'
-                }}>Today</span>
+              <button className="w-[69px] h-[30px] flex items-center py-[5px] pl-2.5 pr-[7px] bg-white border border-border-subtle rounded-lg shadow-[0px_1px_4.8px_rgba(0,0,0,0.03)] cursor-pointer gap-1">
+                <span className="font-sans font-normal text-xs leading-[14px] text-text-muted whitespace-nowrap">Today</span>
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path fillRule="evenodd" clipRule="evenodd" d="M5.83337 7.5L10 11.6667L14.1667 7.5H5.83337Z" fill="#5F5971" />
                 </svg>
               </button>
 
-              {/* Dropdown Menu (Hidden by default, shown on hover/focus-within - simplistic implementation for now, or state based if needed. Using group-hover for simplicity per CSS request urgency) */}
-              <div className="hidden group-hover:flex absolute right-0 top-[34px] z-50 rounded-[8px] flex-col overflow-hidden bg-white"
-                style={{
-                  width: '114px',
-                  // Height 165px from spec (33px * 5 items)
-                  height: '165px',
-                  border: '1px solid #EBEBEB',
-                  boxShadow: '0px 116px 46px rgba(0, 0, 0, 0.01), 0px 65px 39px rgba(0, 0, 0, 0.05), 0px 29px 29px rgba(0, 0, 0, 0.09), 0px 7px 16px rgba(0, 0, 0, 0.1)',
-                  padding: '0px'
-                }}
-              >
+              {/* Dropdown Menu */}
+              <div className="hidden group-hover:flex absolute right-0 top-[34px] z-50 rounded-lg flex-col overflow-hidden bg-white w-[114px] h-[165px] border border-border-subtle shadow-[0px_116px_46px_rgba(0,0,0,0.01),0px_65px_39px_rgba(0,0,0,0.05),0px_29px_29px_rgba(0,0,0,0.09),0px_7px_16px_rgba(0,0,0,0.1)] p-0">
                 {['Today', 'Yesterday', 'Last 7 days', 'Last 30 days', 'Custom'].map((item, i) => (
-                  <div key={item} style={{
-                    width: '114px',
-                    height: '33px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '8px 16px 8px 16px', // "padding: 8px 24px 8px 16px" in spec, adjusted right padding for fit/text
-                    gap: '10px',
-                    backgroundColor: '#FFFFFF',
-                    borderBottom: i < 4 ? '0.2px solid #EBEBEB' : 'none', // Apply separator logic
-                    cursor: 'pointer'
-                  }} className="hover:bg-gray-50">
-                    <span style={{
-                      fontFamily: 'Neue Montreal',
-                      fontWeight: 400,
-                      fontSize: '13.5px',
-                      lineHeight: '16px',
-                      color: '#5F5971'
-                    }}>{item}</span>
+                  <div key={item} className={cn(
+                    "w-[114px] h-[33px] flex items-center px-4 py-2 gap-2.5 bg-white cursor-pointer hover:bg-surface",
+                    i < 4 && "border-b border-border-subtle"
+                  )}>
+                    <span className="font-sans font-normal text-[13.5px] leading-4 text-text-muted">{item}</span>
                   </div>
                 ))}
               </div>
             </div>
           </div>
-          <div style={{ width: '100%', height: '0px', border: '1px solid #EBEBEB' }}></div>
+          <div className="w-full h-0 border border-border-subtle"></div>
           <div className="h-[207px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={revenueData}>

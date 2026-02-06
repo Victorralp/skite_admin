@@ -6,70 +6,18 @@ import { TrendingUp } from 'lucide-react';
 
 export default function Overview() {
   return (
-    <div style={{
-      width: '100%',
-      // height: '128px', // Removing fixed height to allow wrapping
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '8px',
-      alignItems: 'flex-start'
-    }}>
-      <h2 style={{
-        fontFamily: 'Neue Montreal',
-        fontWeight: 700,
-        fontSize: '20px',
-        lineHeight: '24px',
-        letterSpacing: '-0.01em',
-        color: '#2B2834',
-        margin: 0
-      }}>Overview</h2>
+    <div className="w-full flex flex-col gap-2 items-start">
+      <h2 className="font-sans font-bold text-xl leading-6 -tracking-[0.01em] text-text-main m-0">Overview</h2>
 
-      <div style={{
-        width: '100%',
-        // height: '96px', // Removing fixed height to allow wrapping
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: '8px',
-        flexWrap: 'wrap' // Allow wrapping on small screens
-      }}>
+      <div className="w-full flex items-start gap-2 flex-wrap">
         {overviewMetrics.map((metric) => (
-          <div key={metric.title} style={{
-            minWidth: '214px',
-            height: '96px',
-            backgroundColor: '#FFFFFF',
-            border: '1px solid #EBEBEB',
-            borderRadius: '8px',
-            boxSizing: 'border-box',
-            display: 'flex',
-            flexDirection: 'column',
-            padding: '16px',
-            gap: '12px',
-            flexGrow: 1
-          }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '182px', height: '40px' }}>
-              <span style={{
-                fontFamily: 'Neue Montreal',
-                fontWeight: 400,
-                fontSize: '12px',
-                lineHeight: '14px',
-                color: '#5F5971'
-              }}>{metric.title}</span>
-              <span style={{
-                fontFamily: 'Neue Montreal',
-                fontWeight: 500,
-                fontSize: '18px',
-                lineHeight: '22px',
-                color: '#2B2834'
-              }}>{metric.value}</span>
+          <div key={metric.title} className="min-w-[214px] h-24 bg-white border border-border-subtle rounded-lg box-border flex flex-col p-4 gap-3 grow">
+            <div className="flex flex-col gap-1 w-[182px] h-10">
+              <span className="font-sans font-normal text-xs leading-[14px] text-text-muted">{metric.title}</span>
+              <span className="font-sans font-medium text-lg leading-[22px] text-text-main">{metric.value}</span>
             </div>
 
-            <span style={{
-              fontFamily: 'Neue Montreal',
-              fontWeight: 400,
-              fontSize: '10px',
-              lineHeight: '12px',
-              color: '#239B73'
-            }}>{metric.delta}</span>
+            <span className="font-sans font-normal text-[10px] leading-3 text-success-text">{metric.delta}</span>
           </div>
         ))}
       </div>
