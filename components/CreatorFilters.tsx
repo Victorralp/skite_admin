@@ -3,7 +3,7 @@
 import { Plus, SlidersHorizontal, Download, LayoutGrid, List } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 type CreatorFiltersProps = {
     searchQuery: string;
@@ -27,77 +27,88 @@ const SlidersHorizontalIcon = ({ className }: { className?: string }) => (
 
 type FilterDropdownProps = {
     title: string;
+    showCalendar?: boolean;
+    showCurrency?: boolean;
     onApply: () => void;
 };
 
-const FilterDropdown = ({ title, onApply }: FilterDropdownProps) => (
-    <div
-        className="absolute left-[-0.75px] top-[27px] w-[185px] h-[154px] bg-white border border-[#5F2EFC] rounded-2xl flex flex-col justify-center items-start p-3 gap-[10px]"
-        style={{
-            boxShadow: '0px 116px 46px rgba(0, 0, 0, 0.01), 0px 65px 39px rgba(0, 0, 0, 0.05), 0px 29px 29px rgba(0, 0, 0, 0.09), 0px 7px 16px rgba(0, 0, 0, 0.1)',
-            zIndex: 50
-        }}
-    >
-        {/* Title */}
-        <span className="text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
-            {title}
-        </span>
+const FilterDropdown = ({ title, showCalendar, showCurrency, onApply }: FilterDropdownProps) => {
+    const [fromValue, setFromValue] = useState('');
+    const [toValue, setToValue] = useState('');
 
-        {/* Input Fields */}
-        <div className="flex flex-col items-start gap-1 w-[161px] h-16">
-            {/* From Field */}
-            <div className="flex items-center gap-[10px] w-[161px] h-[30px]">
-                <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal'] w-[32.91px]">
-                    From
-                </span>
-                <div className="flex-1 h-[30px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-md flex items-center justify-end px-2">
-                    <span className="text-[12px] font-medium text-[#5F5971] leading-[14px] font-['Neue_Montreal']">
-                        {title.includes('Revenue') ? '₦' : (
-                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9.5 1.5H2.5C1.94772 1.5 1.5 1.94772 1.5 2.5V9.5C1.5 10.0523 1.94772 10.5 2.5 10.5H9.5C10.0523 10.5 10.5 10.0523 10.5 9.5V2.5C10.5 1.94772 10.0523 1.5 9.5 1.5Z" stroke="#5F5971" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-                                <path d="M8 0.5V2.5M4 0.5V2.5M1.5 4.5H10.5" stroke="#5F5971" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                        )}
-                    </span>
-                </div>
-            </div>
-
-            {/* To Field */}
-            <div className="flex items-center gap-[10px] w-[161px] h-[30px]">
-                <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal'] w-[32.91px]">
-                    To
-                </span>
-                <div className="flex-1 h-[30px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-md flex items-center justify-end px-2">
-                    <span className="text-[12px] font-medium text-[#5F5971] leading-[14px] font-['Neue_Montreal']">
-                        {title.includes('Revenue') ? '₦' : (
-                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9.5 1.5H2.5C1.94772 1.5 1.5 1.94772 1.5 2.5V9.5C1.5 10.0523 1.94772 10.5 2.5 10.5H9.5C10.0523 10.5 10.5 10.0523 10.5 9.5V2.5C10.5 1.94772 10.0523 1.5 9.5 1.5Z" stroke="#5F5971" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-                                <path d="M8 0.5V2.5M4 0.5V2.5M1.5 4.5H10.5" stroke="#5F5971" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                        )}
-                    </span>
-                </div>
-            </div>
-        </div>
-
-        {/* Apply Button */}
-        <button
-            onClick={onApply}
-            className="w-[161px] h-8 flex items-center justify-center px-6 py-[14px] rounded-[9px]"
+    return (
+        <div
+            className="absolute left-[-0.75px] top-[27px] w-[185px] h-[154px] bg-white border border-[#5F2EFC] rounded-[16px] flex flex-col justify-center items-start p-3 gap-[10px]"
             style={{
-                background: 'linear-gradient(180deg, #5F2EFC 22.58%, #4E18FC 100%)',
-                boxShadow: 'inset 0px 1.5px 1px rgba(255, 255, 255, 0.11)'
+                boxShadow: '0px 116px 46px rgba(0, 0, 0, 0.01), 0px 65px 39px rgba(0, 0, 0, 0.05), 0px 29px 29px rgba(0, 0, 0, 0.09), 0px 7px 16px rgba(0, 0, 0, 0.1)',
+                zIndex: 50
             }}
         >
-            <span
-                className="text-[13.5px] font-medium text-[#FFFCF8] leading-4 font-['Neue_Montreal']"
-                style={{ textShadow: '0px -1px 6px rgba(0, 0, 0, 0.25)' }}
-            >
-                Apply
+            {/* Title */}
+            <span className="text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
+                {title}
             </span>
-        </button>
-    </div>
-);
+
+            {/* Input Fields */}
+            <div className="flex flex-col items-start gap-1 w-[161px] h-16">
+                {/* From Field */}
+                <div className="flex items-center gap-[10px] w-[161px] h-[30px]">
+                    <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal'] w-[32.91px] shrink-0">
+                        From
+                    </span>
+                    <div className="w-[118px] h-[30px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-[6px] flex items-center justify-end px-2 gap-[10px] overflow-hidden">
+                        <input
+                            type={showCalendar ? "date" : "number"}
+                            value={fromValue}
+                            onChange={(e) => setFromValue(e.target.value)}
+                            className="w-full bg-transparent text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal'] outline-none border-none text-right"
+                            placeholder=""
+                        />
+                        {showCurrency && (
+                            <span className="text-[12px] font-medium text-[#5F5971] leading-[14px] font-['Neue_Montreal'] shrink-0">₦</span>
+                        )}
+                    </div>
+                </div>
+
+                {/* To Field */}
+                <div className="flex items-center gap-[10px] w-[161px] h-[30px]">
+                    <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal'] w-[32.91px] shrink-0">
+                        To
+                    </span>
+                    <div className="w-[118px] h-[30px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-[6px] flex items-center justify-end px-2 gap-[10px] overflow-hidden">
+                        <input
+                            type={showCalendar ? "date" : "number"}
+                            value={toValue}
+                            onChange={(e) => setToValue(e.target.value)}
+                            className="w-full bg-transparent text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal'] outline-none border-none text-right"
+                            placeholder=""
+                        />
+                        {showCurrency && (
+                            <span className="text-[12px] font-medium text-[#5F5971] leading-[14px] font-['Neue_Montreal'] shrink-0">₦</span>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Apply Button */}
+            <button
+                onClick={onApply}
+                className="w-[161px] h-8 flex items-center justify-center px-6 py-[14px] rounded-[9px]"
+                style={{
+                    background: 'linear-gradient(180deg, #5F2EFC 22.58%, #4E18FC 100%)',
+                    boxShadow: 'inset 0px 1.5px 1px rgba(255, 255, 255, 0.11)'
+                }}
+            >
+                <span
+                    className="text-[13.5px] font-medium text-[#FFFCF8] leading-4 font-['Neue_Montreal']"
+                    style={{ textShadow: '0px -1px 6px rgba(0, 0, 0, 0.25)' }}
+                >
+                    Apply
+                </span>
+            </button>
+        </div>
+    );
+};
 
 export default function CreatorFilters({
     searchQuery,
@@ -109,12 +120,32 @@ export default function CreatorFilters({
     const [revenueFilterActive, setRevenueFilterActive] = useState(false);
     const [dateJoinedFilterActive, setDateJoinedFilterActive] = useState(false);
 
+    const revenueFilterRef = useRef<HTMLDivElement>(null);
+    const dateJoinedFilterRef = useRef<HTMLDivElement>(null);
+
+    // Close dropdowns when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (revenueFilterRef.current && !revenueFilterRef.current.contains(event.target as Node)) {
+                setRevenueFilterActive(false);
+            }
+            if (dateJoinedFilterRef.current && !dateJoinedFilterRef.current.contains(event.target as Node)) {
+                setDateJoinedFilterActive(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
     return (
         <div className="flex flex-col sm:flex-row gap-[10px] items-center justify-between h-[24px]">
             {/* Left: Filter Pills (Gap 6px) */}
             <div className="flex items-center gap-[6px] relative overflow-visible">
                 {/* Revenue Filter */}
-                <div className="relative overflow-visible">
+                <div className="relative overflow-visible" ref={revenueFilterRef}>
                     <button
                         onClick={() => {
                             setRevenueFilterActive(!revenueFilterActive);
@@ -131,13 +162,14 @@ export default function CreatorFilters({
                     {revenueFilterActive && (
                         <FilterDropdown
                             title="Filter by: Revenue"
+                            showCurrency={true}
                             onApply={() => setRevenueFilterActive(false)}
                         />
                     )}
                 </div>
 
                 {/* Date Joined Filter */}
-                <div className="relative overflow-visible">
+                <div className="relative overflow-visible" ref={dateJoinedFilterRef}>
                     <button
                         onClick={() => {
                             setDateJoinedFilterActive(!dateJoinedFilterActive);
@@ -154,6 +186,7 @@ export default function CreatorFilters({
                     {dateJoinedFilterActive && (
                         <FilterDropdown
                             title="Filter by: Timeline"
+                            showCalendar={true}
                             onApply={() => setDateJoinedFilterActive(false)}
                         />
                     )}

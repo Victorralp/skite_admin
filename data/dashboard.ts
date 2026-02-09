@@ -589,75 +589,278 @@ export type Product = {
   id: string;
   name: string;
   thumbnail: string;
+  image?: string; // Alias for thumbnail for backward compatibility
   price: number;
   sales: number;
   revenue: number;
-  status: 'Active' | 'Draft' | 'Archived';
+  status: 'Active' | 'Draft' | 'Archived' | 'active' | 'rejected' | 'inactive'; // Support both cases
   dateCreated: string;
+  creatorId: string;
+  type?: string; // Product type (eBook, Course, etc.)
+  creator?: { // Creator info for display
+    name: string;
+    username: string;
+  };
 };
 
-export const creatorProducts: Product[] = [
+// Comprehensive Products Data for Products Page
+export const allProducts: Product[] = [
   {
     id: 'PROD-001',
     name: 'Skit Editing Masterclass',
     thumbnail: 'https://images.unsplash.com/photo-1492619375914-88005aa9e8fb?w=100&h=100&fit=crop',
+    image: '/image.png',
     price: 21000,
-    sales: 20,
-    revenue: 420000,
-    status: 'Active',
-    dateCreated: '12.03.2025'
+    sales: 242,
+    revenue: 5082000,
+    status: 'active',
+    dateCreated: '2 min ago',
+    creatorId: 'CR001',
+    type: 'Course',
+    creator: { name: 'Mfonobong Essien', username: '@SkiteMaster' }
   },
   {
     id: 'PROD-002',
-    name: 'WhatsApp Copy Templates',
+    name: 'Digital Marketing Blueprint',
     thumbnail: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=100&h=100&fit=crop',
-    price: 5600,
-    sales: 100,
-    revenue: 560000,
-    status: 'Active',
-    dateCreated: '10.02.2025'
+    image: '/image.png',
+    price: 15600,
+    sales: 189,
+    revenue: 2948400,
+    status: 'active',
+    dateCreated: '3 min ago',
+    creatorId: 'CR002',
+    type: 'eBook',
+    creator: { name: 'Tolulope Adebayo', username: '@apokjie' }
   },
   {
     id: 'PROD-003',
-    name: 'Skit Business eBook',
+    name: 'Fashion Design Fundamentals',
     thumbnail: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=100&h=100&fit=crop',
-    price: 8000,
-    sales: 150,
-    revenue: 1200000,
-    status: 'Draft',
-    dateCreated: '05.01.2025'
+    image: '/image.png',
+    price: 18000,
+    sales: 156,
+    revenue: 2808000,
+    status: 'active',
+    dateCreated: '5 min ago',
+    creatorId: 'CR003',
+    type: 'Course',
+    creator: { name: 'Adesuwa Ighodaro', username: '@fashionista' }
   },
   {
     id: 'PROD-004',
-    name: 'Skit Editing Masterclass',
-    thumbnail: 'https://images.unsplash.com/photo-1492619375914-88005aa9e8fb?w=100&h=100&fit=crop',
-    price: 21000,
-    sales: 50,
-    revenue: 1050000,
-    status: 'Active',
-    dateCreated: '15.12.2024'
+    name: 'Python Programming Course',
+    thumbnail: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=100&h=100&fit=crop',
+    image: '/image.png',
+    price: 25000,
+    sales: 134,
+    revenue: 3350000,
+    status: 'active',
+    dateCreated: '11 min ago',
+    creatorId: 'CR004',
+    type: 'Course',
+    creator: { name: 'Yetunde Bakare', username: '@codequeen' }
   },
   {
     id: 'PROD-005',
-    name: 'WhatsApp Copy Templates',
-    thumbnail: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=100&h=100&fit=crop',
-    price: 5600,
-    sales: 56,
-    revenue: 313600,
-    status: 'Active',
-    dateCreated: '20.11.2024'
+    name: 'Fitness Training Program',
+    thumbnail: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=100&h=100&fit=crop',
+    image: '/image.png',
+    price: 12000,
+    sales: 98,
+    revenue: 1176000,
+    status: 'rejected',
+    dateCreated: '14 min ago',
+    creatorId: 'CR005',
+    type: 'Program',
+    creator: { name: 'Chidi Nwachukwu', username: '@fitlife' }
   },
   {
     id: 'PROD-006',
-    name: 'Skit Business eBook',
-    thumbnail: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=100&h=100&fit=crop',
-    price: 8000,
-    sales: 45,
-    revenue: 360000,
-    status: 'Active',
-    dateCreated: '18.10.2024'
+    name: 'Graphic Design Templates Pack',
+    thumbnail: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=100&h=100&fit=crop',
+    image: '/image.png',
+    price: 8500,
+    sales: 312,
+    revenue: 2652000,
+    status: 'active',
+    dateCreated: '23 min ago',
+    creatorId: 'CR006',
+    type: 'Digital Product',
+    creator: { name: 'Funmilayo Adeleke', username: '@designpro' }
+  },
+  {
+    id: 'PROD-007',
+    name: 'Web Development Bootcamp',
+    thumbnail: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=100&h=100&fit=crop',
+    image: '/image.png',
+    price: 45000,
+    sales: 87,
+    revenue: 3915000,
+    status: 'active',
+    dateCreated: '27 min ago',
+    creatorId: 'CR007',
+    type: 'Course',
+    creator: { name: 'Adebayo Ogunlesi', username: '@webdev' }
+  },
+  {
+    id: 'PROD-008',
+    name: 'Content Writing Masterclass',
+    thumbnail: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=100&h=100&fit=crop',
+    image: '/image.png',
+    price: 16000,
+    sales: 145,
+    revenue: 2320000,
+    status: 'active',
+    dateCreated: '31 min ago',
+    creatorId: 'CR008',
+    type: 'Course',
+    creator: { name: 'Ngozi Okafor', username: '@writer' }
+  },
+  {
+    id: 'PROD-009',
+    name: 'Nigerian Cuisine eBook',
+    thumbnail: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&h=100&fit=crop',
+    image: '/image.png',
+    price: 9500,
+    sales: 223,
+    revenue: 2118500,
+    status: 'active',
+    dateCreated: '35 min ago',
+    creatorId: 'CR009',
+    type: 'eBook',
+    creator: { name: 'Amaka Nwosu', username: '@chef' }
+  },
+  {
+    id: 'PROD-010',
+    name: 'Makeup Artistry Course',
+    thumbnail: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=100&h=100&fit=crop',
+    image: '/image.png',
+    price: 22000,
+    sales: 167,
+    revenue: 3674000,
+    status: 'inactive',
+    dateCreated: '46 min ago',
+    creatorId: 'CR010',
+    type: 'Course',
+    creator: { name: 'Kemi Adetiba', username: '@makeup' }
+  },
+  {
+    id: 'PROD-011',
+    name: 'Photography Basics',
+    thumbnail: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=100&h=100&fit=crop',
+    image: '/image.png',
+    price: 19000,
+    sales: 92,
+    revenue: 1748000,
+    status: 'inactive',
+    dateCreated: '49 min ago',
+    creatorId: 'CR011',
+    type: 'Course',
+    creator: { name: 'Tunde Kelani', username: '@photographer' }
+  },
+  {
+    id: 'PROD-012',
+    name: 'UI/UX Design Principles',
+    thumbnail: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=100&h=100&fit=crop',
+    image: '/image.png',
+    price: 28000,
+    sales: 178,
+    revenue: 4984000,
+    status: 'rejected',
+    dateCreated: '53 min ago',
+    creatorId: 'CR012',
+    type: 'Course',
+    creator: { name: 'Ola Rotimi', username: '@designer' }
+  },
+  {
+    id: 'PROD-013',
+    name: 'Music Production 101',
+    thumbnail: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=100&h=100&fit=crop',
+    image: '/image.png',
+    price: 32000,
+    sales: 124,
+    revenue: 3968000,
+    status: 'active',
+    dateCreated: '58 min ago',
+    creatorId: 'CR013',
+    type: 'Course',
+    creator: { name: 'Seun Kuti', username: '@musicpro' }
+  },
+  {
+    id: 'PROD-014',
+    name: 'Business Strategy Guide',
+    thumbnail: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=100&h=100&fit=crop',
+    image: '/image.png',
+    price: 24000,
+    sales: 201,
+    revenue: 4824000,
+    status: 'active',
+    dateCreated: '1 hr ago',
+    creatorId: 'CR014',
+    type: 'eBook',
+    creator: { name: 'Aliko Dangote Jr', username: '@business' }
+  },
+  {
+    id: 'PROD-015',
+    name: 'Personal Training Certification',
+    thumbnail: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=100&h=100&fit=crop',
+    image: '/image.png',
+    price: 35000,
+    sales: 89,
+    revenue: 3115000,
+    status: 'active',
+    dateCreated: '1 hr ago',
+    creatorId: 'CR015',
+    type: 'Certification',
+    creator: { name: 'Blessing Okagbare', username: '@trainer' }
+  },
+  {
+    id: 'PROD-016',
+    name: 'French Language Course',
+    thumbnail: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=100&h=100&fit=crop',
+    image: '/image.png',
+    price: 18500,
+    sales: 156,
+    revenue: 2886000,
+    status: 'active',
+    dateCreated: '1 hr ago',
+    creatorId: 'CR016',
+    type: 'Course',
+    creator: { name: 'Pierre Nkurunziza', username: '@french' }
+  },
+  {
+    id: 'PROD-017',
+    name: 'Social Media Marketing',
+    thumbnail: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=100&h=100&fit=crop',
+    image: '/image.png',
+    price: 17000,
+    sales: 234,
+    revenue: 3978000,
+    status: 'active',
+    dateCreated: '2 hr ago',
+    creatorId: 'CR017',
+    type: 'Course',
+    creator: { name: 'Linda Ikeji', username: '@socialmedia' }
+  },
+  {
+    id: 'PROD-018',
+    name: 'Digital Illustration Guide',
+    thumbnail: 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=100&h=100&fit=crop',
+    image: '/image.png',
+    price: 14000,
+    sales: 178,
+    revenue: 2492000,
+    status: 'active',
+    dateCreated: '2 hr ago',
+    creatorId: 'CR018',
+    type: 'eBook',
+    creator: { name: 'Laolu Senbanjo', username: '@illustrator' }
   }
 ];
+
+// Legacy export for backward compatibility
+export const creatorProducts: Product[] = allProducts.slice(0, 6);
 
 export type Hub = {
   id: string;
@@ -920,5 +1123,258 @@ export const revenueStats = [
     value: '₦9.2M',
     delta: 'After refunds/fees',
     deltaType: 'neutral' as const
+  }
+];
+
+
+// User Type and Data for Users Page
+export type User = {
+  id: string;
+  name: string;
+  username: string;
+  email: string;
+  avatar: string;
+  joined: string;
+  purchases: number;
+  spent: number;
+  subscriptions: number;
+  lastActive: string;
+  status: 'Active' | 'Inactive' | 'Pending' | 'Suspended';
+};
+
+export const allUsers: User[] = [
+  {
+    id: 'USR-001',
+    name: 'Temilade Odunsi',
+    username: '@temilade_o',
+    email: 'temilade.odunsi@gmail.com',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face',
+    joined: '2 min ago',
+    purchases: 15,
+    spent: 342000,
+    subscriptions: 8,
+    lastActive: '12.03.2025 14:23',
+    status: 'Active'
+  },
+  {
+    id: 'USR-002',
+    name: 'Emeka Onwudiwe',
+    username: '@emeka_tech',
+    email: 'emeka.onwudiwe@gmail.com',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
+    joined: '3 min ago',
+    purchases: 23,
+    spent: 567000,
+    subscriptions: 12,
+    lastActive: '12.03.2025 13:45',
+    status: 'Active'
+  },
+  {
+    id: 'USR-003',
+    name: 'Blessing Okon',
+    username: '@blessing_b',
+    email: 'blessing.okon@gmail.com',
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
+    joined: '5 min ago',
+    purchases: 8,
+    spent: 156000,
+    subscriptions: 4,
+    lastActive: '12.03.2025 12:10',
+    status: 'Active'
+  },
+  {
+    id: 'USR-004',
+    name: 'Yahaya Ibrahim',
+    username: '@yahaya_i',
+    email: 'yahaya.ibrahim@gmail.com',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',
+    joined: '11 min ago',
+    purchases: 19,
+    spent: 423000,
+    subscriptions: 9,
+    lastActive: '12.03.2025 11:30',
+    status: 'Active'
+  },
+  {
+    id: 'USR-005',
+    name: 'Fatima Musa',
+    username: '@fatima_m',
+    email: 'fatima.musa@gmail.com',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face',
+    joined: '14 min ago',
+    purchases: 5,
+    spent: 89000,
+    subscriptions: 2,
+    lastActive: '11.03.2025 18:45',
+    status: 'Inactive'
+  },
+  {
+    id: 'USR-006',
+    name: 'Nnamdi Kalu',
+    username: '@nnamdi_k',
+    email: 'nnamdi.kalu@gmail.com',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
+    joined: '23 min ago',
+    purchases: 31,
+    spent: 789000,
+    subscriptions: 15,
+    lastActive: '12.03.2025 14:00',
+    status: 'Active'
+  },
+  {
+    id: 'USR-007',
+    name: 'Iretiola Osho',
+    username: '@iretiola_o',
+    email: 'iretiola.osho@gmail.com',
+    avatar: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=100&h=100&fit=crop&crop=face',
+    joined: '27 min ago',
+    purchases: 12,
+    spent: 234000,
+    subscriptions: 6,
+    lastActive: '12.03.2025 10:15',
+    status: 'Active'
+  },
+  {
+    id: 'USR-008',
+    name: 'Chidi Nwachukwu',
+    username: '@chidi_fitness',
+    email: 'chidi.nwachukwu@gmail.com',
+    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face',
+    joined: '31 min ago',
+    purchases: 7,
+    spent: 145000,
+    subscriptions: 3,
+    lastActive: '12.03.2025 09:30',
+    status: 'Active'
+  },
+  {
+    id: 'USR-009',
+    name: 'Kayode Ajayi',
+    username: '@kayode_a',
+    email: 'kayode.ajayi@gmail.com',
+    avatar: 'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=100&h=100&fit=crop&crop=face',
+    joined: '35 min ago',
+    purchases: 26,
+    spent: 612000,
+    subscriptions: 11,
+    lastActive: '12.03.2025 08:45',
+    status: 'Active'
+  },
+  {
+    id: 'USR-010',
+    name: 'Tolulope Adebayo',
+    username: '@tolulope_a',
+    email: 'tolulope.adebayo@gmail.com',
+    avatar: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=100&h=100&fit=crop&crop=face',
+    joined: '46 min ago',
+    purchases: 3,
+    spent: 45000,
+    subscriptions: 1,
+    lastActive: '12.03.2025 07:20',
+    status: 'Pending'
+  },
+  {
+    id: 'USR-011',
+    name: 'Ishaya Tanko',
+    username: '@ishaya_t',
+    email: 'ishaya.tanko@gmail.com',
+    avatar: 'https://images.unsplash.com/photo-1463453091185-61582044d556?w=100&h=100&fit=crop&crop=face',
+    joined: '49 min ago',
+    purchases: 2,
+    spent: 28000,
+    subscriptions: 1,
+    lastActive: '11.03.2025 22:10',
+    status: 'Pending'
+  },
+  {
+    id: 'USR-012',
+    name: 'Yetunde Bakare',
+    username: '@yetunde_b',
+    email: 'yetunde.bakare@gmail.com',
+    avatar: 'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=100&h=100&fit=crop&crop=face',
+    joined: '53 min ago',
+    purchases: 4,
+    spent: 67000,
+    subscriptions: 2,
+    lastActive: '10.03.2025 16:30',
+    status: 'Inactive'
+  },
+  {
+    id: 'USR-013',
+    name: 'Adebola Ogunleye',
+    username: '@adebola_o',
+    email: 'adebola.ogunleye@gmail.com',
+    avatar: 'https://images.unsplash.com/photo-1521146764736-56c929d59c83?w=100&h=100&fit=crop&crop=face',
+    joined: '58 min ago',
+    purchases: 18,
+    spent: 456000,
+    subscriptions: 7,
+    lastActive: '12.03.2025 13:20',
+    status: 'Active'
+  },
+  {
+    id: 'USR-014',
+    name: 'Chioma Okeke',
+    username: '@chioma_o',
+    email: 'chioma.okeke@gmail.com',
+    avatar: 'https://images.unsplash.com/photo-1506863530036-1efeddceb993?w=100&h=100&fit=crop&crop=face',
+    joined: '1 hr ago',
+    purchases: 22,
+    spent: 534000,
+    subscriptions: 10,
+    lastActive: '12.03.2025 12:45',
+    status: 'Active'
+  },
+  {
+    id: 'USR-015',
+    name: 'Oluwaseun Bello',
+    username: '@seun_music',
+    email: 'oluwaseun.bello@gmail.com',
+    avatar: 'https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=100&h=100&fit=crop&crop=face',
+    joined: '1 hr ago',
+    purchases: 9,
+    spent: 178000,
+    subscriptions: 4,
+    lastActive: '12.03.2025 11:10',
+    status: 'Active'
+  },
+  {
+    id: 'USR-016',
+    name: 'Ngozi Eze',
+    username: '@ngozi_beauty',
+    email: 'ngozi.eze@gmail.com',
+    avatar: 'https://images.unsplash.com/photo-1491349174775-aaafddd81942?w=100&h=100&fit=crop&crop=face',
+    joined: '1 hr ago',
+    purchases: 14,
+    spent: 312000,
+    subscriptions: 6,
+    lastActive: '12.03.2025 10:30',
+    status: 'Active'
+  },
+  {
+    id: 'USR-017',
+    name: 'Ibrahim Mohammed',
+    username: '@ibrahim_photo',
+    email: 'ibrahim.mohammed@gmail.com',
+    avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=100&h=100&fit=crop&crop=face',
+    joined: '2 hr ago',
+    purchases: 6,
+    spent: 123000,
+    subscriptions: 3,
+    lastActive: '11.03.2025 20:15',
+    status: 'Suspended'
+  },
+  {
+    id: 'USR-018',
+    name: 'Amara Nwosu',
+    username: '@amara_design',
+    email: 'amara.nwosu@gmail.com',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face',
+    joined: '2 hr ago',
+    purchases: 28,
+    spent: 678000,
+    subscriptions: 13,
+    lastActive: '12.03.2025 14:10',
+    status: 'Active'
   }
 ];

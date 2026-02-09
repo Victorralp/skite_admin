@@ -4,7 +4,7 @@ import { Creator } from '@/data/dashboard';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { MoreVertical } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 type CreatorsTableProps = {
     creators: Creator[];
@@ -21,8 +21,22 @@ export default function CreatorsTable({
 }: CreatorsTableProps) {
     const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (openMenuId) {
+                const openMenu = document.getElementById(`menu-container-${openMenuId}`);
+                if (openMenu && openMenu.contains(event.target as Node)) {
+                    return;
+                }
+                setOpenMenuId(null);
+            }
+        };
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, [openMenuId]);
+
     return (
-        <Card className="rounded-lg border border-[#EBEBEB] overflow-hidden flex flex-col h-[676px] w-full max-w-[1102px] shadow-none p-1 gap-1" style={{ backgroundColor: '#F9F9FB' }}>
+        <Card className="rounded-lg border border-[#EBEBEB] flex flex-col w-full shadow-none p-1 gap-1" style={{ backgroundColor: '#F9F9FB' }}>
             {/* Header Row - Outside white container */}
             <div className="flex items-center h-[30px] shrink-0" style={{ padding: '8px 24px', gap: '16px' }}>
                 <div className="w-[201.38px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Creator</div>
@@ -36,9 +50,9 @@ export default function CreatorsTable({
             </div>
 
             {/* White container with border */}
-            <div className="flex flex-col bg-white border border-[#EBEBEB] rounded-lg flex-1 overflow-hidden">
-                {/* Scrollable table area */}
-                <div className="flex-1 overflow-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+            <div className="flex flex-col bg-white border border-[#EBEBEB] rounded-lg">
+                {/* Table area */}
+                <div className="">
                     {creators.length === 0 ? (
                         <div className="flex items-center justify-center py-12 text-muted-foreground">
                             No creators found
@@ -47,8 +61,9 @@ export default function CreatorsTable({
                         creators.map((creator) => (
                             <div
                                 key={creator.id}
-                                className="flex items-center h-[50px] bg-white border-b border-[#EBEBEB] last:border-0 hover:bg-gray-50/50 transition-colors"
+                                className="flex items-center h-[50px] bg-white border-b border-[#EBEBEB] last:border-0 hover:bg-gray-50/50 transition-colors cursor-pointer"
                                 style={{ padding: '10px 24px', gap: '16px' }}
+                                onClick={() => onCreatorClick(creator)}
                             >
                                 <div className="w-[201.38px] flex items-center gap-1.5 relative">
                                     <div className="relative">
@@ -121,9 +136,14 @@ export default function CreatorsTable({
                                 </div>
 
                                 {/* Actions Column */}
-                                <div className="w-[18px] flex items-center justify-center relative" onClick={(e) => e.stopPropagation()}>
+                                <div
+                                    id={`menu-container-${creator.id}`}
+                                    className="w-[18px] flex items-center justify-center relative"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
                                     <button
                                         className="p-0 hover:bg-gray-100 rounded-full transition-colors"
+
                                         onClick={() => setOpenMenuId(openMenuId === creator.id ? null : creator.id)}
                                     >
                                         <MoreVertical className="h-[18px] w-[18px] text-[#5F5971]" />

@@ -6,7 +6,7 @@ import { revenueStats } from '@/data/dashboard';
 
 export default function RevenuePage() {
   return (
-    <div className="flex flex-col items-start p-6 md:px-16 gap-8 w-full min-h-screen bg-white">
+    <div className="w-full min-h-screen bg-white flex flex-col items-start gap-8 box-border px-4 py-6 md:px-12">
       {/* Revenue Stats Section */}
       <div className="flex flex-col items-start gap-2 w-full">
         <h2 className="font-['Neue_Montreal'] font-bold text-xl leading-6 tracking-[-0.01em] text-[#2B2834]">

@@ -74,7 +74,7 @@ export default function SupportCenter() {
       {/* Header and Stats */}
       <div className="flex flex-col gap-2">
         <h1 className="text-[20px] font-bold text-[#2B2834] leading-6 tracking-[-0.01em]">Support Center</h1>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 w-full">
           <div className="flex flex-col items-start bg-white border border-[#EBEBEB] rounded-lg p-4 gap-3">
             <div className="flex flex-col gap-1 w-full">
@@ -112,33 +112,30 @@ export default function SupportCenter() {
         <div className="flex items-center p-[3px] bg-[#F9F9FB] rounded-lg w-[249px] h-[34px] gap-[3px]">
           <button
             onClick={() => setActiveTab('all')}
-            className={`flex flex-col justify-center items-center px-6 h-7 text-xs font-medium leading-[14px] text-center rounded-[5px] transition-all ${
-              activeTab === 'all'
-                ? 'bg-white text-[#17181C] shadow-[0px_0px_3px_rgba(22,0,155,0.35)]'
-                : 'bg-[#F8F7FC] text-[#999999]'
-            }`}
+            className={`flex flex-col justify-center items-center px-6 h-7 text-xs font-medium leading-[14px] text-center rounded-[5px] transition-all ${activeTab === 'all'
+              ? 'bg-white text-[#17181C] shadow-[0px_0px_3px_rgba(22,0,155,0.35)]'
+              : 'bg-[#F8F7FC] text-[#999999]'
+              }`}
             style={{ width: '61px' }}
           >
             All
           </button>
           <button
             onClick={() => setActiveTab('pending')}
-            className={`flex flex-col justify-center items-center px-6 h-7 text-xs font-medium leading-[14px] text-center rounded-[5px] transition-all ${
-              activeTab === 'pending'
-                ? 'bg-white text-[#17181C] shadow-[0px_0px_3px_rgba(22,0,155,0.35)]'
-                : 'bg-[#F8F7FC] text-[#999999]'
-            }`}
+            className={`flex flex-col justify-center items-center px-6 h-7 text-xs font-medium leading-[14px] text-center rounded-[5px] transition-all ${activeTab === 'pending'
+              ? 'bg-white text-[#17181C] shadow-[0px_0px_3px_rgba(22,0,155,0.35)]'
+              : 'bg-[#F8F7FC] text-[#999999]'
+              }`}
             style={{ width: '85px' }}
           >
             Pending
           </button>
           <button
             onClick={() => setActiveTab('closed')}
-            className={`flex flex-col justify-center items-center px-6 h-7 text-xs font-medium leading-[14px] text-center rounded-[5px] transition-all ${
-              activeTab === 'closed'
-                ? 'bg-white text-[#17181C] shadow-[0px_0px_3px_rgba(22,0,155,0.35)]'
-                : 'bg-[#F8F7FC] text-[#999999]'
-            }`}
+            className={`flex flex-col justify-center items-center px-6 h-7 text-xs font-medium leading-[14px] text-center rounded-[5px] transition-all ${activeTab === 'closed'
+              ? 'bg-white text-[#17181C] shadow-[0px_0px_3px_rgba(22,0,155,0.35)]'
+              : 'bg-[#F8F7FC] text-[#999999]'
+              }`}
             style={{ width: '91px' }}
           >
             Closed
@@ -164,9 +161,8 @@ export default function SupportCenter() {
                 <button
                   key={msg.id}
                   onClick={() => setSelectedMessage(msg)}
-                  className={`flex items-center gap-2 p-4 rounded-lg transition-colors h-20 ${
-                    selectedMessage?.id === msg.id ? 'bg-[#F3F0FF]' : 'bg-white hover:bg-gray-50'
-                  }`}
+                  className={`flex items-center gap-2 p-4 rounded-lg transition-colors h-20 ${selectedMessage?.id === msg.id ? 'bg-[#F3F0FF]' : 'bg-white hover:bg-gray-50'
+                    }`}
                 >
                   <div className="w-11 h-11 rounded-full bg-gray-200 flex-shrink-0" />
                   <div className="flex-1 flex flex-col gap-1 min-w-0">
@@ -223,121 +219,121 @@ export default function SupportCenter() {
                   </div>
                 </div>
 
-            {/* Messages */}
-            <div className="flex-1 flex flex-col px-8 pt-8 pb-0 overflow-y-auto">
-              <div className="flex flex-col items-end gap-6">
-                {/* Date Divider */}
-                <div className="flex items-center gap-[21px] w-full">
-                  <div className="flex-1 h-px border-t border-[#E1E1E1]" />
-                  <span className="text-xs font-medium leading-[18px] text-[#4B4B4B]">
-                    March 24, 2026
-                  </span>
-                  <div className="flex-1 h-px border-t border-[#E1E1E1]" />
+                {/* Messages */}
+                <div className="flex-1 flex flex-col px-8 pt-8 pb-0 overflow-y-auto">
+                  <div className="flex flex-col items-end gap-6">
+                    {/* Date Divider */}
+                    <div className="flex items-center gap-[21px] w-full">
+                      <div className="flex-1 h-px border-t border-[#E1E1E1]" />
+                      <span className="text-xs font-medium leading-[18px] text-[#4B4B4B]">
+                        March 24, 2026
+                      </span>
+                      <div className="flex-1 h-px border-t border-[#E1E1E1]" />
+                    </div>
+
+                    {/* Messages Container */}
+                    <div className="flex flex-col items-start gap-6 w-full">
+                      {/* Incoming Message */}
+                      <div className="flex gap-3 items-start">
+                        <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0" />
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium leading-[22px] text-[#1F1F1F]">
+                              {selectedMessage.sender}
+                            </span>
+                            <span className="text-xs font-medium leading-[18px] text-[#8E8E8E]">
+                              2:20pm
+                            </span>
+                          </div>
+                          <div className="px-3.5 py-2.5 bg-white rounded-tr-lg rounded-b-lg">
+                            <p className="text-base leading-[26px] text-[#1F1F1F]">
+                              Hey Olivia, can you please review the latest design when you can?
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Incoming Audio Message */}
+                      <div className="flex gap-3 items-start">
+                        <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0" />
+                        <div className="flex flex-col gap-1.5">
+                          <span className="text-sm font-medium leading-[22px] text-[#1F1F1F]">
+                            {selectedMessage.sender}
+                          </span>
+                          <div className="flex items-center gap-3 px-3.5 py-2 bg-white rounded-tr-lg rounded-b-lg h-12">
+                            <button className="w-8 h-8 rounded-full bg-[#5838FC] flex items-center justify-center flex-shrink-0">
+                              <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-white border-b-[6px] border-b-transparent ml-0.5" />
+                            </button>
+                            <div className="flex items-center gap-1 py-2">
+                              {[2, 8, 14, 4, 16, 14, 10, 10, 10, 14, 10, 16, 10, 4, 2].map((h, i) => (
+                                <div
+                                  key={i}
+                                  className="w-0.5 bg-[#1F1F1F] opacity-66 rounded-full"
+                                  style={{ height: `${h}px` }}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-sm font-medium leading-[22px] text-[#1F1F1F] opacity-66">
+                              0:32
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Outgoing Message */}
+                      <div className="flex justify-end w-full">
+                        <div className="flex flex-col gap-1.5 items-end max-w-[369px]">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium leading-5 text-[#344054]">You</span>
+                            <span className="text-xs leading-[18px] text-[#667085]">2:20pm</span>
+                          </div>
+                          <div className="px-3.5 py-2.5 bg-[#5838FC] rounded-tl-lg rounded-b-lg">
+                            <p className="text-base leading-6 text-white">
+                              Sure thing, I&apos;ll have a look today.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Typing Indicator */}
+                      <div className="flex gap-3 items-start">
+                        <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0" />
+                        <div className="flex flex-col gap-1.5">
+                          <span className="text-sm font-medium leading-[22px] text-[#1F1F1F]">
+                            {selectedMessage.sender}
+                          </span>
+                          <div className="px-2.5 py-2.5 bg-white rounded-tr-lg rounded-b-lg flex items-center gap-1 h-7">
+                            <div className="flex items-end h-2 gap-0">
+                              <div className="w-1 h-1 bg-[#667085] rounded-full" />
+                            </div>
+                            <div className="flex items-start h-2 gap-0">
+                              <div className="w-1 h-1 bg-[#98A2B3] rounded-full" />
+                            </div>
+                            <div className="flex items-end h-2 gap-0">
+                              <div className="w-1 h-1 bg-[#667085] rounded-full" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Messages Container */}
-                <div className="flex flex-col items-start gap-6 w-full">
-                  {/* Incoming Message */}
-                  <div className="flex gap-3 items-start">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0" />
-                    <div className="flex flex-col gap-1.5">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium leading-[22px] text-[#1F1F1F]">
-                          {selectedMessage.sender}
-                        </span>
-                        <span className="text-xs font-medium leading-[18px] text-[#8E8E8E]">
-                          2:20pm
-                        </span>
-                      </div>
-                      <div className="px-3.5 py-2.5 bg-white rounded-tr-lg rounded-b-lg">
-                        <p className="text-base leading-[26px] text-[#1F1F1F]">
-                          Hey Olivia, can you please review the latest design when you can?
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Incoming Audio Message */}
-                  <div className="flex gap-3 items-start">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0" />
-                    <div className="flex flex-col gap-1.5">
-                      <span className="text-sm font-medium leading-[22px] text-[#1F1F1F]">
-                        {selectedMessage.sender}
-                      </span>
-                      <div className="flex items-center gap-3 px-3.5 py-2 bg-white rounded-tr-lg rounded-b-lg h-12">
-                        <button className="w-8 h-8 rounded-full bg-[#5838FC] flex items-center justify-center flex-shrink-0">
-                          <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-white border-b-[6px] border-b-transparent ml-0.5" />
-                        </button>
-                        <div className="flex items-center gap-1 py-2">
-                          {[2, 8, 14, 4, 16, 14, 10, 10, 10, 14, 10, 16, 10, 4, 2].map((h, i) => (
-                            <div
-                              key={i}
-                              className="w-0.5 bg-[#1F1F1F] opacity-66 rounded-full"
-                              style={{ height: `${h}px` }}
-                            />
-                          ))}
-                        </div>
-                        <span className="text-sm font-medium leading-[22px] text-[#1F1F1F] opacity-66">
-                          0:32
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Outgoing Message */}
-                  <div className="flex justify-end w-full">
-                    <div className="flex flex-col gap-1.5 items-end max-w-[369px]">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium leading-5 text-[#344054]">You</span>
-                        <span className="text-xs leading-[18px] text-[#667085]">2:20pm</span>
-                      </div>
-                      <div className="px-3.5 py-2.5 bg-[#5838FC] rounded-tl-lg rounded-b-lg">
-                        <p className="text-base leading-6 text-white">
-                          Sure thing, I'll have a look today.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Typing Indicator */}
-                  <div className="flex gap-3 items-start">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0" />
-                    <div className="flex flex-col gap-1.5">
-                      <span className="text-sm font-medium leading-[22px] text-[#1F1F1F]">
-                        {selectedMessage.sender}
-                      </span>
-                      <div className="px-2.5 py-2.5 bg-white rounded-tr-lg rounded-b-lg flex items-center gap-1 h-7">
-                        <div className="flex items-end h-2 gap-0">
-                          <div className="w-1 h-1 bg-[#667085] rounded-full" />
-                        </div>
-                        <div className="flex items-start h-2 gap-0">
-                          <div className="w-1 h-1 bg-[#98A2B3] rounded-full" />
-                        </div>
-                        <div className="flex items-end h-2 gap-0">
-                          <div className="w-1 h-1 bg-[#667085] rounded-full" />
-                        </div>
-                      </div>
-                    </div>
+                {/* Message Input */}
+                <div className="p-2 pb-2">
+                  <div className="flex items-center justify-between gap-2 px-3 py-3 bg-white border border-[#E8E8E8] rounded-lg">
+                    <input
+                      type="text"
+                      value={messageInput}
+                      onChange={(e) => setMessageInput(e.target.value)}
+                      placeholder="Type a message..."
+                      className="flex-1 text-base text-[#141414] outline-none"
+                    />
+                    <button className="w-8 h-8 flex items-center justify-center bg-[#5838FC] rounded-full hover:bg-[#4729d4] transition-colors">
+                      <Send className="w-4 h-4 text-white" />
+                    </button>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            {/* Message Input */}
-            <div className="p-2 pb-2">
-              <div className="flex items-center justify-between gap-2 px-3 py-3 bg-white border border-[#E8E8E8] rounded-lg">
-                <input
-                  type="text"
-                  value={messageInput}
-                  onChange={(e) => setMessageInput(e.target.value)}
-                  placeholder="Type a message..."
-                  className="flex-1 text-base text-[#141414] outline-none"
-                />
-                <button className="w-8 h-8 flex items-center justify-center bg-[#5838FC] rounded-full hover:bg-[#4729d4] transition-colors">
-                  <Send className="w-4 h-4 text-white" />
-                </button>
-              </div>
-            </div>
               </>
             )}
           </div>

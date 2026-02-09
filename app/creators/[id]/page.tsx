@@ -226,7 +226,7 @@ export default function CreatorDetailsPage({ params }: { params: any }) {
                     <div className="flex items-center gap-[6px] h-[28px]">
                         <div className="flex flex-row justify-center items-center py-[6px] px-[10px] gap-[4px] w-[84px] h-[28px] bg-[#F9F9FB] rounded-full flex-none">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-none">
-                                <path fillRule="evenodd" clipRule="evenodd" d="M6.39515 2.13339C6.28993 2.22783 6.17977 2.31662 6.06515 2.39939C5.86648 2.53273 5.64315 2.62473 5.40848 2.67139C5.30648 2.69139 5.19982 2.70006 4.98715 2.71673C4.45315 2.75939 4.18582 2.78073 3.96315 2.85939C3.70848 2.94916 3.47717 3.09487 3.28623 3.28581C3.09529 3.47674 2.94958 3.70806 2.85982 3.96273C2.78115 4.18539 2.75982 4.45273 2.71715 4.98673C2.7095 5.12787 2.69436 5.26852 2.67182 5.40806C2.62515 5.64273 2.53315 5.86606 2.39982 6.06473C2.34182 6.15139 2.27248 6.23273 2.13382 6.39473C1.78648 6.80273 1.61248 7.00673 1.51048 7.22006C1.27515 7.71339 1.27515 8.28673 1.51048 8.78006C1.61248 8.99339 1.78648 9.19739 2.13382 9.60539C2.27248 9.76739 2.34182 9.84873 2.39982 9.93539C2.53315 10.1341 2.62515 10.3574 2.67182 10.5921C2.69182 10.6941 2.70048 10.8007 2.71715 11.0134C2.75982 11.5474 2.78115 11.8147 2.85982 12.0374C2.94958 12.2921 3.09529 12.5234 3.28623 12.7143C3.47717 12.9053 3.70848 13.051 3.96315 13.1407C4.18582 13.2194 4.45315 13.2407 4.98715 13.2834C5.19982 13.3001 5.30648 13.3087 5.40848 13.3287C5.64315 13.3754 5.86648 13.4681 6.06515 13.6007C6.15182 13.6587 6.23315 13.7281 6.39515 13.8667C6.80315 14.2141 7.00715 14.3881 7.22048 14.4901C7.71382 14.7254 8.28715 14.7254 8.78048 14.4901C8.99382 14.3881 9.19782 14.2141 9.60582 13.8667C9.76782 13.7281 9.84915 13.6587 9.93582 13.6007C10.1345 13.4674 10.3578 13.3754 10.5925 13.3287C10.6945 13.3087 10.8012 13.3001 11.0138 13.2834C11.5478 13.2407 11.8152 13.2194 12.0378 13.1407C12.2925 13.051 12.5238 12.9053 12.7147 12.7143C12.9057 12.5234 13.0514 12.2921 13.1412 12.0374C13.2198 11.8147 13.2412 11.5474 13.2838 11.0134C13.3005 10.8007 13.3092 10.6941 13.3292 10.5921C13.3758 10.3574 13.4685 10.1341 13.6012 9.93539C13.6592 9.84873 13.7285 9.76739 13.8672 9.60539C14.2145 9.19739 14.3885 8.99339 14.4905 8.78006C14.7258 8.28673 14.7258 7.71339 14.4905 7.22006C14.3885 7.00673 14.2145 6.80273 13.8672 6.39473C13.7727 6.28951 13.6839 6.17935 13.6012 6.06473C13.4677 5.86609 13.3753 5.64285 13.3292 5.40806C13.3066 5.26852 13.2915 5.12787 13.2838 4.98673C13.2412 4.45273 13.2198 4.18539 13.1412 3.96273C13.0514 3.70806 12.9057 3.47674 12.7147 3.28581C12.5238 3.09487 12.2925 2.94916 12.0378 2.85939C11.8152 2.78073 11.5478 2.75939 11.0138 2.71673C10.8727 2.70907 10.732 2.69394 10.5925 2.67139C10.3577 2.62527 10.1345 2.5328 9.93582 2.39939C9.82119 2.31662 9.71104 2.22783 9.60582 2.13339C9.19782 1.78606 8.99382 1.61206 8.78048 1.51006C8.53698 1.39351 8.27045 1.33301 8.00048 1.33301C7.73052 1.33301 7.46399 1.39351 7.22048 1.51006C7.00715 1.61206 6.80315 1.78606 6.39515 2.13339ZM10.9158 6.57539C11.01 6.47227 11.0609 6.33678 11.0577 6.19712C11.0546 6.05747 10.9977 5.92441 10.8989 5.82563C10.8001 5.72686 10.6671 5.66997 10.5274 5.66683C10.3878 5.66368 10.2523 5.7145 10.1492 5.80873L6.91582 9.04206L5.85182 7.97873C5.74869 7.8845 5.6132 7.83368 5.47355 7.83683C5.33389 7.83997 5.20083 7.89686 5.10206 7.99563C5.00328 8.09441 4.9464 8.22747 4.94325 8.36712C4.9401 8.50678 4.99093 8.64227 5.08515 8.74539L6.53182 10.1921C6.63356 10.2936 6.77142 10.3506 6.91515 10.3506C7.05888 10.3506 7.19675 10.2936 7.29848 10.1921L10.9158 6.57539Z" fill="#5F2EFC"/>
+                                <path fillRule="evenodd" clipRule="evenodd" d="M6.39515 2.13339C6.28993 2.22783 6.17977 2.31662 6.06515 2.39939C5.86648 2.53273 5.64315 2.62473 5.40848 2.67139C5.30648 2.69139 5.19982 2.70006 4.98715 2.71673C4.45315 2.75939 4.18582 2.78073 3.96315 2.85939C3.70848 2.94916 3.47717 3.09487 3.28623 3.28581C3.09529 3.47674 2.94958 3.70806 2.85982 3.96273C2.78115 4.18539 2.75982 4.45273 2.71715 4.98673C2.7095 5.12787 2.69436 5.26852 2.67182 5.40806C2.62515 5.64273 2.53315 5.86606 2.39982 6.06473C2.34182 6.15139 2.27248 6.23273 2.13382 6.39473C1.78648 6.80273 1.61248 7.00673 1.51048 7.22006C1.27515 7.71339 1.27515 8.28673 1.51048 8.78006C1.61248 8.99339 1.78648 9.19739 2.13382 9.60539C2.27248 9.76739 2.34182 9.84873 2.39982 9.93539C2.53315 10.1341 2.62515 10.3574 2.67182 10.5921C2.69182 10.6941 2.70048 10.8007 2.71715 11.0134C2.75982 11.5474 2.78115 11.8147 2.85982 12.0374C2.94958 12.2921 3.09529 12.5234 3.28623 12.7143C3.47717 12.9053 3.70848 13.051 3.96315 13.1407C4.18582 13.2194 4.45315 13.2407 4.98715 13.2834C5.19982 13.3001 5.30648 13.3087 5.40848 13.3287C5.64315 13.3754 5.86648 13.4681 6.06515 13.6007C6.15182 13.6587 6.23315 13.7281 6.39515 13.8667C6.80315 14.2141 7.00715 14.3881 7.22048 14.4901C7.71382 14.7254 8.28715 14.7254 8.78048 14.4901C8.99382 14.3881 9.19782 14.2141 9.60582 13.8667C9.76782 13.7281 9.84915 13.6587 9.93582 13.6007C10.1345 13.4674 10.3578 13.3754 10.5925 13.3287C10.6945 13.3087 10.8012 13.3001 11.0138 13.2834C11.5478 13.2407 11.8152 13.2194 12.0378 13.1407C12.2925 13.051 12.5238 12.9053 12.7147 12.7143C12.9057 12.5234 13.0514 12.2921 13.1412 12.0374C13.2198 11.8147 13.2412 11.5474 13.2838 11.0134C13.3005 10.8007 13.3092 10.6941 13.3292 10.5921C13.3758 10.3574 13.4685 10.1341 13.6012 9.93539C13.6592 9.84873 13.7285 9.76739 13.8672 9.60539C14.2145 9.19739 14.3885 8.99339 14.4905 8.78006C14.7258 8.28673 14.7258 7.71339 14.4905 7.22006C14.3885 7.00673 14.2145 6.80273 13.8672 6.39473C13.7727 6.28951 13.6839 6.17935 13.6012 6.06473C13.4677 5.86609 13.3753 5.64285 13.3292 5.40806C13.3066 5.26852 13.2915 5.12787 13.2838 4.98673C13.2412 4.45273 13.2198 4.18539 13.1412 3.96273C13.0514 3.70806 12.9057 3.47674 12.7147 3.28581C12.5238 3.09487 12.2925 2.94916 12.0378 2.85939C11.8152 2.78073 11.5478 2.75939 11.0138 2.71673C10.8727 2.70907 10.732 2.69394 10.5925 2.67139C10.3577 2.62527 10.1345 2.5328 9.93582 2.39939C9.82119 2.31662 9.71104 2.22783 9.60582 2.13339C9.19782 1.78606 8.99382 1.61206 8.78048 1.51006C8.53698 1.39351 8.27045 1.33301 8.00048 1.33301C7.73052 1.33301 7.46399 1.39351 7.22048 1.51006C7.00715 1.61206 6.80315 1.78606 6.39515 2.13339ZM10.9158 6.57539C11.01 6.47227 11.0609 6.33678 11.0577 6.19712C11.0546 6.05747 10.9977 5.92441 10.8989 5.82563C10.8001 5.72686 10.6671 5.66997 10.5274 5.66683C10.3878 5.66368 10.2523 5.7145 10.1492 5.80873L6.91582 9.04206L5.85182 7.97873C5.74869 7.8845 5.6132 7.83368 5.47355 7.83683C5.33389 7.83997 5.20083 7.89686 5.10206 7.99563C5.00328 8.09441 4.9464 8.22747 4.94325 8.36712C4.9401 8.50678 4.99093 8.64227 5.08515 8.74539L6.53182 10.1921C6.63356 10.2936 6.77142 10.3506 6.91515 10.3506C7.05888 10.3506 7.19675 10.2936 7.29848 10.1921L10.9158 6.57539Z" fill="#5F2EFC" />
                             </svg>
                             <span className="w-[44px] h-[16px] font-['Neue_Montreal'] font-normal text-[13.5px] leading-[16px] text-[#2B2834] flex-none whitespace-nowrap">Verified</span>
                         </div>
@@ -247,7 +247,7 @@ export default function CreatorDetailsPage({ params }: { params: any }) {
 
 
                 {/* Stats Row */}
-                <div className="box-border flex flex-row items-start p-[16px] w-full max-w-[1102px] h-[68px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-[8px] flex-none z-[2] mt-[12px]">
+                <div className="box-border flex flex-row items-start p-[16px] w-full h-[68px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-[8px] flex-none z-[2] mt-[12px]">
                     <StatItem label="Revenue" value={creator.revenue} />
                     <div className="w-0 h-[36px] border border-[#EBEBEB] self-stretch flex-none" />
                     <StatItem label="Transactions" value={creator.salesCount.toLocaleString()} />
@@ -261,9 +261,9 @@ export default function CreatorDetailsPage({ params }: { params: any }) {
             </div>
 
             {/* Tabs & Content Wrapper */}
-            <div className="flex flex-col w-full max-w-[1102px] items-center">
+            <div className="flex flex-col w-full items-center">
                 {/* Tabs */}
-                <div className="flex flex-row items-center p-0 w-[1102px] h-[38px] mt-[12px]">
+                <div className="flex flex-row items-center p-0 w-full h-[38px] mt-[12px]">
                     {['Overview', 'Products', 'Hubs', 'Classes', 'Transactions', 'Compliance'].map((tab) => (
                         <TabButton
                             key={tab}
@@ -276,48 +276,48 @@ export default function CreatorDetailsPage({ params }: { params: any }) {
 
                 {/* Main Content - Overview Tab */}
                 {activeTab === 'Overview' && (
-                    <div className="flex flex-col w-[1102px] bg-[#F9F9FB] rounded-b-[36px] p-6 gap-6">
+                    <div className="flex flex-col w-full bg-[#F9F9FB] rounded-b-[36px] p-6 gap-6">
 
                         {/* Row 1: Revenue & Users Pie Chart */}
                         <div className="flex flex-col lg:flex-row items-stretch gap-[16px] h-[309px]">
                             {/* Revenue Chart Section */}
-                            <div className="flex flex-col gap-[8px] w-full lg:w-[683px]">
+                            <div className="flex flex-col gap-[8px] w-full lg:flex-1">
                                 <div className="flex items-center gap-[10px] h-[30px] w-full">
-                                    <h3 className="w-[595px] h-[19px] font-['Neue_Montreal'] font-medium text-[16px] leading-[19px] text-[#2B2834] flex-none order-0 grow">Revenue</h3>
+                                    <h3 className="h-[19px] font-['Neue_Montreal'] font-medium text-[16px] leading-[19px] text-[#2B2834] flex-1 order-0">Revenue</h3>
                                     <CustomDropdown options={['All Time', 'This Year', 'This Month']} defaultLabel="All Time" width="78px" menuWidth="100px" />
                                 </div>
-                                <div 
+                                <div
                                     className="box-border flex flex-col items-start"
                                     style={{
                                         padding: '16px',
                                         gap: '4px',
-                                        width: '683px',
+                                        width: '100%',
                                         height: '271px',
                                         background: '#FFFFFF',
                                         border: '1px solid #EBEBEB',
                                         borderRadius: '12px'
                                     }}
                                 >
-                                    <div 
+                                    <div
                                         className="flex flex-col items-start"
                                         style={{
                                             padding: '0px',
                                             gap: '4px',
-                                            width: '651px',
+                                            width: '100%',
                                             height: '239px'
                                         }}
                                     >
-                                        <div 
+                                        <div
                                             className="flex flex-row items-start"
                                             style={{
                                                 padding: '0px',
                                                 gap: '16px',
-                                                width: '651px',
+                                                width: '100%',
                                                 height: '221px'
                                             }}
                                         >
                                             {/* Y-Axis Labels */}
-                                            <div 
+                                            <div
                                                 className="flex flex-col justify-between items-end"
                                                 style={{
                                                     padding: '0px',
@@ -362,7 +362,7 @@ export default function CreatorDetailsPage({ params }: { params: any }) {
                                             </div>
 
                                             {/* Chart Area */}
-                                            <div style={{ width: '611px', height: '221px', position: 'relative' }}>
+                                            <div style={{ width: '100%', height: '221px', position: 'relative' }}>
                                                 <ResponsiveContainer width="100%" height="100%">
                                                     <AreaChart data={revenueData}>
                                                         <defs>
@@ -371,13 +371,13 @@ export default function CreatorDetailsPage({ params }: { params: any }) {
                                                                 <stop offset="100%" stopColor="rgba(71, 166, 99, 0)" />
                                                             </linearGradient>
                                                         </defs>
-                                                        <CartesianGrid 
-                                                            strokeDasharray="1 1" 
-                                                            vertical={false} 
-                                                            stroke="#D9D9D9" 
+                                                        <CartesianGrid
+                                                            strokeDasharray="1 1"
+                                                            vertical={false}
+                                                            stroke="#D9D9D9"
                                                             opacity={0.1}
                                                         />
-                                                        <XAxis 
+                                                        <XAxis
                                                             dataKey="day"
                                                             axisLine={false}
                                                             tickLine={false}
@@ -402,12 +402,12 @@ export default function CreatorDetailsPage({ params }: { params: any }) {
                                         </div>
 
                                         {/* X-Axis Labels */}
-                                        <div 
+                                        <div
                                             className="flex flex-row justify-between items-start"
                                             style={{
                                                 padding: '0px 0px 0px 40px',
                                                 gap: '16px',
-                                                width: '651px',
+                                                width: '100%',
                                                 height: '14px'
                                             }}
                                         >
@@ -462,12 +462,12 @@ export default function CreatorDetailsPage({ params }: { params: any }) {
                         </div>
 
                         {/* Row 2: Live Session & Personal Info */}
-                        <div 
+                        <div
                             className="flex flex-row items-start"
                             style={{
                                 padding: '0px',
                                 gap: '24px',
-                                width: '1054px',
+                                width: '100%',
                                 height: '247px'
                             }}
                         >
@@ -492,7 +492,7 @@ export default function CreatorDetailsPage({ params }: { params: any }) {
                         </div>
 
                         {/* Row 3: Reviews Section */}
-                        <div className="w-full max-w-[1054px]">
+                        <div className="w-full">
                             <ReviewsList />
                         </div>
                     </div>
@@ -501,31 +501,31 @@ export default function CreatorDetailsPage({ params }: { params: any }) {
 
                 {/* Main Content - Products Tab */}
                 {activeTab === 'Products' && (
-                    <div className="w-[1102px]">
+                    <div className="w-full">
                         <ProductsTab />
                     </div>
                 )}
                 {/* Main Content - Hubs Tab */}
                 {activeTab === 'Hubs' && (
-                    <div className="w-[1102px]">
+                    <div className="w-full">
                         <HubsTab />
                     </div>
                 )}
                 {/* Main Content - Classes Tab */}
                 {activeTab === 'Classes' && (
-                    <div className="w-[1102px]">
+                    <div className="w-full">
                         <ClassesTab />
                     </div>
                 )}
                 {/* Main Content - Transactions Tab */}
                 {activeTab === 'Transactions' && (
-                    <div className="w-[1102px]">
+                    <div className="w-full">
                         <TransactionsTab />
                     </div>
                 )}
                 {/* Main Content - Compliance Tab */}
                 {activeTab === 'Compliance' && (
-                    <div className="w-[1102px]">
+                    <div className="w-full">
                         <ComplianceTab />
                     </div>
                 )}

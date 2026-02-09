@@ -209,7 +209,14 @@ export default function Sidebar({ className }: SidebarProps) {
       )}>
         {/* User Info */}
         <div className="flex flex-col gap-3 items-center w-full">
-          <Link href="/profile" className={cn("flex items-center gap-2.5 h-[30px] w-full no-underline cursor-pointer", isCollapsed ? "justify-center" : "justify-start")}>
+          {/* Clickable User Profile Section */}
+          <Link
+            href="/profile"
+            className={cn(
+              "flex items-center gap-2.5 h-[30px] w-full no-underline cursor-pointer hover:opacity-80 transition-opacity",
+              isCollapsed ? "justify-center" : "justify-start"
+            )}
+          >
             <div className="w-7 h-7 rounded-full bg-[#eee] overflow-hidden shrink-0">
               <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face" alt="User" />
             </div>
@@ -222,7 +229,7 @@ export default function Sidebar({ className }: SidebarProps) {
           </Link>
 
           {/* Logout Button */}
-          <button className="w-full h-8 p-0 bg-surface rounded-lg flex items-center justify-center gap-2 border-none cursor-pointer">
+          <button className="w-full h-8 p-0 bg-surface rounded-lg flex items-center justify-center gap-2 border-none cursor-pointer hover:bg-danger-bg transition-colors">
             <LogOut size={16} className="text-danger-text" />
             {!isCollapsed && (
               <span className="font-sans font-normal text-[12.5px] text-text-main">Log Out</span>

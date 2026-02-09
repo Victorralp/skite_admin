@@ -100,7 +100,7 @@ export default function RevenueOverview() {
                       borderRadius: '8px',
                       boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                     }}
-                    formatter={(value: number) => [formatCurrency(value), 'Revenue']}
+                    formatter={(value: number | undefined) => [formatCurrency(value || 0), 'Revenue']}
                     labelFormatter={(label) => `Day ${label}`}
                   />
                   <Area
@@ -217,7 +217,7 @@ export default function RevenueOverview() {
                           borderRadius: '8px',
                           boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                         }}
-                        formatter={(value: number) => [`${value}%`, '']}
+                        formatter={(value: number | undefined) => [`${value || 0}%`, '']}
                       />
                     </PieChart>
                   </ResponsiveContainer>

@@ -9,7 +9,7 @@ export default function PageContainer({ children, className, ...props }: PageCon
     return (
         <div
             className={cn(
-                "w-full max-w-[1150px] mx-auto box-border px-6 py-8 flex flex-col gap-8 transition-all duration-300 ease-in-out",
+                "w-full min-h-screen bg-white mx-auto box-border px-4 py-6 md:px-12 flex flex-col gap-8 transition-all duration-300 ease-in-out",
                 className
             )}
             {...props}
