@@ -1,18 +1,19 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { allCreators, Creator } from '@/data/dashboard';
-import Sidebar from '@/components/Sidebar';
 import CreatorFilters from '@/components/CreatorFilters';
 import CreatorsTable from '@/components/CreatorsTable';
-import CreatorDetailModal from '@/components/CreatorDetailModal';
-import { SearchBar } from '@/components/ui/SearchBar';
+import StatsCard from '@/components/StatsCard';
+import PageContainer from '@/components/layout/PageContainer';
 
 export default function CreatorsPage() {
+    const router = useRouter();
     const [searchQuery, setSearchQuery] = useState('');
-    const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'suspended'>('all');
-    const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'suspended' | 'banned'>('all');
+    // const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null); // Removed modal state
+    // const [isModalOpen, setIsModalOpen] = useState(false); // Removed modal state
 
     // Filter creators based on search and status
     const filteredCreators = useMemo(() => {
@@ -20,6 +21,7 @@ export default function CreatorsPage() {
             // Status filter
             if (statusFilter === 'active' && creator.status !== 'Active') return false;
             if (statusFilter === 'suspended' && creator.status !== 'Suspended') return false;
+            if (statusFilter === 'banned' && creator.status !== 'Banned') return false;
 
             // Search filter
             if (searchQuery) {
@@ -36,136 +38,101 @@ export default function CreatorsPage() {
     }, [searchQuery, statusFilter]);
 
     const handleCreatorClick = (creator: Creator) => {
-        setSelectedCreator(creator);
-        setIsModalOpen(true);
+        router.push(`/creators/${creator.id}`);
     };
 
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-        setTimeout(() => setSelectedCreator(null), 300);
-    };
+    // const handleCloseModal = () => { ... } // Removed modal handler
 
     const handleAction = (action: 'view' | 'message' | 'suspend', creatorId: string) => {
         const creator = allCreators.find((c) => c.id === creatorId);
 
         if (action === 'view' && creator) {
-            setSelectedCreator(creator);
-            setIsModalOpen(true);
+            router.push(`/creators/${creator.id}`);
         } else if (action === 'message') {
-            // TODO: Implement message functionality
             console.log('Send message to creator:', creatorId);
         } else if (action === 'suspend') {
-            // TODO: Implement suspend/unsuspend functionality
             console.log('Toggle suspend for creator:', creatorId);
         }
     };
 
-    const handleSendMessage = (creatorId: string) => {
-        // TODO: Implement send message functionality
-        console.log('Send message to:', creatorId);
-        setIsModalOpen(false);
-    };
 
-    const handleSuspend = (creatorId: string) => {
-        // TODO: Implement suspend functionality
-        console.log('Toggle suspend for:', creatorId);
-        setIsModalOpen(false);
-    };
 
     const handleAddCreator = () => {
-        // TODO: Implement add creator functionality
         console.log('Add new creator');
     };
 
     return (
-        <div className="min-h-screen flex bg-white font-['Neue_Montreal']">
-            <Sidebar activePage="creators" />
+        <>
+            <PageContainer>
+                {/* Header */}
+                <div className="flex flex-col gap-2">
+                    <h1 className="text-[20px] font-bold text-[#2B2834] leading-[100%] tracking-[-0.01em] font-['Neue_Montreal']">Creators</h1>
 
-            {/* Main scrolling container - Matches app/page.tsx */}
-            <main className="flex-1 overflow-y-auto overflow-x-hidden bg-white" style={{ padding: 0 }}>
-                {/* Content Centering Wrapper - Fluid width */}
-                <div style={{ width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column' }}>
-
-                    {/* Header Row: Search (Consistent with Dashboard) */}
-                    <div style={{
-                        width: '100%',
-                        height: '62px',
-                        backgroundColor: '#FFFFFF',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'flex-end', // Align search to right if needed, or keep same
-                        padding: '16px 48px',
-                        boxSizing: 'border-box',
-                        position: 'sticky',
-                        top: 0,
-                        zIndex: 10
-                    }}>
-                        {/* We can reuse the SearchBar here if it's "Global", or keep specific page header things */}
-                        {/* For now, sticking to the Dashboard header look but maybe without the search bar if it's redundant with the page filter? 
-                            Dashboard has "Search users, products, docs". Creators page has "Search creators...".
-                            User might expect the global header. Let's add a placeholder or the same SearchBar component.
-                        */}
-                        <div style={{ width: '400px' }}>
-                            <SearchBar placeholder="Search users, products, docs" />
-                        </div>
-                    </div>
-
-                    {/* Main Content Area */}
-                    <div style={{
-                        width: '100%',
-                        minHeight: '100vh',
-                        backgroundColor: '#FFFFFF',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'flex-start',
-                        padding: '24px 48px',
-                        gap: '32px',
-                        boxSizing: 'border-box'
-                    }}>
-                        {/* Page Header */}
-                        <div className="mb-2 w-full">
-                            <h1 className="text-2xl font-bold text-gray-900">Creators</h1>
-                            <p className="text-sm text-muted-foreground mt-1">
-                                Manage and monitor all creators on the platform
-                            </p>
-                        </div>
-
-                        {/* Filters */}
-                        <div className="w-full">
-                            <CreatorFilters
-                                searchQuery={searchQuery}
-                                setSearchQuery={setSearchQuery}
-                                statusFilter={statusFilter}
-                                setStatusFilter={setStatusFilter}
-                                onAddCreator={handleAddCreator}
-                            />
-                        </div>
-
-                        {/* Results Count */}
-                        <div className="text-sm text-muted-foreground">
-                            Showing {filteredCreators.length} of {allCreators.length} creators
-                        </div>
-
-                        {/* Table */}
-                        <div className="w-full">
-                            <CreatorsTable
-                                creators={filteredCreators}
-                                onCreatorClick={handleCreatorClick}
-                                onAction={handleAction}
-                            />
-                        </div>
+                    {/* Stats Cards Row */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 w-full">
+                        <StatsCard
+                            title="Total Creators"
+                            value="3,819"
+                            trend="+12.3% from last month"
+                            trendDirection="up"
+                        />
+                        <StatsCard
+                            title="Active Creators"
+                            value="3,281"
+                            trend="+12.3% from yesterday"
+                            trendDirection="up"
+                        />
+                        <StatsCard
+                            title="Pending Verification"
+                            value="21"
+                            trend="+2 today"
+                            trendDirection="neutral"
+                        />
+                        <StatsCard
+                            title="Flagged Creators"
+                            value="2"
+                            trend="+0 today"
+                            trendDirection="down"
+                        />
                     </div>
                 </div>
-            </main>
 
-            {/* Detail Modal */}
-            <CreatorDetailModal
-                creator={selectedCreator}
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}
-                onSendMessage={handleSendMessage}
-                onSuspend={handleSuspend}
-            />
-        </div>
+                {/* Filters and Table Section */}
+                <div className="flex flex-col gap-2">
+                    <CreatorFilters
+                        searchQuery={searchQuery}
+                        setSearchQuery={setSearchQuery}
+                        statusFilter={statusFilter}
+                        setStatusFilter={setStatusFilter}
+                        onAddCreator={handleAddCreator}
+                    />
+
+                    <CreatorsTable
+                        creators={filteredCreators}
+                        onCreatorClick={handleCreatorClick}
+                        onAction={(action, creatorId) => {
+                            const creator = filteredCreators.find(c => c.id === creatorId);
+                            if (!creator) return;
+
+                            switch (action) {
+                                case 'view':
+                                    handleCreatorClick(creator);
+                                    break;
+                                case 'message':
+                                    console.log('Send message to:', creator.name);
+                                    // TODO: Implement message functionality
+                                    break;
+                                case 'suspend':
+                                    console.log('Suspend user:', creator.name);
+                                    // TODO: Implement suspend functionality
+                                    break;
+                            }
+                        }}
+                    />
+                </div>
+            </PageContainer>
+
+            {/* Detail Modal Removed */}
+        </>
     );
 }

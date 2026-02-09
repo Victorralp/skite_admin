@@ -48,18 +48,19 @@ export default function CustomDropdown({
                     textAlign: 'left'
                 }}>{defaultLabel}</span>
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fillRule="evenodd" clipRule="evenodd" d="M5.83337 7.5L10 11.6667L14.1667 7.5H5.83337Z" fill="#5F5971" />
+                    <path fillRule="evenodd" clipRule="evenodd" d="M5.83337 7.5L10 11.6667L14.1667 7.5H5.83337Z" fill="#DBD8E4" />
                 </svg>
             </button>
 
             {/* Dropdown Menu */}
-            <div className="hidden group-hover:flex absolute right-0 top-[34px] z-50 rounded-[8px] flex-col overflow-hidden bg-white"
+            <div className="hidden group-hover:flex absolute right-0 top-[34px] z-50 flex-col overflow-hidden bg-white"
                 style={{
                     width: menuWidth,
                     height: calculatedHeight,
                     border: '1px solid #EBEBEB',
                     boxShadow: '0px 116px 46px rgba(0, 0, 0, 0.01), 0px 65px 39px rgba(0, 0, 0, 0.05), 0px 29px 29px rgba(0, 0, 0, 0.09), 0px 7px 16px rgba(0, 0, 0, 0.1)',
-                    padding: '0px'
+                    padding: '0px',
+                    borderRadius: '8px'
                 }}
             >
                 {options.map((item, i) => (

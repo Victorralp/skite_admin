@@ -102,7 +102,7 @@ export default function ChartsRow() {
                     data={pieData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={0}
+                    innerRadius={10}
                     outerRadius={90}
                     paddingAngle={0}
                     dataKey="value"

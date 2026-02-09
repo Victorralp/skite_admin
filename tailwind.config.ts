@@ -83,7 +83,7 @@ const config: Config = {
 				}
 			},
 			fontFamily: {
-				sans: ['"Neue Montreal"', 'sans-serif'],
+				sans: ['"Neue Montreal"'],
 			},
 			boxShadow: {
 				card: '0 8px 24px rgba(17, 16, 35, 0.08)',

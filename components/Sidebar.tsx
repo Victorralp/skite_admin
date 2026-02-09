@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   User,
@@ -115,18 +116,20 @@ const FileTextIcon = ({ size = 18 }: { size?: number }) => (
 );
 
 const SettingsIcon = ({ size = 18 }: { size?: number }) => (
-  <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M9.14489 0.864C8.86964 0.75 8.52014 0.75 7.82114 0.75C7.12214 0.75 6.77264 0.75 6.49739 0.864C6.31527 0.939385 6.1498 1.04992 6.01043 1.18929C5.87106 1.32866 5.76052 1.49414 5.68514 1.67625C5.61614 1.8435 5.58839 2.03925 5.57789 2.3235C5.57301 2.52895 5.51609 2.7298 5.41247 2.90727C5.30885 3.08473 5.16191 3.23302 4.98539 3.33825C4.80599 3.43858 4.60408 3.49175 4.39854 3.4928C4.193 3.49385 3.99055 3.44274 3.81014 3.34425C3.55814 3.21075 3.37589 3.13725 3.19514 3.11325C2.80088 3.0614 2.40216 3.16823 2.08664 3.41025C1.85114 3.5925 1.67564 3.89475 1.32614 4.5C0.976639 5.10525 0.801139 5.4075 0.762889 5.70375C0.737115 5.89909 0.750079 6.09759 0.801039 6.28792C0.851999 6.47825 0.939957 6.65667 1.05989 6.813C1.17089 6.957 1.32614 7.07775 1.56689 7.22925C1.92164 7.452 2.14964 7.8315 2.14964 8.25C2.14964 8.6685 1.92164 9.048 1.56689 9.27C1.32614 9.42225 1.17014 9.543 1.05989 9.687C0.939957 9.84333 0.851999 10.0218 0.801039 10.2121C0.750079 10.4024 0.737115 10.6009 0.762889 10.7963C0.801889 11.0918 0.976639 11.3948 1.32539 12C1.67564 12.6052 1.85039 12.9075 2.08664 13.0897C2.24297 13.2097 2.42139 13.2976 2.61172 13.3486C2.80205 13.3996 3.00055 13.4125 3.19589 13.3868C3.37589 13.3628 3.55814 13.2893 3.81014 13.1558C3.99055 13.0573 4.193 13.0061 4.39854 13.0072C4.60408 13.0082 4.80599 13.0614 4.98539 13.1617C5.34764 13.3717 5.56289 13.758 5.57789 14.1765C5.58839 14.4615 5.61539 14.6565 5.68514 14.8237C5.76052 15.0059 5.87106 15.1713 6.01043 15.3107C6.1498 15.4501 6.31527 15.5606 6.49739 15.636C6.77264 15.75 7.12214 15.75 7.82114 15.75C8.52014 15.75 8.86964 15.75 9.14489 15.636C9.327 15.5606 9.49247 15.4501 9.63185 15.3107C9.77122 15.1713 9.88175 15.0059 9.95714 14.8237C10.0261 14.6565 10.0539 14.4615 10.0644 14.1765C10.0794 13.758 10.2946 13.371 10.6569 13.1617C10.8363 13.0614 11.0382 13.0082 11.2437 13.0072C11.4493 13.0061 11.6517 13.0573 11.8321 13.1558C12.0841 13.2893 12.2664 13.3628 12.4464 13.3868C12.6417 13.4125 12.8402 13.3996 13.0306 13.3486C13.2209 13.2976 13.3993 13.2097 13.5556 13.0897C13.7919 12.9082 13.9666 12.6052 14.3161 12C14.6656 11.3948 14.8411 11.0925 14.8794 10.7963C14.9052 10.6009 14.8922 10.4024 14.8412 10.2121C14.7903 10.0218 14.7023 9.84333 14.5824 9.687C14.4714 9.543 14.3161 9.42225 14.0754 9.27075C13.8998 9.1638 13.7543 9.01405 13.6524 8.83553C13.5504 8.65701 13.4955 8.45555 13.4926 8.25C13.4926 7.8315 13.7206 7.452 14.0754 7.23C14.3161 7.07775 14.4721 6.957 14.5824 6.813C14.7023 6.65667 14.7903 6.47825 14.8412 6.28792C14.8922 6.09759 14.9052 5.89909 14.8794 5.70375C14.8404 5.40825 14.6656 5.10525 14.3169 4.5C13.9666 3.89475 13.7919 3.5925 13.5556 3.41025C13.3993 3.29032 13.2209 3.20236 13.0306 3.1514C12.8402 3.10044 12.6417 3.08748 12.4464 3.11325C12.2664 3.13725 12.0841 3.21075 11.8314 3.34425C11.6511 3.44261 11.4488 3.49365 11.2434 3.4926C11.038 3.49155 10.8362 3.43844 10.6569 3.33825C10.4804 3.23302 10.3334 3.08473 10.2298 2.90727C10.1262 2.7298 10.0693 2.52895 10.0644 2.3235C10.0539 2.0385 10.0269 1.8435 9.95714 1.67625C9.88175 1.49414 9.77122 1.32866 9.63185 1.18929C9.49247 1.04992 9.327 0.939385 9.14489 0.864Z" stroke="#5F5971" stroke-width="1.5" />
+  <svg width={size} height={size} viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M9 11.25C10.2426 11.25 11.25 10.2426 11.25 9C11.25 7.75736 10.2426 6.75 9 6.75C7.75736 6.75 6.75 7.75736 6.75 9C6.75 10.2426 7.75736 11.25 9 11.25Z" stroke="currentColor" strokeWidth="1.5" />
+    <path d="M10.3237 1.614C10.0485 1.5 9.69897 1.5 8.99997 1.5C8.30097 1.5 7.95147 1.5 7.67622 1.614C7.49411 1.68938 7.32864 1.79992 7.18926 1.93929C7.04989 2.07866 6.93936 2.24414 6.86397 2.42625C6.79497 2.5935 6.76722 2.78925 6.75672 3.0735C6.75184 3.27895 6.69492 3.4798 6.5913 3.65727C6.48768 3.83473 6.34074 3.98302 6.16422 4.08825C5.98483 4.18858 5.78291 4.24175 5.57737 4.2428C5.37183 4.24385 5.16938 4.19274 4.98897 4.09425C4.73697 3.96075 4.55472 3.88725 4.37397 3.86325C3.97971 3.8114 3.581 3.91823 3.26547 4.16025C3.02997 4.3425 2.85447 4.64475 2.50497 5.25C2.15547 5.85525 1.97997 6.1575 1.94172 6.45375C1.91595 6.64909 1.92891 6.84759 1.97987 7.03792C2.03083 7.22825 2.11879 7.40667 2.23872 7.563C2.34972 7.707 2.50497 7.82775 2.74572 7.97925C3.10047 8.202 3.32847 8.5815 3.32847 9C3.32847 9.4185 3.10047 9.798 2.74572 10.02C2.50497 10.1722 2.34897 10.293 2.23872 10.437C2.11879 10.5933 2.03083 10.7718 1.97987 10.9621C1.92891 11.1524 1.91595 11.3509 1.94172 11.5463C1.98072 11.8418 2.15547 12.1448 2.50422 12.75C2.85447 13.3552 3.02922 13.6575 3.26547 13.8397C3.4218 13.9597 3.60022 14.0476 3.79055 14.0986C3.98088 14.1496 4.17938 14.1625 4.37472 14.1368C4.55472 14.1128 4.73697 14.0393 4.98897 13.9058C5.16938 13.8073 5.37183 13.7561 5.57737 13.7572C5.78291 13.7582 5.98483 13.8114 6.16422 13.9117C6.52647 14.1217 6.74172 14.508 6.75672 14.9265C6.76722 15.2115 6.79422 15.4065 6.86397 15.5737C6.93936 15.7559 7.04989 15.9213 7.18926 16.0607C7.32864 16.2001 7.49411 16.3106 7.67622 16.386C7.95147 16.5 8.30097 16.5 8.99997 16.5C9.69897 16.5 10.0485 16.5 10.3237 16.386C10.5058 16.3106 10.6713 16.2001 10.8107 16.0607C10.95 15.9213 11.0606 15.7559 11.136 15.5737C11.205 15.4065 11.2327 15.2115 11.2432 14.9265C11.2582 14.508 11.4735 14.121 11.8357 13.9117C12.0151 13.8114 12.217 13.7582 12.4226 13.7572C12.6281 13.7561 12.8306 13.8073 13.011 13.9058C13.263 14.0393 13.4452 14.1128 13.6252 14.1368C13.8206 14.1625 14.0191 14.1496 14.2094 14.0986C14.3997 14.0476 14.5781 13.9597 14.7345 13.8397C14.9707 13.6582 15.1455 13.3552 15.495 12.75C15.8445 12.1448 16.02 11.8425 16.0582 11.5463C16.084 11.3509 16.071 11.1524 16.0201 10.9621C15.9691 10.7718 15.8812 10.5933 15.7612 10.437C15.6502 10.293 15.495 10.1723 15.2542 10.0208C15.0787 9.9138 14.9331 9.76405 14.8312 9.58553C14.7293 9.40701 14.6743 9.20555 14.6715 9C14.6715 8.5815 14.8995 8.202 15.2542 7.98C15.495 7.82775 15.651 7.707 15.7612 7.563C15.8812 7.40667 15.9691 7.22825 16.0201 7.03792C16.071 6.84759 16.084 6.64909 16.0582 6.45375C16.0192 6.15825 15.8445 5.85525 15.4957 5.25C15.1455 4.64475 14.9707 4.3425 14.7345 4.16025C14.5781 4.04032 14.3997 3.95236 14.2094 3.9014C14.0191 3.85044 13.8206 3.83748 13.6252 3.86325C13.4452 3.88725 13.263 3.96075 13.0102 4.09425C12.8299 4.19261 12.6276 4.24365 12.4222 4.2426C12.2168 4.24155 12.015 4.18844 11.8357 4.08825C11.6592 3.98302 11.5123 3.83473 11.4086 3.65727C11.305 3.4798 11.2481 3.27895 11.2432 3.0735C11.2327 2.7885 11.2057 2.5935 11.136 2.42625C11.0606 2.24414 10.95 2.07866 10.8107 1.93929C10.6713 1.79992 10.5058 1.68938 10.3237 1.614Z" stroke="currentColor" strokeWidth="1.5" />
   </svg>
 );
 
 
 type SidebarProps = {
-  activePage?: string;
+  className?: string;
 };
 
-export default function Sidebar({ activePage = 'dashboard' }: SidebarProps) {
+export default function Sidebar({ className }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const pathname = usePathname();
 
   return (
     <aside
@@ -169,11 +172,11 @@ export default function Sidebar({ activePage = 'dashboard' }: SidebarProps) {
 
           {/* Main Group */}
           <div className={cn("flex flex-col w-full", isCollapsed ? "items-center" : "items-start")}>
-            <NavItem icon={<LayoutDashboard size={18} />} label="Dashboard" isActive={activePage === 'dashboard'} isCollapsed={isCollapsed} />
-            <NavItem icon={<CreatorsIcon size={18} />} label="Creators" isActive={activePage === 'creators'} isCollapsed={isCollapsed} />
-            <NavItem icon={<UsersIcon size={18} />} label="Users" isActive={activePage === 'users'} isCollapsed={isCollapsed} />
-            <NavItem icon={<PackageIcon size={18} />} label="Products" isActive={activePage === 'products'} isCollapsed={isCollapsed} />
-            <NavItem icon={<VideoIcon size={18} />} label="Events & Live" isActive={activePage === 'events'} isCollapsed={isCollapsed} />
+            <NavItem href="/" icon={<LayoutDashboard size={18} />} label="Dashboard" isActive={pathname === '/'} isCollapsed={isCollapsed} />
+            <NavItem href="/creators" icon={<CreatorsIcon size={18} />} label="Creators" isActive={pathname.startsWith('/creators')} isCollapsed={isCollapsed} />
+            <NavItem href="/users" icon={<UsersIcon size={18} />} label="Users" isActive={pathname.startsWith('/users')} isCollapsed={isCollapsed} />
+            <NavItem href="/products" icon={<PackageIcon size={18} />} label="Products" isActive={pathname.startsWith('/products')} isCollapsed={isCollapsed} />
+            <NavItem href="/events" icon={<VideoIcon size={18} />} label="Events & Live" isActive={pathname.startsWith('/events')} isCollapsed={isCollapsed} />
           </div>
 
           {/* Operations Group */}
@@ -181,9 +184,9 @@ export default function Sidebar({ activePage = 'dashboard' }: SidebarProps) {
             {!isCollapsed && (
               <div className="font-sans font-normal text-xs text-text-light mb-1 w-full pl-2">OPERATIONS</div>
             )}
-            <NavItem icon={<TrendingUpIcon size={18} />} label="Revenue" isActive={activePage === 'revenue'} isCollapsed={isCollapsed} />
-            <NavItem icon={<HeadphonesIcon size={18} />} label="Support Center" isActive={activePage === 'support'} isCollapsed={isCollapsed} />
-            <NavItem icon={<DiscIcon size={18} />} label="Live Tools" isActive={activePage === 'live'} isCollapsed={isCollapsed} />
+            <NavItem href="/revenue" icon={<TrendingUpIcon size={18} />} label="Revenue" isActive={pathname.startsWith('/revenue')} isCollapsed={isCollapsed} />
+            <NavItem href="/support" icon={<HeadphonesIcon size={18} />} label="Support Center" isActive={pathname.startsWith('/support')} isCollapsed={isCollapsed} />
+            <NavItem href="/live-tools" icon={<DiscIcon size={18} />} label="Live Tools" isActive={pathname.startsWith('/live-tools')} isCollapsed={isCollapsed} />
           </div>
 
           {/* System Group */}
@@ -191,9 +194,9 @@ export default function Sidebar({ activePage = 'dashboard' }: SidebarProps) {
             {!isCollapsed && (
               <div className="font-sans font-normal text-xs text-text-light mb-1 w-full pl-2">SYSTEM</div>
             )}
-            <NavItem icon={<BellIcon size={18} />} label="Notifications" isActive={activePage === 'notifications'} isCollapsed={isCollapsed} />
-            <NavItem icon={<FileTextIcon size={18} />} label="Logs" isActive={activePage === 'logs'} isCollapsed={isCollapsed} />
-            <NavItem icon={<SettingsIcon size={18} />} label="Settings" isActive={activePage === 'settings'} isCollapsed={isCollapsed} />
+            <NavItem href="/notifications" icon={<BellIcon size={18} />} label="Notifications" isActive={pathname.startsWith('/notifications')} isCollapsed={isCollapsed} />
+            <NavItem href="/logs" icon={<FileTextIcon size={18} />} label="Logs" isActive={pathname.startsWith('/logs')} isCollapsed={isCollapsed} />
+            <NavItem href="/settings" icon={<SettingsIcon size={18} />} label="Settings" isActive={pathname.startsWith('/settings')} isCollapsed={isCollapsed} />
           </div>
 
         </div>
@@ -206,7 +209,7 @@ export default function Sidebar({ activePage = 'dashboard' }: SidebarProps) {
       )}>
         {/* User Info */}
         <div className="flex flex-col gap-3 items-center w-full">
-          <div className={cn("flex items-center gap-2.5 h-[30px] w-full", isCollapsed ? "justify-center" : "justify-start")}>
+          <Link href="/profile" className={cn("flex items-center gap-2.5 h-[30px] w-full no-underline cursor-pointer", isCollapsed ? "justify-center" : "justify-start")}>
             <div className="w-7 h-7 rounded-full bg-[#eee] overflow-hidden shrink-0">
               <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face" alt="User" />
             </div>
@@ -216,7 +219,7 @@ export default function Sidebar({ activePage = 'dashboard' }: SidebarProps) {
                 <span className="font-sans font-medium text-[10px] leading-[12px] text-text-muted">Super Admin (HQ)</span>
               </div>
             )}
-          </div>
+          </Link>
 
           {/* Logout Button */}
           <button className="w-full h-8 p-0 bg-surface rounded-lg flex items-center justify-center gap-2 border-none cursor-pointer">
@@ -231,12 +234,12 @@ export default function Sidebar({ activePage = 'dashboard' }: SidebarProps) {
   );
 }
 
-function NavItem({ icon, label, isActive, isCollapsed }: { icon: ReactNode; label: string; isActive: boolean; isCollapsed: boolean }) {
+function NavItem({ icon, label, isActive, isCollapsed, href }: { icon: ReactNode; label: string; isActive: boolean; isCollapsed: boolean; href: string }) {
   return (
-    <div className={cn(
-      "flex items-center gap-2.5 p-2 h-9 cursor-pointer w-full rounded-lg transition-colors duration-200",
+    <Link href={href} className={cn(
+      "flex items-center gap-2.5 p-2 h-9 cursor-pointer w-full transition-colors duration-200 no-underline",
       isCollapsed ? "justify-center" : "justify-start",
-      isActive ? "bg-active text-brand-primary font-medium" : "bg-transparent text-text-muted font-medium hover:bg-surface"
+      isActive ? "text-brand-primary font-medium" : "text-text-muted font-medium"
     )}>
       <span className={cn("flex items-center", isActive ? "text-brand-primary" : "text-currentColor")}>{icon}</span>
       {!isCollapsed && (
@@ -245,6 +248,6 @@ function NavItem({ icon, label, isActive, isCollapsed }: { icon: ReactNode; labe
           isActive ? "text-brand-primary font-medium" : "text-text-muted font-medium"
         )}>{label}</span>
       )}
-    </div>
+    </Link>
   );
 }
