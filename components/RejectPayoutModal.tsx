@@ -37,8 +37,14 @@ export default function RejectPayoutModal({ isOpen, onClose, onConfirm }: Reject
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 overflow-hidden">
-      <div className="flex flex-col justify-end items-end p-5 gap-6 w-[420px] h-[245px] bg-white rounded-[10px]">
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 overflow-hidden"
+      onClick={handleClose}
+    >
+      <div 
+        className="flex flex-col justify-end items-end p-5 gap-6 w-[420px] h-[245px] bg-white rounded-[10px]"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Title */}
         <h2 className="font-['Neue_Montreal'] font-bold text-base leading-[19px] text-[#2B2834] w-full">
           Reject Payout

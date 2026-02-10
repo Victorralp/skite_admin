@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Clock, Users, MoreVertical, Eye, X } from 'lucide-react';
 import PageContainer from './layout/PageContainer';
 import SessionDetailsModal from './SessionDetailsModal';
@@ -133,6 +133,24 @@ export default function LiveTools() {
   const [showDropdown, setShowDropdown] = useState<string | null>(null);
   const [selectedSession, setSelectedSession] = useState<LiveSession | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showDropdown) {
+        const dropdownElement = dropdownRefs.current[showDropdown];
+        if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
+          setShowDropdown(null);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDropdown]);
 
   // Filter sessions based on active filter
   const filteredSessions = mockSessions.filter((session) => {
@@ -162,80 +180,77 @@ export default function LiveTools() {
   return (
     <PageContainer>
       {/* Header and Stats */}
-      <div className="flex flex-col items-start gap-2 w-[1102px] h-[104px]">
-        <h1 className="text-[20px] font-bold text-[#2B2834] leading-6 tracking-[-0.01em] w-[88px] h-6">Live Tools</h1>
+      <div className="flex flex-col gap-2">
+        <h1 className="text-[20px] font-bold text-[#2B2834] leading-[100%] tracking-[-0.01em] font-['Neue_Montreal']">Live Tools</h1>
         
-        <div className="flex flex-row items-start gap-2 w-[1102px] h-[72px]">
-          <div className="flex flex-col items-start bg-white border border-[#EBEBEB] rounded-lg p-4 gap-3 flex-1" style={{ width: '269.5px', height: '72px' }}>
-            <div className="flex flex-col gap-1 w-full">
-              <span className="text-xs leading-[14px] text-[#5F5971]">Live Sessions</span>
-              <span className="text-lg leading-[22px] font-medium text-[#2B2834]">1,393</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 w-full">
+          <div className="min-w-[214px] h-24 bg-white border border-[#EBEBEB] rounded-lg box-border flex flex-col p-4 gap-3 grow">
+            <div className="flex flex-col gap-1 w-full h-10">
+              <span className="font-sans font-normal text-xs leading-[14px] text-[#5F5971]">Live Sessions</span>
+              <span className="font-sans font-medium text-lg leading-[22px] text-[#2B2834]">1,393</span>
             </div>
           </div>
-          <div className="flex flex-col items-start bg-white border border-[#EBEBEB] rounded-lg p-4 gap-3 flex-1" style={{ width: '269.5px', height: '72px' }}>
-            <div className="flex flex-col gap-1 w-full">
-              <span className="text-xs leading-[14px] text-[#5F5971]">1-1 Calls</span>
-              <span className="text-lg leading-[22px] font-medium text-[#2B2834]">6</span>
+          <div className="min-w-[214px] h-24 bg-white border border-[#EBEBEB] rounded-lg box-border flex flex-col p-4 gap-3 grow">
+            <div className="flex flex-col gap-1 w-full h-10">
+              <span className="font-sans font-normal text-xs leading-[14px] text-[#5F5971]">1-1 Calls</span>
+              <span className="font-sans font-medium text-lg leading-[22px] text-[#2B2834]">6</span>
             </div>
           </div>
-          <div className="flex flex-col items-start bg-white border border-[#EBEBEB] rounded-lg p-4 gap-3 flex-1" style={{ width: '269.5px', height: '72px' }}>
-            <div className="flex flex-col gap-1 w-full">
-              <span className="text-xs leading-[14px] text-[#5F5971]">Critical Alerts</span>
-              <span className="text-lg leading-[22px] font-medium text-[#2B2834]">156</span>
+          <div className="min-w-[214px] h-24 bg-white border border-[#EBEBEB] rounded-lg box-border flex flex-col p-4 gap-3 grow">
+            <div className="flex flex-col gap-1 w-full h-10">
+              <span className="font-sans font-normal text-xs leading-[14px] text-[#5F5971]">Critical Alerts</span>
+              <span className="font-sans font-medium text-lg leading-[22px] text-[#2B2834]">156</span>
             </div>
           </div>
-          <div className="flex flex-col items-start bg-white border border-[#EBEBEB] rounded-lg p-4 gap-3 flex-1" style={{ width: '269.5px', height: '72px' }}>
-            <div className="flex flex-col gap-1 w-full">
-              <span className="text-xs leading-[14px] text-[#5F5971]">Warning Alerts</span>
-              <span className="text-lg leading-[22px] font-medium text-[#2B2834]">11</span>
+          <div className="min-w-[214px] h-24 bg-white border border-[#EBEBEB] rounded-lg box-border flex flex-col p-4 gap-3 grow">
+            <div className="flex flex-col gap-1 w-full h-10">
+              <span className="font-sans font-normal text-xs leading-[14px] text-[#5F5971]">Warning Alerts</span>
+              <span className="font-sans font-medium text-lg leading-[22px] text-[#2B2834]">11</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Filters and Live Sessions */}
-      <div className="flex flex-col items-start gap-2 w-[1102px] h-[502px]">
+      <div className="flex flex-col gap-2 w-full">
         {/* Filter Tabs */}
-        <div className="flex flex-row items-center gap-2 w-[1102px] h-8">
+        <div className="flex gap-2 w-full">
           <button
             onClick={() => setActiveFilter('all')}
-            className={`flex flex-row justify-center items-center px-4 py-2 gap-2.5 h-8 text-[13.5px] font-medium leading-4 rounded-md border transition-all flex-1 ${
+            className={`flex justify-center items-center px-4 py-2 gap-2.5 h-8 text-[13.5px] font-medium leading-4 rounded-md border transition-all flex-1 ${
               activeFilter === 'all'
                 ? 'bg-white border-[#5F2EFC] text-[#5F2EFC]'
                 : 'bg-white border-[#EBEBEB] text-[#5F5971]'
             }`}
-            style={{ width: '362px' }}
           >
             All
           </button>
           <button
             onClick={() => setActiveFilter('warning')}
-            className={`flex flex-row justify-center items-center px-4 py-2 gap-2.5 h-8 text-[13.5px] font-medium leading-4 rounded-md border transition-all flex-1 ${
+            className={`flex justify-center items-center px-4 py-2 gap-2.5 h-8 text-[13.5px] font-medium leading-4 rounded-md border transition-all flex-1 ${
               activeFilter === 'warning'
                 ? 'bg-white border-[#5F2EFC] text-[#5F2EFC]'
                 : 'bg-white border-[#EBEBEB] text-[#5F5971]'
             }`}
-            style={{ width: '362px' }}
           >
             Warning
           </button>
           <button
             onClick={() => setActiveFilter('critical')}
-            className={`flex flex-row justify-center items-center px-4 py-2 gap-2.5 h-8 text-[13.5px] font-medium leading-4 rounded-md border transition-all flex-1 ${
+            className={`flex justify-center items-center px-4 py-2 gap-2.5 h-8 text-[13.5px] font-medium leading-4 rounded-md border transition-all flex-1 ${
               activeFilter === 'critical'
                 ? 'bg-white border-[#5F2EFC] text-[#5F2EFC]'
                 : 'bg-white border-[#EBEBEB] text-[#5F5971]'
             }`}
-            style={{ width: '362px' }}
           >
             Critical
           </button>
         </div>
 
         {/* Live Sessions Grid */}
-        <div className="flex flex-col items-start p-1 gap-1 w-[1102px] h-[462px] bg-[#F9F9FB] rounded-lg">
+        <div className="flex flex-col p-1 gap-1 w-full bg-[#F9F9FB] rounded-lg">
           {/* Header */}
-          <div className="flex flex-row items-center px-2 py-1 gap-4 w-[1094px] h-8">
+          <div className="flex items-center px-2 py-1 gap-4 w-full h-8">
             <span className="text-base font-medium leading-[19px] text-[#2B2834] flex-1">Live</span>
             <div className="flex items-center gap-1 px-2 py-1 bg-white border border-[#EBEBEB] rounded-lg opacity-0 w-[63px] h-6">
               <span className="text-xs leading-[14px] text-[#5F5971]">Today</span>
@@ -244,17 +259,17 @@ export default function LiveTools() {
           </div>
 
           {/* Sessions Grid */}
-          <div className="flex flex-row flex-wrap items-start content-start gap-1 w-[1094px] h-[418px]">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 w-full">
             {filteredSessions.map((session) => {
               const config = statusConfig[session.status];
               return (
                 <div
                   key={session.id}
-                  className="flex flex-col justify-center items-start p-4 gap-4 bg-white border border-[#EBEBEB] rounded-[4px] relative flex-none"
-                  style={{ width: '362px', height: '207px' }}
+                  className="flex flex-col justify-center items-start p-4 gap-4 bg-white border border-[#EBEBEB] rounded-[4px] relative w-full max-w-[362px]"
+                  style={{ height: '207px' }}
                 >
                   {/* Header with Status and Actions */}
-                  <div className="flex justify-between items-start w-[330px] h-7">
+                  <div className="flex justify-between items-start w-full h-7">
                     <div className="flex items-start gap-2">
                       {/* Status Badge */}
                       <div
@@ -299,7 +314,7 @@ export default function LiveTools() {
                     </div>
 
                     {/* Actions Menu */}
-                    <div className="relative">
+                    <div className="relative" ref={(el) => { dropdownRefs.current[session.id] = el; }}>
                       <button
                         onClick={() => handleDropdownToggle(session.id)}
                         className="flex items-center justify-center w-[18px] h-[18px]"
@@ -328,13 +343,13 @@ export default function LiveTools() {
                   </div>
 
                   {/* Session Info */}
-                  <div className="flex flex-col gap-3 w-[330px] h-[83px]">
-                    <h3 className="text-base font-bold leading-[19px] text-[#2B2834] w-[330px] h-[19px]">
+                  <div className="flex flex-col gap-3 w-full h-[83px]">
+                    <h3 className="text-base font-bold leading-[19px] text-[#2B2834] w-full h-[19px]">
                       {session.title}
                     </h3>
 
                     {/* Host Info */}
-                    <div className="flex items-center gap-2 w-[330px] h-6">
+                    <div className="flex items-center gap-2 w-full h-6">
                       <div className="w-6 h-6 rounded-full bg-gray-200 flex-shrink-0" />
                       <span className="text-base font-medium leading-[19px] text-[#5F5971] flex-1">
                         {session.host}
@@ -342,7 +357,7 @@ export default function LiveTools() {
                     </div>
 
                     {/* Session Details */}
-                    <div className="flex items-center gap-6 w-[330px] h-4">
+                    <div className="flex items-center gap-6 w-full h-4">
                       <div className="flex items-center gap-1">
                         <Clock className="w-4 h-4 text-[#2B2834]" strokeWidth={1.3} />
                         <span className="text-xs leading-[14px] text-[#5F5971]">{session.time}</span>
@@ -373,7 +388,7 @@ export default function LiveTools() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex items-center gap-1 w-[330px] h-8">
+                  <div className="flex items-center gap-1 w-full h-8">
                     <button 
                       onClick={() => handleMonitorClick(session)}
                       className="flex items-center justify-center gap-1 px-6 py-3.5 bg-white border border-[#EBEBEB] rounded-[9px] shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] flex-1 h-8 hover:bg-gray-50 transition-colors"

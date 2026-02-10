@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { MoreVertical, CircleCheck, AlertTriangle, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import HoldTransactionModal from './HoldTransactionModal';
@@ -152,44 +152,51 @@ const transactions: Transaction[] = [
     status: 'Success'
   }
 ];
-
 const StatusBadge = ({ status }: { status: Transaction['status'] }) => {
   const config = {
     Success: {
       bg: '#E7F3EF',
       color: '#239B73',
-      label: 'Active'
+      label: 'Active',
+      icon: (
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="5" cy="5" r="4.5" stroke="#239B73" strokeWidth="1"/>
+          <path d="M3.75 5L4.375 5.625L6.25 3.75" stroke="#239B73" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      )
     },
     Pending: {
       bg: '#FFF3EB',
       color: '#FB6A00',
-      label: 'Pending'
+      label: 'Pending',
+      icon: (
+        <svg width="9" height="9" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3.36512 7.81417C3.00256 7.73156 2.65431 7.59549 2.33179 7.41042M5.03179 0.5C5.86019 0.689197 6.59981 1.15404 7.12956 1.81842C7.65931 2.4828 7.9478 3.30735 7.9478 4.15708C7.9478 5.00681 7.65931 5.83137 7.12956 6.49575C6.59981 7.16013 5.86019 7.62497 5.03179 7.81417M1.10637 6.27917C0.879327 5.94881 0.70672 5.58418 0.595122 5.19917M0.500122 3.53208C0.566789 3.13625 0.695122 2.76125 0.875122 2.4175L0.945539 2.29042M2.07637 1.065C2.46645 0.797033 2.90374 0.605325 3.36512 0.5M4.19846 2.49042V4.15708M4.19846 5.82375V5.82792" stroke="#FB6A00" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      )
     },
     Failed: {
       bg: '#FBECEB',
       color: '#CD110A',
-      label: 'Failed'
+      label: 'Failed',
+      icon: (
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 1.25L8.125 8.75H1.875L5 1.25Z" stroke="#CD110A" strokeWidth="1"/>
+          <path d="M5 4V6" stroke="#CD110A" strokeWidth="1"/>
+          <circle cx="5" cy="7.5" r="0.5" fill="#CD110A"/>
+        </svg>
+      )
     }
   };
 
-  const { bg, color, label } = config[status];
+  const { bg, color, label, icon } = config[status];
 
   return (
     <div
-      className="flex items-center justify-center gap-0.5 px-1.5 py-0.5 rounded"
+      className="flex items-center justify-center px-1.5 py-0.5 gap-0.5 rounded w-fit h-[14px]"
       style={{ backgroundColor: bg }}
     >
-      {status === 'Success' && (
-        <CircleCheck size={10} style={{ color }} />
-      )}
-      {status === 'Pending' && (
-        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M4.16676 8.65792C3.8042 8.57531 3.45595 8.43924 3.13342 8.25417M5.83342 1.34375C6.66182 1.53295 7.40144 1.99779 7.9312 2.66217C8.46095 3.32655 8.74944 4.1511 8.74944 5.00083C8.74944 5.85056 8.46095 6.67512 7.9312 7.3395C7.40144 8.00388 6.66182 8.46872 5.83342 8.65792M1.90801 7.12292C1.68096 6.79256 1.50836 6.42793 1.39676 6.04292M1.30176 4.37583C1.36842 3.98 1.49676 3.605 1.67676 3.26125L1.74717 3.13417M2.87801 1.90875C3.26809 1.64078 3.70537 1.44907 4.16676 1.34375M5.00009 3.33417V5.00083M5.00009 6.6675V6.67167" stroke="#FB6A00" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      )}
-      {status === 'Failed' && (
-        <AlertTriangle size={10} style={{ color }} />
-      )}
+      {icon}
       <span
         className="font-['Neue_Montreal'] font-medium text-[10px] leading-3"
         style={{ color }}
@@ -199,91 +206,58 @@ const StatusBadge = ({ status }: { status: Transaction['status'] }) => {
     </div>
   );
 };
-
 const FilterPill = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
   <button
     onClick={onClick}
-    className={`flex items-center justify-center gap-1 px-[9px] py-1 border border-dashed rounded-full h-[22px] transition-colors ${active ? 'border-[#5F2EFC]' : 'border-[#EBEBEB] hover:bg-gray-50'
-      }`}
+    className={cn(
+      "flex items-center justify-center px-2 py-1 gap-1 rounded-full border font-['Neue_Montreal'] font-medium text-xs leading-none h-[22px]",
+      active
+        ? "bg-[#5F2EFC] border-[#5F2EFC] text-white"
+        : "bg-white border-dashed border-[#EBEBEB] text-[#5F5971]"
+    )}
   >
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-      <circle cx="6" cy="6" r="5.25" stroke="currentColor" strokeWidth="1.2" fill="none" className={active ? 'text-[#5F2EFC]' : 'text-[#5F5971]'} />
-      <path d="M6 3V9M3 6H9" stroke="currentColor" strokeWidth="1.2" className={active ? 'text-[#5F2EFC]' : 'text-[#5F5971]'} />
-    </svg>
-    <span className={`text-xs font-medium leading-[14px] ${active ? 'text-[#5F2EFC]' : 'text-[#5F5971]'}`}>{label}</span>
+    {!active && (
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="6" cy="6" r="5.25" stroke="#5F5971" strokeWidth="1.2"/>
+        <path d="M6 3.5V8.5M3.5 6H8.5" stroke="#5F5971" strokeWidth="1.2" strokeLinecap="round"/>
+      </svg>
+    )}
+    {label}
   </button>
 );
-
 const FilterDropdown = ({ title, onApply }: { title: string; onApply: () => void }) => (
   <div
     className="absolute left-[-0.75px] top-[27px] w-[185px] bg-white border border-[#5F2EFC] rounded-2xl flex flex-col justify-center items-start p-3 gap-[10px]"
     style={{
       boxShadow: '0px 116px 46px rgba(0, 0, 0, 0.01), 0px 65px 39px rgba(0, 0, 0, 0.05), 0px 29px 29px rgba(0, 0, 0, 0.09), 0px 7px 16px rgba(0, 0, 0, 0.1)',
-      zIndex: 50
+      zIndex: 10
     }}
   >
-    <span className="text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
+    <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834]">
       {title}
     </span>
-    {title === 'Filter by: Status' ? (
-      <div className="flex flex-col items-start gap-2 w-[161px]">
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" className="w-4 h-4" />
-          <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal']">Success</span>
-        </label>
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" className="w-4 h-4" />
-          <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal']">Pending</span>
-        </label>
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" className="w-4 h-4" />
-          <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal']">Failed</span>
-        </label>
-      </div>
-    ) : (
-      <div className="flex flex-col items-start gap-1 w-[161px] h-16">
-        <div className="flex items-center gap-[10px] w-[161px] h-[30px]">
-          <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal'] w-[32.91px]">
-            From
-          </span>
-          <div className="flex-1 h-[30px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-md flex items-center justify-end px-2">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9.5 1.5H2.5C1.94772 1.5 1.5 1.94772 1.5 2.5V9.5C1.5 10.0523 1.94772 10.5 2.5 10.5H9.5C10.0523 10.5 10.5 10.0523 10.5 9.5V2.5C10.5 1.94772 10.0523 1.5 9.5 1.5Z" stroke="#5F5971" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M8 0.5V2.5M4 0.5V2.5M1.5 4.5H10.5" stroke="#5F5971" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-        </div>
-        <div className="flex items-center gap-[10px] w-[161px] h-[30px]">
-          <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal'] w-[32.91px]">
-            To
-          </span>
-          <div className="flex-1 h-[30px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-md flex items-center justify-end px-2">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9.5 1.5H2.5C1.94772 1.5 1.5 1.94772 1.5 2.5V9.5C1.5 10.0523 1.94772 10.5 2.5 10.5H9.5C10.0523 10.5 10.5 10.0523 10.5 9.5V2.5C10.5 1.94772 10.0523 1.5 9.5 1.5Z" stroke="#5F5971" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M8 0.5V2.5M4 0.5V2.5M1.5 4.5H10.5" stroke="#5F5971" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-        </div>
-      </div>
-    )}
+    <div className="flex flex-col items-start gap-2 w-full">
+      <label className="flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" className="w-3 h-3" />
+        <span className="font-['Neue_Montreal'] font-normal text-xs leading-none text-[#5F5971]">
+          Option 1
+        </span>
+      </label>
+      <label className="flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" className="w-3 h-3" />
+        <span className="font-['Neue_Montreal'] font-normal text-xs leading-none text-[#5F5971]">
+          Option 2
+        </span>
+      </label>
+    </div>
     <button
       onClick={onApply}
-      className="w-[161px] h-8 flex items-center justify-center px-6 py-[14px] rounded-[9px]"
-      style={{
-        background: 'linear-gradient(180deg, #5F2EFC 22.58%, #4E18FC 100%)',
-        boxShadow: 'inset 0px 1.5px 1px rgba(255, 255, 255, 0.11)'
-      }}
+      className="w-full py-2 bg-[#5F2EFC] text-white rounded-lg font-['Neue_Montreal'] font-medium text-xs"
     >
-      <span
-        className="text-[13.5px] font-medium text-[#FFFCF8] leading-4 font-['Neue_Montreal']"
-        style={{ textShadow: '0px -1px 6px rgba(0, 0, 0, 0.25)' }}
-      >
-        Apply
-      </span>
+      Apply
     </button>
   </div>
 );
-
 const ActionMenu = ({ onClose, isLastRows, onHold, onView }: { onClose: () => void; isLastRows?: boolean; onHold: () => void; onView: () => void }) => (
   <div
     className={cn(
@@ -297,8 +271,8 @@ const ActionMenu = ({ onClose, isLastRows, onHold, onView }: { onClose: () => vo
   >
     <button
       onClick={() => {
-        onView();
         onClose();
+        onView();
       }}
       className="flex items-center w-[83px] h-[37px] px-4 py-2.5 bg-white border-b-[0.5px] border-[#EBEBEB]"
     >
@@ -319,8 +293,8 @@ const ActionMenu = ({ onClose, isLastRows, onHold, onView }: { onClose: () => vo
     </button>
     <button
       onClick={() => {
-        onHold();
         onClose();
+        onHold();
       }}
       className="flex items-center w-[83px] h-[37px] px-4 py-2.5 bg-white"
     >
@@ -330,7 +304,6 @@ const ActionMenu = ({ onClose, isLastRows, onHold, onView }: { onClose: () => vo
     </button>
   </div>
 );
-
 export default function TransactionsTable() {
   const [paymentMethodFilterActive, setPaymentMethodFilterActive] = useState(false);
   const [productTypeFilterActive, setProductTypeFilterActive] = useState(false);
@@ -340,6 +313,25 @@ export default function TransactionsTable() {
   const [selectedTransaction, setSelectedTransaction] = useState<string | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedTransactionData, setSelectedTransactionData] = useState<Transaction | null>(null);
+  const [activeModal, setActiveModal] = useState<'none' | 'details' | 'hold'>('none');
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: Event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpenMenuId(null);
+      }
+    };
+
+    if (openMenuId) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [openMenuId]);
 
   // Filter transactions based on status
   const filteredTransactions = statusFilter === 'all'
@@ -358,7 +350,6 @@ export default function TransactionsTable() {
               onClick={() => {
                 setPaymentMethodFilterActive(!paymentMethodFilterActive);
                 setProductTypeFilterActive(false);
-
               }}
             />
             {paymentMethodFilterActive && (
@@ -376,7 +367,6 @@ export default function TransactionsTable() {
               onClick={() => {
                 setProductTypeFilterActive(!productTypeFilterActive);
                 setPaymentMethodFilterActive(false);
-
               }}
             />
             {productTypeFilterActive && (
@@ -401,7 +391,7 @@ export default function TransactionsTable() {
             />
           </div>
         </div>
-        <button className="flex items-center gap-0.5 px-2 py-1 bg-white border border-[#EBEBEB] rounded-lg shadow-[0px_1px_4.8px_rgba(0,0,0,0.03)]">
+        <button className="flex items-center gap-0.5 px-2.5 py-1.25 bg-white border border-[#EBEBEB] rounded-lg shadow-[0px_1px_4.8px_rgba(0,0,0,0.03)] h-6">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M9.33337 10.5V3.5M9.33337 3.5L11.6667 5.90625M9.33337 3.5L7.00004 5.90625M4.66671 3.5V10.5M4.66671 10.5L7.00004 8.09375M4.66671 10.5L2.33337 8.09375" stroke="#5F5971" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -410,7 +400,6 @@ export default function TransactionsTable() {
           </span>
         </button>
       </div>
-
       {/* Table Container */}
       <div className="flex flex-col items-start p-1 gap-1 w-full bg-[#F9F9FB] rounded-lg">
         {/* Table Header */}
@@ -421,13 +410,13 @@ export default function TransactionsTable() {
           <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[98.88px] whitespace-nowrap">
             Date
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] flex-1 min-w-[129.05px] whitespace-nowrap">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[129.05px] whitespace-nowrap flex-grow">
             Creator
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] flex-1 min-w-[129.05px] whitespace-nowrap">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[129.05px] whitespace-nowrap flex-grow">
             Buyer
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] flex-1 min-w-[129.05px] whitespace-nowrap">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[129.05px] whitespace-nowrap flex-grow">
             Product/Service
           </span>
           <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[82.12px] whitespace-nowrap">
@@ -444,49 +433,56 @@ export default function TransactionsTable() {
           </span>
           <div className="w-[18px]" />
         </div>
-
         {/* Table Body */}
-        <div className="flex flex-col items-start w-full bg-white border border-[#EBEBEB] rounded-lg overflow-hidden">
+        <div className="flex flex-col items-start w-full bg-white border border-[#EBEBEB] rounded-lg">
           {filteredTransactions.map((txn, index) => {
             const isLastRows = index >= filteredTransactions.length - 3;
             return (
               <div
                 key={`${txn.id}-${index}`}
+                onClick={() => {
+                  setSelectedTransactionData(txn);
+                  setActiveModal('details');
+                  setIsDetailsModalOpen(true);
+                }}
                 className={cn(
-                  'flex items-center px-6 py-3.5 gap-4 w-full h-[46px] bg-white',
+                  'flex items-center px-6 py-3.5 gap-4 w-full h-[46px] bg-white cursor-pointer hover:bg-gray-50 transition-colors',
                   index < filteredTransactions.length - 1 && 'border-b border-[#EBEBEB]'
                 )}
               >
-                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[72.67px] whitespace-nowrap">
+                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[72.67px] whitespace-nowrap overflow-hidden text-ellipsis">
                   {txn.id}
                 </span>
-                <span className="font-['Neue_Montreal'] font-normal text-xs leading-none text-[#5F5971] w-[98.88px] whitespace-nowrap">
+                <span className="font-['Neue_Montreal'] font-normal text-xs leading-none text-[#5F5971] w-[98.88px] whitespace-nowrap overflow-hidden text-ellipsis">
                   {txn.date}
                 </span>
-                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] flex-1 min-w-[129.05px] whitespace-nowrap overflow-hidden text-ellipsis">
+                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[129.05px] whitespace-nowrap overflow-hidden text-ellipsis flex-grow">
                   {txn.creator}
                 </span>
-                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] flex-1 min-w-[129.05px] whitespace-nowrap overflow-hidden text-ellipsis">
+                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[129.05px] whitespace-nowrap overflow-hidden text-ellipsis flex-grow">
                   {txn.buyer}
                 </span>
-                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] flex-1 min-w-[129.05px] whitespace-nowrap overflow-hidden text-ellipsis">
+                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[129.05px] whitespace-nowrap overflow-hidden text-ellipsis flex-grow">
                   {txn.product}
                 </span>
-                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[82.12px] whitespace-nowrap">
+                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[82.12px] whitespace-nowrap overflow-hidden text-ellipsis">
                   {txn.amount}
                 </span>
-                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[54.77px] whitespace-nowrap">
+                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[54.77px] whitespace-nowrap overflow-hidden text-ellipsis">
                   {txn.fee}
                 </span>
-                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[81.39px] whitespace-nowrap">
+                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[81.39px] whitespace-nowrap overflow-hidden text-ellipsis">
                   {txn.creatorNet}
                 </span>
-                <div className="w-[59px]">
+                <div className="w-[59px] flex items-center">
                   <StatusBadge status={txn.status} />
                 </div>
-                <div className="relative w-[18px] h-[18px] flex-shrink-0">
+                <div className="relative w-[18px] h-[18px]" ref={openMenuId === `${txn.id}-${index}` ? menuRef : null}>
                   <button
-                    onClick={() => setOpenMenuId(openMenuId === `${txn.id}-${index}` ? null : `${txn.id}-${index}`)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenMenuId(openMenuId === `${txn.id}-${index}` ? null : `${txn.id}-${index}`);
+                    }}
                     className="w-[18px] h-[18px] flex items-center justify-center"
                   >
                     <MoreVertical size={18} className="text-[#5F5971]" />
@@ -496,10 +492,16 @@ export default function TransactionsTable() {
                       onClose={() => setOpenMenuId(null)}
                       isLastRows={isLastRows}
                       onHold={() => {
+                        setOpenMenuId(null);
+                        setActiveModal('hold');
+                        setIsDetailsModalOpen(false);
+                        setSelectedTransactionData(null);
                         setSelectedTransaction(`${txn.id}-${index}`);
                         setIsHoldModalOpen(true);
                       }}
                       onView={() => {
+                        setOpenMenuId(null);
+                        setActiveModal('details');
                         setSelectedTransactionData(txn);
                         setIsDetailsModalOpen(true);
                       }}
@@ -511,27 +513,29 @@ export default function TransactionsTable() {
           })}
         </div>
       </div>
-
       {/* Hold Transaction Modal */}
       <HoldTransactionModal
         isOpen={isHoldModalOpen}
         onClose={() => {
           setIsHoldModalOpen(false);
           setSelectedTransaction(null);
+          setActiveModal('none');
         }}
         onConfirm={(reason) => {
           console.log('Hold transaction:', selectedTransaction, 'Reason:', reason);
           setIsHoldModalOpen(false);
           setSelectedTransaction(null);
+          setActiveModal('none');
         }}
       />
 
       {/* Transaction Details Modal */}
       <TransactionDetailsModal
-        isOpen={isDetailsModalOpen}
+        isOpen={isDetailsModalOpen && activeModal === 'details'}
         onClose={() => {
           setIsDetailsModalOpen(false);
           setSelectedTransactionData(null);
+          setActiveModal('none');
         }}
         transaction={selectedTransactionData ? {
           id: selectedTransactionData.id,
@@ -543,7 +547,7 @@ export default function TransactionsTable() {
           productType: selectedTransactionData.product,
           amount: selectedTransactionData.amount,
           fee: selectedTransactionData.fee,
-          paymentMethod: 'Card',
+          paymentMethod: 'Paystack Card',
           status: selectedTransactionData.status
         } : undefined}
       />

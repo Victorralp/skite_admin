@@ -270,35 +270,35 @@ export default function RefundsTable() {
       <div className="flex flex-col items-start p-1 gap-1 w-full bg-[#F9F9FB] rounded-lg">
         {/* Table Header */}
         <div className="flex items-center px-6 py-2 gap-4 w-full h-[30px]">
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[62.95px]">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[10%]">
             TXN ID
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[101.35px]">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[12%]">
             Date
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] flex-1 min-w-[154.84px]">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[18%]">
             Product
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[73.21px]">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[10%]">
             Product type
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] flex-1 min-w-[154.84px]">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[15%]">
             Creator
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] flex-1 min-w-[154.84px]">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[15%]">
             Buyer
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[90.96px]">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[12%]">
             Amount
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[59px]">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[8%]">
             Status
           </span>
-          <div className="w-[18px]" />
+          <div className="w-[4%]" />
         </div>
 
         {/* Table Body */}
-        <div className="flex flex-col items-start w-full bg-white border border-[#EBEBEB] rounded-lg overflow-hidden">
+        <div className="flex flex-col items-start w-full bg-white border border-[#EBEBEB] rounded-lg">
           {filteredRefunds.map((refund, index) => (
             <div
               key={`${refund.id}-${index}`}
@@ -307,31 +307,31 @@ export default function RefundsTable() {
                 index < filteredRefunds.length - 1 && 'border-b border-[#EBEBEB]'
               )}
             >
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[62.95px]">
+              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[10%] truncate">
                 {refund.id}
               </span>
-              <span className="font-['Neue_Montreal'] font-normal text-xs leading-none text-[#5F5971] w-[101.35px]">
+              <span className="font-['Neue_Montreal'] font-normal text-xs leading-none text-[#5F5971] w-[12%] truncate">
                 {refund.date}
               </span>
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] flex-1 min-w-[154.84px] overflow-hidden text-ellipsis whitespace-nowrap">
+              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[18%] truncate">
                 {refund.product}
               </span>
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[73.21px]">
+              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[10%] truncate">
                 {refund.productType}
               </span>
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] flex-1 min-w-[154.84px] overflow-hidden text-ellipsis whitespace-nowrap">
+              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[15%] truncate">
                 {refund.creator}
               </span>
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] flex-1 min-w-[154.84px] overflow-hidden text-ellipsis whitespace-nowrap">
+              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[15%] truncate">
                 {refund.buyer}
               </span>
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[90.96px]">
+              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[12%] truncate">
                 {refund.amount}
               </span>
-              <div className="w-[59px]">
+              <div className="w-[8%]">
                 <StatusBadge status={refund.status} />
               </div>
-              <div className="relative w-[18px] h-[18px] flex-shrink-0">
+              <div className="relative w-[4%] h-[18px]">
                 <button 
                   onClick={() => setOpenMenuId(openMenuId === `${refund.id}-${index}` ? null : `${refund.id}-${index}`)}
                   className="w-[18px] h-[18px] flex items-center justify-center"

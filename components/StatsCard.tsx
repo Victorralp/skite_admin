@@ -21,22 +21,22 @@ export default function StatsCard({
     const displayType = delta ? deltaType : trendDirection;
 
     return (
-        <div className="bg-white border border-[#EBEBEB] rounded-lg p-4 flex flex-col gap-3 flex-1 min-w-[240px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)]">
-            {/* Title and Value Wrapper with gap-1 (4px) */}
-            <div className="flex flex-col gap-1">
-                <span className="text-[12px] text-[#5F5971] font-normal leading-[14px] font-['Neue_Montreal']">
+        <div className="flex flex-col items-start p-4 gap-3 w-full flex-1 basis-0 min-w-[240px] h-24 bg-white border border-[#EBEBEB] rounded-lg">
+            {/* Title and Value Section */}
+            <div className="flex flex-col items-start gap-1 w-full h-10">
+                <span className="font-['Neue_Montreal'] font-normal text-xs leading-[14px] text-[#5F5971] w-full">
                     {title}
                 </span>
-                <span className="text-[18px] font-medium text-[#2B2834] leading-[22px] font-['Neue_Montreal']">
+                <span className="font-['Neue_Montreal'] font-medium text-lg leading-[22px] text-[#2B2834] w-full">
                     {value}
                 </span>
             </div>
 
-            {/* Delta/Trend Wrapper */}
+            {/* Delta/Trend Section */}
             {displayText && (
                 <span
                     className={cn(
-                        "text-[10px] font-normal leading-[12px] font-['Neue_Montreal']",
+                        "font-['Neue_Montreal'] font-normal text-[10px] leading-3 w-full",
                         displayType === 'positive' && "text-[#239B73]",
                         displayType === 'up' && "text-[#239B73]",
                         displayType === 'negative' && "text-[#CD110A]",

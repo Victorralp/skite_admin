@@ -3,7 +3,7 @@
 import { creatorProducts } from '@/data/dashboard';
 import { cn } from '@/lib/utils';
 import { MoreVertical, CheckCircle2, XCircle } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import ProductDetailModal from '@/components/ProductDetailModal';
 import type { Product } from '@/data/dashboard';
 
@@ -50,6 +50,24 @@ const ActionMenu = ({ onClose, onViewProduct }: { onClose: () => void; onViewPro
 export default function ProductsTab() {
     const [openMenuId, setOpenMenuId] = useState<string | null>(null);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    // Close menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setOpenMenuId(null);
+            }
+        };
+
+        if (openMenuId) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [openMenuId]);
 
     return (
         <>
@@ -120,7 +138,7 @@ export default function ProductsTab() {
                                 </div>
 
                                 {/* Actions */}
-                                <div className="w-[18px] relative">
+                                <div className="w-[18px] relative" ref={openMenuId === product.id ? menuRef : null}>
                                     <button 
                                         onClick={() => setOpenMenuId(openMenuId === product.id ? null : product.id)}
                                         className="p-0 hover:opacity-70 transition-opacity"

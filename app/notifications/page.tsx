@@ -1,9 +1,10 @@
 import NotificationsOverview from '@/components/NotificationsOverview';
+import PageContainer from '@/components/layout/PageContainer';
 
 export default function NotificationsPage() {
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col items-start gap-8 box-border px-4 py-6 md:px-12">
+    <PageContainer>
       <NotificationsOverview />
-    </div>
+    </PageContainer>
   );
 }

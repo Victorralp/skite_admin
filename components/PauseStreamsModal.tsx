@@ -12,8 +12,14 @@ export default function PauseStreamsModal({ isOpen, onClose, onConfirm }: PauseS
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center">
-      <div className="flex flex-col justify-end items-end p-5 gap-6 w-[420px] h-[212.54px] bg-white rounded-[10px]">
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center"
+      onClick={onClose}
+    >
+      <div 
+        className="flex flex-col justify-end items-end p-5 gap-6 w-[420px] h-[212.54px] bg-white rounded-[10px]"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex flex-col items-start gap-4 w-[380px] h-[112.54px]">
           {/* Warning Icon */}
           <div className="w-[58.66px] h-[51.54px] flex items-center justify-center">

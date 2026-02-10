@@ -48,17 +48,17 @@ export default function RevenueOverview() {
   return (
     <div className="flex flex-col items-center justify-center gap-2 w-full">
       {/* Revenue Trend Title */}
-      <h3 className="font-['Neue_Montreal'] font-medium text-base leading-[19px] text-[#2B2834] w-full z-10">
+      <h3 className="text-heading-sm text-text-primary w-full z-10">
         Revenue Trend
       </h3>
 
       {/* Charts Container */}
-      <div className="flex flex-col items-start gap-1 w-full bg-[#F9F9FB] rounded-xl p-1">
+      <div className="flex flex-col items-start gap-1 w-full bg-surface-secondary rounded-xl p-1">
         {/* Daily Revenue Chart */}
-        <Card className="w-full min-h-[285px] rounded-lg bg-white border-none shadow-none">
+        <Card className="w-full min-h-[285px] rounded-lg bg-surface-primary border-none shadow-none">
           <CardContent className="p-4 flex flex-col gap-2">
             <div className="flex justify-between items-center h-[30px]">
-              <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834]">
+              <span className="text-caption-lg text-text-primary">
                 Daily Revenue
               </span>
               <CustomDropdown
@@ -67,7 +67,7 @@ export default function RevenueOverview() {
                 width="103px"
               />
             </div>
-            <div className="w-full h-0 border border-[#EBEBEB]" />
+            <div className="w-full h-0 border border-border-primary" />
             <div className="h-[207px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={revenueTrendData}>
@@ -77,26 +77,26 @@ export default function RevenueOverview() {
                       <stop offset="100%" stopColor="rgba(71, 166, 99, 0)" />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#EBEBEB" vertical={false} opacity={0.1} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border-primary)" vertical={false} opacity={0.1} />
                   <XAxis
                     dataKey="day"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: '#A5A1AF', fontSize: 12 }}
+                    tick={{ fill: 'var(--text-tertiary)', fontSize: 12 }}
                     ticks={[1, 15, 30]}
                   />
                   <YAxis
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: '#A5A1AF', fontSize: 12 }}
+                    tick={{ fill: 'var(--text-tertiary)', fontSize: 12 }}
                     tickFormatter={formatCurrency}
                     ticks={[0, 2000000, 4000000]}
                     width={40}
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#FFFFFF',
-                      border: '1px solid #EBEBEB',
+                      backgroundColor: 'var(--surface-primary)',
+                      border: '1px solid var(--border-primary)',
                       borderRadius: '8px',
                       boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                     }}

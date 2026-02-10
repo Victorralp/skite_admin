@@ -1,16 +1,39 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import LiveSessionCard from './LiveSessionCard';
 import UpcomingSessionCard from './UpcomingSessionCard';
 import PastSessionsTable from './PastSessionsTable';
+import { cn } from '@/lib/utils';
 
 type SessionType = 'Live' | 'Upcoming' | 'Past';
+
+const FilterPlusIcon = ({ className }: { className?: string }) => (
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="M4.09998 5.8501H7.59998M5.84998 4.1001V7.6001M0.599976 5.8501C0.599976 6.53954 0.735771 7.22223 0.999608 7.85919C1.26345 8.49614 1.65016 9.0749 2.13766 9.56241C2.62517 10.0499 3.20393 10.4366 3.84089 10.7005C4.47785 10.9643 5.16054 11.1001 5.84998 11.1001C6.53942 11.1001 7.2221 10.9643 7.85906 10.7005C8.49602 10.4366 9.07478 10.0499 9.56229 9.56241C10.0498 9.0749 10.4365 8.49614 10.7003 7.85919C10.9642 7.22223 11.1 6.53954 11.1 5.8501C11.1 4.45771 10.5469 3.12235 9.56229 2.13779C8.57772 1.15322 7.24236 0.600098 5.84998 0.600098C4.45759 0.600098 3.12223 1.15322 2.13766 2.13779C1.1531 3.12235 0.599976 4.45771 0.599976 5.8501Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
 export default function LiveSessionsGrid() {
   const [activeTab, setActiveTab] = useState<SessionType>('Upcoming');
   const [creatorFilterActive, setCreatorFilterActive] = useState(false);
-  const [statusFilterActive, setStatusFilterActive] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'Success' | 'Failed' | 'Rejected'>('all');
+
+  const creatorFilterRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (creatorFilterRef.current && !creatorFilterRef.current.contains(event.target as Node)) {
+        setCreatorFilterActive(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const tabs: SessionType[] = ['Live', 'Upcoming', 'Past'];
 
@@ -209,20 +232,18 @@ export default function LiveSessionsGrid() {
 
       {/* Creator Filter (only show for Upcoming) */}
       {activeTab === 'Upcoming' && (
-        <div className="flex items-center gap-2 relative">
+        <div className="flex items-center gap-[6px] relative">
           {/* Creator Filter Pill */}
-          <div className="relative">
+          <div className="relative overflow-visible" ref={creatorFilterRef}>
             <button 
               onClick={() => setCreatorFilterActive(!creatorFilterActive)}
-              className={`flex items-center justify-center gap-1 h-[22px] px-[9px] py-1 border border-dashed rounded-full transition-colors ${
-                creatorFilterActive ? 'border-[#5F2EFC]' : 'border-[#EBEBEB] hover:bg-gray-50'
-              }`}
+              className={cn(
+                "flex items-center gap-[4px] pl-[7px] pr-[9px] py-[4px] h-[22px] rounded-full border border-dashed transition-colors box-border",
+                creatorFilterActive ? "border-[#5F2EFC]" : "border-[#EBEBEB] hover:bg-gray-50"
+              )}
             >
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <circle cx="6" cy="6" r="5.25" stroke="currentColor" strokeWidth="1.2" fill="none" className={creatorFilterActive ? 'text-[#5F2EFC]' : 'text-[#5F5971]'} />
-                <path d="M6 3V9M3 6H9" stroke="currentColor" strokeWidth="1.2" className={creatorFilterActive ? 'text-[#5F2EFC]' : 'text-[#5F5971]'} />
-              </svg>
-              <span className={`text-xs font-medium leading-[14px] ${creatorFilterActive ? 'text-[#5F2EFC]' : 'text-[#5F5971]'}`}>Creator</span>
+              <FilterPlusIcon className={cn(creatorFilterActive ? "text-[#5F2EFC]" : "text-[#5F5971]")} />
+              <span className={cn("text-[12px] font-medium leading-[14px] font-['Neue_Montreal']", creatorFilterActive ? "text-[#5F2EFC]" : "text-[#5F5971]")}>Creator</span>
             </button>
             {creatorFilterActive && (
               <FilterDropdown
@@ -236,48 +257,18 @@ export default function LiveSessionsGrid() {
 
       {/* Filters for Past tab */}
       {activeTab === 'Past' && (
-        <div className="flex items-center gap-2">
-          {/* Status Filter */}
-          <div className="relative">
-            <button
-              onClick={() => {
-                setStatusFilterActive(!statusFilterActive);
-                setCreatorFilterActive(false);
-              }}
-              className={`flex items-center justify-center gap-1 h-[22px] px-[9px] py-1 border border-dashed rounded-full transition-colors ${
-                statusFilterActive ? 'border-[#5F2EFC]' : 'border-[#EBEBEB] hover:bg-gray-50'
-              }`}
-            >
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <circle cx="6" cy="6" r="5.25" stroke="currentColor" strokeWidth="1.2" fill="none" className={statusFilterActive ? 'text-[#5F2EFC]' : 'text-[#5F5971]'} />
-                <path d="M6 3V9M3 6H9" stroke="currentColor" strokeWidth="1.2" className={statusFilterActive ? 'text-[#5F2EFC]' : 'text-[#5F5971]'} />
-              </svg>
-              <span className={`text-xs font-medium leading-[14px] ${statusFilterActive ? 'text-[#5F2EFC]' : 'text-[#5F5971]'}`}>Status</span>
-            </button>
-            {statusFilterActive && (
-              <FilterDropdown
-                title="Filter by: Status"
-                onApply={() => setStatusFilterActive(false)}
-              />
-            )}
-          </div>
-
+        <div className="flex items-center gap-[6px] relative overflow-visible">
           {/* Creator Filter */}
-          <div className="relative">
+          <div className="relative overflow-visible" ref={creatorFilterRef}>
             <button
-              onClick={() => {
-                setCreatorFilterActive(!creatorFilterActive);
-                setStatusFilterActive(false);
-              }}
-              className={`flex items-center justify-center gap-1 h-[22px] px-[9px] py-1 border border-dashed rounded-full transition-colors ${
-                creatorFilterActive ? 'border-[#5F2EFC]' : 'border-[#EBEBEB] hover:bg-gray-50'
-              }`}
+              onClick={() => setCreatorFilterActive(!creatorFilterActive)}
+              className={cn(
+                "flex items-center gap-[4px] pl-[7px] pr-[9px] py-[4px] h-[22px] rounded-full border border-dashed transition-colors box-border",
+                creatorFilterActive ? "border-[#5F2EFC]" : "border-[#EBEBEB] hover:bg-gray-50"
+              )}
             >
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <circle cx="6" cy="6" r="5.25" stroke="currentColor" strokeWidth="1.2" fill="none" className={creatorFilterActive ? 'text-[#5F2EFC]' : 'text-[#5F5971]'} />
-                <path d="M6 3V9M3 6H9" stroke="currentColor" strokeWidth="1.2" className={creatorFilterActive ? 'text-[#5F2EFC]' : 'text-[#5F5971]'} />
-              </svg>
-              <span className={`text-xs font-medium leading-[14px] ${creatorFilterActive ? 'text-[#5F2EFC]' : 'text-[#5F5971]'}`}>Creator</span>
+              <FilterPlusIcon className={cn(creatorFilterActive ? "text-[#5F2EFC]" : "text-[#5F5971]")} />
+              <span className={cn("text-[12px] font-medium leading-[14px] font-['Neue_Montreal']", creatorFilterActive ? "text-[#5F2EFC]" : "text-[#5F5971]")}>Creator</span>
             </button>
             {creatorFilterActive && (
               <FilterDropdown
@@ -286,12 +277,31 @@ export default function LiveSessionsGrid() {
               />
             )}
           </div>
+
+          {/* Status Filter - Toggle Button */}
+          <button
+            onClick={() => setStatusFilter(
+              statusFilter === 'all' ? 'Success' :
+                statusFilter === 'Success' ? 'Failed' :
+                  statusFilter === 'Failed' ? 'Rejected' :
+                    'all'
+            )}
+            className={cn(
+              "flex items-center gap-[4px] pl-[7px] pr-[9px] py-[4px] h-[22px] rounded-full border border-dashed transition-colors box-border",
+              statusFilter !== 'all' ? "border-[#5F2EFC]" : "border-[#EBEBEB] hover:bg-gray-50"
+            )}
+          >
+            <FilterPlusIcon className={cn(statusFilter !== 'all' ? "text-[#5F2EFC]" : "text-[#5F5971]")} />
+            <span className={cn("text-[12px] font-medium leading-[14px] font-['Neue_Montreal']", statusFilter !== 'all' ? "text-[#5F2EFC]" : "text-[#5F5971]")}>
+              {statusFilter === 'all' ? 'Status' : statusFilter}
+            </span>
+          </button>
         </div>
       )}
 
       {/* Content Container */}
       {activeTab === 'Past' ? (
-        <PastSessionsTable />
+        <PastSessionsTable statusFilter={statusFilter} />
       ) : (
         <div className="w-full bg-[#F9F9FB] rounded-lg p-1 flex flex-col gap-1">
           {/* Header */}
@@ -328,9 +338,12 @@ export default function LiveSessionsGrid() {
 
 
 function FilterDropdown({ title, onApply }: { title: string; onApply: () => void }) {
+  const [fromValue, setFromValue] = useState('');
+  const [toValue, setToValue] = useState('');
+
   return (
     <div
-      className="absolute left-[-0.75px] top-[27px] w-[185px] h-[154px] bg-white border border-[#5F2EFC] rounded-2xl flex flex-col justify-center items-start p-3 gap-[10px]"
+      className="absolute left-[-0.75px] top-[27px] w-[185px] h-[154px] bg-white border border-[#5F2EFC] rounded-[16px] flex flex-col justify-center items-start p-3 gap-[10px]"
       style={{
         boxShadow: '0px 116px 46px rgba(0, 0, 0, 0.01), 0px 65px 39px rgba(0, 0, 0, 0.05), 0px 29px 29px rgba(0, 0, 0, 0.09), 0px 7px 16px rgba(0, 0, 0, 0.1)',
         zIndex: 50
@@ -345,21 +358,35 @@ function FilterDropdown({ title, onApply }: { title: string; onApply: () => void
       <div className="flex flex-col items-start gap-1 w-[161px] h-16">
         {/* From Field */}
         <div className="flex items-center gap-[10px] w-[161px] h-[30px]">
-          <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal'] w-[32.91px]">
+          <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal'] w-[32.91px] shrink-0">
             From
           </span>
-          <div className="flex-1 h-[30px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-md flex items-center justify-end px-2">
-            <span className="text-[12px] font-medium text-[#5F5971] leading-[14px] font-['Neue_Montreal']">@</span>
+          <div className="w-[118px] h-[30px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-[6px] flex items-center justify-end px-2 gap-[10px] overflow-hidden">
+            <input
+              type="text"
+              value={fromValue}
+              onChange={(e) => setFromValue(e.target.value)}
+              className="w-full bg-transparent text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal'] outline-none border-none text-right"
+              placeholder=""
+            />
+            <span className="text-[12px] font-medium text-[#5F5971] leading-[14px] font-['Neue_Montreal'] shrink-0">@</span>
           </div>
         </div>
 
         {/* To Field */}
         <div className="flex items-center gap-[10px] w-[161px] h-[30px]">
-          <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal'] w-[32.91px]">
+          <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal'] w-[32.91px] shrink-0">
             To
           </span>
-          <div className="flex-1 h-[30px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-md flex items-center justify-end px-2">
-            <span className="text-[12px] font-medium text-[#5F5971] leading-[14px] font-['Neue_Montreal']">@</span>
+          <div className="w-[118px] h-[30px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-[6px] flex items-center justify-end px-2 gap-[10px] overflow-hidden">
+            <input
+              type="text"
+              value={toValue}
+              onChange={(e) => setToValue(e.target.value)}
+              className="w-full bg-transparent text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal'] outline-none border-none text-right"
+              placeholder=""
+            />
+            <span className="text-[12px] font-medium text-[#5F5971] leading-[14px] font-['Neue_Montreal'] shrink-0">@</span>
           </div>
         </div>
       </div>

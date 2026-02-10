@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import PageContainer from '@/components/layout/PageContainer';
 import LiveStreamingModal from '@/components/LiveStreamingModal';
 import ComplianceModal from '@/components/ComplianceModal';
 import NotificationSettingsModal from '@/components/NotificationSettingsModal';
@@ -60,13 +61,13 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="flex flex-col items-start px-4 sm:px-8 md:px-12 lg:px-16 py-6 gap-8 bg-white min-h-screen">
-      <div className="flex flex-col items-start gap-6 w-full max-w-[1102px]">
-        <h1 className="text-[20px] font-bold leading-6 tracking-[-0.01em] text-[#2B2834]">
+    <PageContainer>
+      <div className="flex flex-col gap-2">
+        <h1 className="text-[20px] font-bold text-[#2B2834] leading-[100%] tracking-[-0.01em] font-['Neue_Montreal']">
           Settings
         </h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 w-full">
           {settingCards.map((card, index) => {
             return (
               <div
@@ -116,6 +117,6 @@ export default function SettingsPage() {
         isOpen={isNotificationModalOpen}
         onClose={() => setIsNotificationModalOpen(false)}
       />
-    </div>
+    </PageContainer>
   );
 }

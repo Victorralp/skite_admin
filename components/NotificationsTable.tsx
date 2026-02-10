@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { MoreVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ActionMenu from './ActionMenu';
@@ -163,6 +163,24 @@ interface NotificationsTableProps {
 export default function NotificationsTable({}: NotificationsTableProps = {}) {
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpenMenuId(null);
+      }
+    };
+
+    if (openMenuId) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [openMenuId]);
 
   const toggleFilter = (filter: string) => {
     setActiveFilters(prev => 
@@ -255,19 +273,19 @@ export default function NotificationsTable({}: NotificationsTableProps = {}) {
       <div className="flex flex-col items-start p-1 gap-1 w-full bg-[#F9F9FB] rounded-lg">
         {/* Table Header */}
         <div className="flex items-center px-6 py-2 gap-4 w-full h-[30px]">
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] flex-1">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] flex-1 min-w-[200px]">
             Subject
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[57px]">
-            Status
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[80px]">
+            Priority
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[95px]">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[120px]">
             Type
           </span>
           <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[120px]">
             Status
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[120px]">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[140px]">
             Date
           </span>
           <div className="w-[18px]" />
@@ -283,15 +301,15 @@ export default function NotificationsTable({}: NotificationsTableProps = {}) {
                 index < filteredNotifications.length - 1 && 'border-b border-[#EBEBEB]'
               )}
             >
-              <span className="font-['Neue_Montreal'] font-medium text-[13.5px] leading-4 text-[#2B2834] flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
+              <span className="font-['Neue_Montreal'] font-medium text-[13.5px] leading-4 text-[#2B2834] flex-1 min-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap">
                 {notification.subject}
               </span>
               
-              <div className="w-[57px] flex justify-start">
+              <div className="w-[80px] flex justify-start">
                 <StatusBadge status={notification.status} />
               </div>
               
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[95px]">
+              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[120px]">
                 {notification.type}
               </span>
               
@@ -299,11 +317,11 @@ export default function NotificationsTable({}: NotificationsTableProps = {}) {
                 {notification.readStatus}
               </span>
               
-              <span className="font-['Neue_Montreal'] font-normal text-xs leading-[14px] text-[#5F5971] w-[120px]">
+              <span className="font-['Neue_Montreal'] font-normal text-xs leading-[14px] text-[#5F5971] w-[140px]">
                 {notification.date}
               </span>
               
-              <div className="relative w-[18px] h-[18px] flex-shrink-0">
+              <div className="relative w-[18px] h-[18px] flex-shrink-0" ref={openMenuId === notification.id ? menuRef : null}>
                 <button 
                   onClick={() => setOpenMenuId(openMenuId === notification.id ? null : notification.id)}
                   className="w-[18px] h-[18px] flex items-center justify-center"

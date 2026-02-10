@@ -66,7 +66,7 @@ export default function CreatorsPage() {
             <PageContainer>
                 {/* Header */}
                 <div className="flex flex-col gap-2">
-                    <h1 className="text-[20px] font-bold text-[#2B2834] leading-[100%] tracking-[-0.01em] font-['Neue_Montreal']">Creators</h1>
+                    <h1 className="text-heading-lg text-text-primary">Creators</h1>
 
                     {/* Stats Cards Row */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 w-full">

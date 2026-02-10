@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 type LogCategory = 'Admin Actions' | 'System Events' | 'Authentication Logs';
@@ -30,10 +31,13 @@ type AuthLogEntry = {
   timestamp: string;
   user: string;
   action: string;
+  message: string;
   userAgent: string;
   ipAddress: string;
   status: 'Failed' | 'Success';
 };
+
+const AUTH_LOG_STORAGE_KEY = 'skite_latest_auth_log';
 
 const adminActionsLogs: AdminLogEntry[] = [
   {
@@ -142,6 +146,7 @@ const authenticationLogs: AuthLogEntry[] = [
     timestamp: '12.03.2025 00:23',
     user: 'Bola Ahmed',
     action: 'Login',
+    message: 'Invalid password',
     userAgent: 'Suspicious Bot',
     ipAddress: '197.210.45.67',
     status: 'Failed'
@@ -151,6 +156,7 @@ const authenticationLogs: AuthLogEntry[] = [
     timestamp: '12.03.2025 00:23',
     user: 'Bola Ahmed',
     action: 'Login',
+    message: 'Login successful',
     userAgent: 'Chrome 120 (Lagos)',
     ipAddress: '197.210.45.67',
     status: 'Success'
@@ -160,6 +166,7 @@ const authenticationLogs: AuthLogEntry[] = [
     timestamp: '12.03.2025 00:23',
     user: 'Bola Ahmed',
     action: 'Login',
+    message: 'Login successful',
     userAgent: 'Chrome 120 (Lagos)',
     ipAddress: '197.210.45.67',
     status: 'Success'
@@ -169,6 +176,7 @@ const authenticationLogs: AuthLogEntry[] = [
     timestamp: '12.03.2025 00:23',
     user: 'Bola Ahmed',
     action: 'Login',
+    message: 'Login successful',
     userAgent: 'Chrome 120 (Lagos)',
     ipAddress: '197.210.45.67',
     status: 'Success'
@@ -178,11 +186,34 @@ const authenticationLogs: AuthLogEntry[] = [
     timestamp: '12.03.2025 00:23',
     user: 'Bola Ahmed',
     action: 'Login',
+    message: 'Login successful',
     userAgent: 'Chrome 120 (Lagos)',
     ipAddress: '197.210.45.67',
     status: 'Success'
   }
 ];
+
+function parseStoredAuthLog(raw: string | null): AuthLogEntry | null {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as Partial<AuthLogEntry>;
+    if (
+      typeof parsed.id !== 'string' ||
+      typeof parsed.timestamp !== 'string' ||
+      typeof parsed.user !== 'string' ||
+      typeof parsed.action !== 'string' ||
+      typeof parsed.message !== 'string' ||
+      typeof parsed.userAgent !== 'string' ||
+      typeof parsed.ipAddress !== 'string' ||
+      (parsed.status !== 'Failed' && parsed.status !== 'Success')
+    ) {
+      return null;
+    }
+    return parsed as AuthLogEntry;
+  } catch {
+    return null;
+  }
+}
 
 const AuthStatusBadge = ({ status }: { status: AuthLogEntry['status'] }) => {
   const config = {
@@ -302,28 +333,35 @@ interface LogsTableProps {
 }
 
 export default function LogsTable({ category }: LogsTableProps) {
+  const [latestAuthLog, setLatestAuthLog] = useState<AuthLogEntry | null>(null);
+
+  useEffect(() => {
+    const latest = parseStoredAuthLog(localStorage.getItem(AUTH_LOG_STORAGE_KEY));
+    setLatestAuthLog(latest);
+  }, []);
+
   // Render different table layouts based on category
   if (category === 'System Events') {
     return (
       <div className="flex flex-col items-start p-1 gap-1 w-full bg-[#F9F9FB] rounded-lg">
         {/* Table Header */}
         <div className="flex items-center px-6 py-2 gap-4 w-full h-[30px]">
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[110.86px]">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[140px]">
             Timestamp
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[131.53px]">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[120px]">
             Event Type
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[105.69px]">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[120px]">
             Component
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] flex-1">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] flex-1 min-w-[150px]">
             Message
           </span>
           <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[80px]">
             Severity
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] flex-1">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] flex-1 min-w-[150px]">
             Details
           </span>
         </div>
@@ -338,22 +376,22 @@ export default function LogsTable({ category }: LogsTableProps) {
                 index < systemEventsLogs.length - 1 && 'border-b border-[#EBEBEB]'
               )}
             >
-              <span className="font-['Neue_Montreal'] font-normal text-xs leading-[14px] text-[#5F5971] w-[110.86px]">
+              <span className="font-['Neue_Montreal'] font-normal text-xs leading-[14px] text-[#5F5971] w-[140px]">
                 {log.timestamp}
               </span>
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[131.53px]">
+              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[120px]">
                 {log.eventType}
               </span>
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[105.69px]">
+              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[120px]">
                 {log.component}
               </span>
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] flex-1">
+              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] flex-1 min-w-[150px] truncate">
                 {log.message}
               </span>
               <div className="w-[80px] flex justify-start">
                 <SeverityBadge severity={log.severity} />
               </div>
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] flex-1">
+              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] flex-1 min-w-[150px] truncate">
                 {log.details}
               </span>
             </div>
@@ -365,56 +403,67 @@ export default function LogsTable({ category }: LogsTableProps) {
 
   // Admin Actions and Authentication Logs use different layouts
   if (category === 'Authentication Logs') {
+    const authLogs = latestAuthLog
+      ? [latestAuthLog, ...authenticationLogs]
+      : authenticationLogs;
+
     return (
       <div className="flex flex-col items-start p-1 gap-1 w-full bg-[#F9F9FB] rounded-lg">
         {/* Table Header */}
         <div className="flex items-center px-6 py-2 gap-4 w-full h-[30px]">
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] flex-1">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[140px]">
             Timestamp
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] flex-1">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] flex-1 min-w-[120px]">
             User
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] flex-1">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[100px]">
             Action
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] flex-1">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] flex-1 min-w-[170px]">
+            Message
+          </span>
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] flex-1 min-w-[150px]">
             User Agent
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] flex-1">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[120px]">
             IP Address
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[57.98px]">
+          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[80px]">
             Status
           </span>
         </div>
 
         {/* Table Body */}
         <div className="flex flex-col items-start w-full bg-white border border-[#EBEBEB] rounded-lg overflow-hidden">
-          {authenticationLogs.map((log, index) => (
+          {authLogs.map((log, index) => (
             <div
               key={log.id}
               className={cn(
                 'flex items-center px-6 py-3 gap-4 w-full h-10 bg-white',
-                index < authenticationLogs.length - 1 && 'border-b border-[#EBEBEB]'
+                index < authLogs.length - 1 && 'border-b border-[#EBEBEB]',
+                latestAuthLog?.id === log.id && 'bg-surface-active'
               )}
             >
-              <span className="font-['Neue_Montreal'] font-normal text-xs leading-[14px] text-[#5F5971] flex-1">
+              <span className="font-['Neue_Montreal'] font-normal text-xs leading-[14px] text-[#5F5971] w-[140px]">
                 {log.timestamp}
               </span>
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] flex-1">
+              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] flex-1 min-w-[120px] truncate">
                 {log.user}
               </span>
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] flex-1">
+              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[100px]">
                 {log.action}
               </span>
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] flex-1">
+              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] flex-1 min-w-[170px] truncate">
+                {log.message}
+              </span>
+              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] flex-1 min-w-[150px] truncate">
                 {log.userAgent}
               </span>
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] flex-1">
+              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[120px]">
                 {log.ipAddress}
               </span>
-              <div className="w-[57.98px] flex justify-start">
+              <div className="w-[80px] flex justify-start">
                 <AuthStatusBadge status={log.status} />
               </div>
             </div>
@@ -431,25 +480,25 @@ export default function LogsTable({ category }: LogsTableProps) {
     <div className="flex flex-col items-start p-1 gap-1 w-full bg-[#F9F9FB] rounded-lg">
       {/* Table Header */}
       <div className="flex items-center px-6 py-2 gap-4 w-full h-[30px]">
-        <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[110.86px]">
+        <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[140px]">
           Timestamp
         </span>
-        <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[131.53px]">
+        <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] flex-1 min-w-[120px]">
           Admin
         </span>
-        <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[105.69px]">
+        <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[100px]">
           Section
         </span>
-        <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[107.02px]">
+        <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[100px]">
           Action
         </span>
-        <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[122.57px]">
+        <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] flex-1 min-w-[120px]">
           Target
         </span>
-        <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] flex-1">
+        <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] flex-1 min-w-[150px]">
           Details
         </span>
-        <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[90px]">
+        <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[120px]">
           IP Address
         </span>
       </div>
@@ -464,25 +513,25 @@ export default function LogsTable({ category }: LogsTableProps) {
               index < logs.length - 1 && 'border-b border-[#EBEBEB]'
             )}
           >
-            <span className="font-['Neue_Montreal'] font-normal text-xs leading-[14px] text-[#5F5971] w-[110.86px]">
+            <span className="font-['Neue_Montreal'] font-normal text-xs leading-[14px] text-[#5F5971] w-[140px]">
               {log.timestamp}
             </span>
-            <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[131.53px]">
+            <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] flex-1 min-w-[120px] truncate">
               {log.admin}
             </span>
-            <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[105.69px]">
+            <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[100px]">
               {log.section}
             </span>
-            <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[107.02px]">
+            <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[100px]">
               {log.action}
             </span>
-            <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[122.57px]">
+            <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] flex-1 min-w-[120px] truncate">
               {log.target}
             </span>
-            <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] flex-1">
+            <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] flex-1 min-w-[150px] truncate">
               {log.details}
             </span>
-            <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[90px]">
+            <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[120px]">
               {log.ipAddress}
             </span>
           </div>

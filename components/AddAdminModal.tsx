@@ -1,39 +1,106 @@
 'use client';
 
 import { useState } from 'react';
+import type { AdminRole } from '@/lib/api';
 
 interface AddAdminModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (email: string, role: string) => void;
+  onConfirm: (payload: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: AdminRole;
+  }) => Promise<void>;
 }
 
 export default function AddAdminModal({ isOpen, onClose, onConfirm }: AddAdminModalProps) {
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [role, setRole] = useState<AdminRole | ''>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleConfirm = () => {
-    if (email && role) {
-      onConfirm(email, role);
-      setEmail(''); // Reset after confirm
-      setRole('');
+  const resetForm = () => {
+    setEmail('');
+    setFirstName('');
+    setLastName('');
+    setRole('');
+    setError(null);
+  };
+
+  const handleClose = () => {
+    if (isSubmitting) return;
+    resetForm();
+    onClose();
+  };
+
+  const handleConfirm = async () => {
+    if (!email || !firstName || !lastName || !role || isSubmitting) return;
+
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      await onConfirm({ email, firstName, lastName, role });
+      resetForm();
+      onClose();
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Failed to create admin';
+      setError(message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center">
-      <div className="flex flex-col justify-end items-end p-5 gap-6 w-[420px] h-[265px] bg-white rounded-[10px]">
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center"
+      onClick={handleClose}
+    >
+      <div 
+        className="flex flex-col justify-end items-end p-5 gap-6 w-[420px] bg-white rounded-[10px]"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Title */}
         <h3 className="text-base font-bold leading-[19px] text-[#2B2834] w-[380px] self-start">
           Add Admin
         </h3>
 
         {/* Content */}
-        <div className="flex flex-col items-start gap-4 w-[380px] h-[122px]">
+        <div className="flex flex-col items-start gap-4 w-[380px]">
+          <div className="flex flex-col items-start gap-[5px] w-[380px]">
+            <label className="text-xs font-normal leading-[14px] text-[#2B2834] w-full">
+              First Name
+            </label>
+            
+            <input
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="First name"
+              className="flex flex-row items-center px-3 py-1 w-full h-[34px] bg-[#F9F9FB] border border-[#EBEBEB] shadow-sm rounded-md text-xs font-normal text-[#2B2834] placeholder-[#A5A1AF] focus:outline-none focus:ring-2 focus:ring-[#5F2EFC]"
+            />
+          </div>
+
+          <div className="flex flex-col items-start gap-[5px] w-[380px]">
+            <label className="text-xs font-normal leading-[14px] text-[#2B2834] w-full">
+              Last Name
+            </label>
+            
+            <input
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="Last name"
+              className="flex flex-row items-center px-3 py-1 w-full h-[34px] bg-[#F9F9FB] border border-[#EBEBEB] shadow-sm rounded-md text-xs font-normal text-[#2B2834] placeholder-[#A5A1AF] focus:outline-none focus:ring-2 focus:ring-[#5F2EFC]"
+            />
+          </div>
+
           {/* Email Field */}
-          <div className="flex flex-col items-start gap-[5px] w-[380px] h-[53px]">
+          <div className="flex flex-col items-start gap-[5px] w-[380px]">
             <label className="text-xs font-normal leading-[14px] text-[#2B2834] w-full">
               Email
             </label>
@@ -48,7 +115,7 @@ export default function AddAdminModal({ isOpen, onClose, onConfirm }: AddAdminMo
           </div>
 
           {/* Role Field */}
-          <div className="flex flex-col items-start gap-[5px] w-[380px] h-[53px]">
+          <div className="flex flex-col items-start gap-[5px] w-[380px]">
             <label className="text-xs font-normal leading-[14px] text-[#2B2834] w-full">
               Role
             </label>
@@ -56,7 +123,7 @@ export default function AddAdminModal({ isOpen, onClose, onConfirm }: AddAdminMo
             <div className="relative w-full">
               <select
                 value={role}
-                onChange={(e) => setRole(e.target.value)}
+                onChange={(e) => setRole(e.target.value as AdminRole | '')}
                 className="appearance-none flex flex-row items-center px-3 py-1 w-full h-[34px] bg-[#F9F9FB] border border-[#EBEBEB] shadow-sm rounded-md text-xs font-normal text-[#2B2834] focus:outline-none focus:ring-2 focus:ring-[#5F2EFC] cursor-pointer"
               >
                 <option value="" disabled className="text-[#A5A1AF]">Select</option>
@@ -64,6 +131,7 @@ export default function AddAdminModal({ isOpen, onClose, onConfirm }: AddAdminMo
                 <option value="Admin">Admin</option>
                 <option value="Moderator">Moderator</option>
                 <option value="Viewer">Viewer</option>
+                <option value="User">User</option>
               </select>
               <svg
                 className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
@@ -77,12 +145,19 @@ export default function AddAdminModal({ isOpen, onClose, onConfirm }: AddAdminMo
               </svg>
             </div>
           </div>
+
+          {error ? (
+            <div className="w-full rounded-md border border-[#F1C6C4] bg-[#FBECEB] px-3 py-2 text-xs text-[#CD110A]">
+              {error}
+            </div>
+          ) : null}
         </div>
 
         {/* Action Buttons */}
         <div className="flex flex-row items-start gap-2 w-[211px] h-9">
           <button
-            onClick={onClose}
+            onClick={handleClose}
+            disabled={isSubmitting}
             className="flex flex-row justify-center items-center px-6 py-2 h-9 bg-white border border-[#EBEBEB] rounded-lg shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] hover:bg-gray-50 transition-colors"
           >
             <span className="text-[13.5px] font-medium leading-4 text-[#353A44]">
@@ -92,11 +167,11 @@ export default function AddAdminModal({ isOpen, onClose, onConfirm }: AddAdminMo
 
           <button
             onClick={handleConfirm}
-            disabled={!email || !role}
+            disabled={!email || !firstName || !lastName || !role || isSubmitting}
             className="flex flex-row justify-center items-center px-6 py-2 h-9 bg-gradient-to-b from-[#5F2EFC] to-[#4E18FC] rounded-lg shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span className="text-[13.5px] font-medium leading-4 text-[#FFFCF8]">
-              Send Invite
+              {isSubmitting ? 'Creating...' : 'Send Invite'}
             </span>
           </button>
         </div>

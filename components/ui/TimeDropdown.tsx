@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface TimeDropdownProps {
   options?: string[];
@@ -23,6 +23,21 @@ const TimeDropdown = ({
 }: TimeDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState(defaultOption);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleSelect = (option: string) => {
     setSelected(option);
@@ -33,12 +48,12 @@ const TimeDropdown = ({
   };
 
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center pt-[5px] pr-[7px] pb-[5px] pl-[10px] gap-0 w-[78px] h-[30px] bg-[#FFFFFF] border border-[#EBEBEB] shadow-[0px_1px_4.8px_0px_rgba(0,0,0,0.03)] rounded-[8px] flex-none cursor-pointer hover:border-[#DBD8E4] transition-colors ${className}`}
+        className={`flex items-center py-1 px-2.5 gap-0 w-20 h-8 bg-surface-primary border border-border-primary shadow-card rounded-lg flex-none cursor-pointer hover:border-border-secondary transition-colors ${className}`}
       >
-        <span className="text-xs font-normal leading-none text-[#5F5971] font-['Neue_Montreal'] flex-1 h-[14px] whitespace-nowrap tracking-[0%]">
+        <span className="text-caption-lg text-text-secondary flex-1 h-4 whitespace-nowrap">
           {selected}
         </span>
         <div className="w-5 h-5 flex-none">
@@ -49,23 +64,18 @@ const TimeDropdown = ({
       {/* Dropdown Menu */}
       {isOpen && (
         <div 
-          className="absolute right-0 top-[34px] z-50 rounded-[8px] flex flex-col overflow-hidden bg-white"
+          className="absolute right-0 top-9 z-50 rounded-lg flex flex-col overflow-hidden bg-white border border-border-primary shadow-dropdown"
           style={{
-            width: '100px',
-            border: '1px solid #EBEBEB',
-            boxShadow: '0px 116px 46px rgba(0, 0, 0, 0.01), 0px 65px 39px rgba(0, 0, 0, 0.05), 0px 29px 29px rgba(0, 0, 0, 0.09), 0px 7px 16px rgba(0, 0, 0, 0.1)'
+            width: '100px'
           }}
         >
           {options.map((option, i) => (
             <button
               key={option}
               onClick={() => handleSelect(option)}
-              className="w-full h-[33px] flex items-center px-4 py-2 gap-2.5 bg-white hover:bg-gray-50 transition-colors"
-              style={{
-                borderBottom: i < options.length - 1 ? '0.2px solid #EBEBEB' : 'none'
-              }}
+              className="w-full h-8 flex items-center px-4 py-2 gap-2.5 bg-white hover:bg-gray-50 transition-colors border-b border-border-primary last:border-b-0"
             >
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-[16px] text-[#5F5971]">
+              <span className="text-body-sm text-text-secondary">
                 {option}
               </span>
             </button>

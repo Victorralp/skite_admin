@@ -7,19 +7,31 @@ import ActionMenu from '@/components/ActionMenu';
 import { MoreVertical } from 'lucide-react';
 import PageContainer from '@/components/layout/PageContainer';
 import { allProducts, Product } from '@/data/dashboard';
+import { cn } from '@/lib/utils';
+
+const FilterPlusIcon = ({ className }: { className?: string }) => (
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="M4.09998 5.8501H7.59998M5.84998 4.1001V7.6001M0.599976 5.8501C0.599976 6.53954 0.735771 7.22223 0.999608 7.85919C1.26345 8.49614 1.65016 9.0749 2.13766 9.56241C2.62517 10.0499 3.20393 10.4366 3.84089 10.7005C4.47785 10.9643 5.16054 11.1001 5.84998 11.1001C6.53942 11.1001 7.2221 10.9643 7.85906 10.7005C8.49602 10.4366 9.07478 10.0499 9.56229 9.56241C10.0498 9.0749 10.4365 8.49614 10.7003 7.85919C10.9642 7.22223 11.1 6.53954 11.1 5.8501C11.1 4.45771 10.5469 3.12235 9.56229 2.13779C8.57772 1.15322 7.24236 0.600098 5.84998 0.600098C4.45759 0.600098 3.12223 1.15322 2.13766 2.13779C1.1531 3.12235 0.599976 4.45771 0.599976 5.8501Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const SlidersHorizontalIcon = ({ className }: { className?: string }) => (
+  <svg width="11" height="8" viewBox="0 0 11 8" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="M7.5 7.5V0.5M7.5 0.5L9.83333 2.90625M7.5 0.5L5.16667 2.90625M2.83333 0.5V7.5M2.83333 7.5L5.16667 5.09375M2.83333 7.5L0.5 5.09375" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
 export default function ProductsPage() {
   const [creatorFilterActive, setCreatorFilterActive] = useState(false);
-  const [statusFilterActive, setStatusFilterActive] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'rejected' | 'inactive'>('all');
   const [typeFilterActive, setTypeFilterActive] = useState(false);
   const [priceFilterActive, setPriceFilterActive] = useState(false);
   const [revenueFilterActive, setRevenueFilterActive] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const creatorFilterRef = useRef<HTMLDivElement>(null);
-  const statusFilterRef = useRef<HTMLDivElement>(null);
   const typeFilterRef = useRef<HTMLDivElement>(null);
   const priceFilterRef = useRef<HTMLDivElement>(null);
   const revenueFilterRef = useRef<HTMLDivElement>(null);
@@ -30,9 +42,6 @@ export default function ProductsPage() {
       if (creatorFilterRef.current && !creatorFilterRef.current.contains(event.target as Node)) {
         setCreatorFilterActive(false);
       }
-      if (statusFilterRef.current && !statusFilterRef.current.contains(event.target as Node)) {
-        setStatusFilterActive(false);
-      }
       if (typeFilterRef.current && !typeFilterRef.current.contains(event.target as Node)) {
         setTypeFilterActive(false);
       }
@@ -41,6 +50,9 @@ export default function ProductsPage() {
       }
       if (revenueFilterRef.current && !revenueFilterRef.current.contains(event.target as Node)) {
         setRevenueFilterActive(false);
+      }
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpenMenuId(null);
       }
     };
 
@@ -60,14 +72,16 @@ export default function ProductsPage() {
   // Use centralized product data
   const products = allProducts;
 
-  const handleViewProductDetails = (product: any) => {
+  const filteredProducts = statusFilter === 'all'
+    ? products
+    : products.filter((product) => product.status === statusFilter);
+
+  const handleViewProductDetails = (product: Product) => {
     setSelectedProduct(product);
-    setIsModalOpen(true);
     setOpenMenuId(null);
   };
 
   const handleCloseModal = () => {
-    setIsModalOpen(false);
     setSelectedProduct(null);
   };
 
@@ -88,14 +102,13 @@ export default function ProductsPage() {
         <div className="flex flex-col gap-2">
           {/* Filters and Sort */}
           <div className="flex justify-between items-center h-6">
-            <div className="flex gap-1.5 items-center relative">
-              <div className="relative" ref={creatorFilterRef}>
+            <div className="flex gap-[6px] items-center relative overflow-visible">
+              <div className="relative overflow-visible" ref={creatorFilterRef}>
                 <FilterPill
                   label="Creator"
                   active={creatorFilterActive}
                   onClick={() => {
                     setCreatorFilterActive(!creatorFilterActive);
-                    setStatusFilterActive(false);
                     setTypeFilterActive(false);
                     setPriceFilterActive(false);
                     setRevenueFilterActive(false);
@@ -110,35 +123,35 @@ export default function ProductsPage() {
                 )}
               </div>
 
-              <div className="relative" ref={statusFilterRef}>
-                <FilterPill
-                  label="Status"
-                  active={statusFilterActive}
-                  onClick={() => {
-                    setStatusFilterActive(!statusFilterActive);
-                    setCreatorFilterActive(false);
-                    setTypeFilterActive(false);
-                    setPriceFilterActive(false);
-                    setRevenueFilterActive(false);
-                  }}
-                />
-                {statusFilterActive && (
-                  <FilterDropdown
-                    title="Filter by: Status"
-                    showCalendar={false}
-                    onApply={() => setStatusFilterActive(false)}
-                  />
+              {/* Status Filter - Toggle Button */}
+              <button
+                onClick={() => setStatusFilter(
+                  statusFilter === 'all' ? 'active' :
+                    statusFilter === 'active' ? 'rejected' :
+                      statusFilter === 'rejected' ? 'inactive' :
+                        'all'
                 )}
-              </div>
+                className={cn(
+                  "flex items-center gap-[4px] pl-[7px] pr-[9px] py-[4px] h-[22px] rounded-full border border-dashed transition-colors box-border",
+                  statusFilter !== 'all' ? "border-[#5F2EFC]" : "border-[#EBEBEB] hover:bg-gray-50"
+                )}
+              >
+                <FilterPlusIcon className={cn(statusFilter !== 'all' ? "text-[#5F2EFC]" : "text-[#5F5971]")} />
+                <span className={cn("text-[12px] font-medium leading-[14px] font-['Neue_Montreal']", statusFilter !== 'all' ? "text-[#5F2EFC]" : "text-[#5F5971]")}>
+                  {statusFilter === 'all' ? 'Status' :
+                    statusFilter === 'active' ? 'Active' :
+                      statusFilter === 'rejected' ? 'Rejected' :
+                        'Inactive'}
+                </span>
+              </button>
 
-              <div className="relative" ref={typeFilterRef}>
+              <div className="relative overflow-visible" ref={typeFilterRef}>
                 <FilterPill
                   label="Type"
                   active={typeFilterActive}
                   onClick={() => {
                     setTypeFilterActive(!typeFilterActive);
                     setCreatorFilterActive(false);
-                    setStatusFilterActive(false);
                     setPriceFilterActive(false);
                     setRevenueFilterActive(false);
                   }}
@@ -152,14 +165,13 @@ export default function ProductsPage() {
                 )}
               </div>
 
-              <div className="relative" ref={priceFilterRef}>
+              <div className="relative overflow-visible" ref={priceFilterRef}>
                 <FilterPill
                   label="Price"
                   active={priceFilterActive}
                   onClick={() => {
                     setPriceFilterActive(!priceFilterActive);
                     setCreatorFilterActive(false);
-                    setStatusFilterActive(false);
                     setTypeFilterActive(false);
                     setRevenueFilterActive(false);
                   }}
@@ -173,14 +185,13 @@ export default function ProductsPage() {
                 )}
               </div>
 
-              <div className="relative" ref={revenueFilterRef}>
+              <div className="relative overflow-visible" ref={revenueFilterRef}>
                 <FilterPill
                   label="Revenue"
                   active={revenueFilterActive}
                   onClick={() => {
                     setRevenueFilterActive(!revenueFilterActive);
                     setCreatorFilterActive(false);
-                    setStatusFilterActive(false);
                     setTypeFilterActive(false);
                     setPriceFilterActive(false);
                   }}
@@ -194,11 +205,9 @@ export default function ProductsPage() {
                 )}
               </div>
             </div>
-            <button className="flex items-center gap-0.5 px-2.5 py-[5px] bg-white border border-[#EBEBEB] rounded-lg shadow-[0px_1px_4.8px_rgba(0,0,0,0.03)] h-6">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9.33333 10.5V3.5M9.33333 3.5L11.6667 5.90625M9.33333 3.5L7 5.90625M4.66667 3.5V10.5M4.66667 10.5L7 8.09375M4.66667 10.5L2.33333 8.09375" stroke="#5F5971" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <span className="text-xs text-[#5F5971]">Sort</span>
+            <button className="flex items-center gap-[2px] pl-[7px] pr-[10px] py-[5px] h-[24px] bg-white border border-[#EBEBEB] rounded-lg shadow-[0px_1px_4.8px_rgba(0,0,0,0.03)] hover:bg-gray-50 transition-colors box-border">
+              <SlidersHorizontalIcon className="h-[14px] w-[14px] text-[#5F5971]" />
+              <span className="text-[12px] font-normal text-[#5F5971] leading-[14px] font-['Neue_Montreal']">Sort</span>
             </button>
           </div>
 
@@ -206,27 +215,26 @@ export default function ProductsPage() {
           <div className="rounded-lg border border-[#EBEBEB] flex flex-col w-full shadow-none p-1 gap-1" style={{ backgroundColor: '#F9F9FB' }}>
             {/* Table Header */}
             <div className="flex items-center h-[30px] shrink-0" style={{ padding: '8px 24px', gap: '16px' }}>
-              <div className="flex-1 text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Product</div>
-              <div className="flex-1 text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Creator</div>
-              <div className="w-20 text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Type</div>
-              <div className="w-[102px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Date Created</div>
+              <div className="w-[240px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Product</div>
+              <div className="w-[180px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Creator</div>
+              <div className="w-[120px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Type</div>
+              <div className="w-[120px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Date Created</div>
               <div className="w-[100px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Price</div>
-              <div className="w-20 text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Sales</div>
+              <div className="w-[80px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Sales</div>
               <div className="w-[120px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Revenue</div>
-              <div className="w-[18px] opacity-0">1</div>
+              <div className="flex-1 min-w-[18px] flex justify-end opacity-0">•</div>
             </div>
 
             {/* Table Body */}
             <div className="bg-white border border-[#EBEBEB] rounded-lg overflow-hidden">
-              {products.map((product, index) => (
+              {filteredProducts.map((product) => (
                 <ProductRow
                   key={product.id}
                   product={product}
-                  index={index}
-                  totalCount={products.length}
                   isMenuOpen={openMenuId === product.id}
                   onMenuToggle={() => setOpenMenuId(openMenuId === product.id ? null : product.id)}
                   onViewDetails={() => handleViewProductDetails(product)}
+                  menuRef={openMenuId === product.id ? menuRef : null}
                 />
               ))}
             </div>
@@ -267,14 +275,13 @@ function FilterPill({ label, active, onClick }: { label: string; active: boolean
   return (
     <button
       onClick={onClick}
-      className={`flex items-center justify-center gap-1 px-[9px] py-1 border border-dashed rounded-full h-[22px] transition-colors ${active ? 'border-[#5F2EFC]' : 'border-[#EBEBEB] hover:bg-gray-50'
-        }`}
+      className={cn(
+        "flex items-center gap-[4px] pl-[7px] pr-[9px] py-[4px] h-[22px] rounded-full border border-dashed transition-colors box-border",
+        active ? "border-[#5F2EFC]" : "border-[#EBEBEB] hover:bg-gray-50"
+      )}
     >
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-        <circle cx="6" cy="6" r="5.25" stroke="currentColor" strokeWidth="1.2" fill="none" className={active ? 'text-[#5F2EFC]' : 'text-[#5F5971]'} />
-        <path d="M6 3V9M3 6H9" stroke="currentColor" strokeWidth="1.2" className={active ? 'text-[#5F2EFC]' : 'text-[#5F5971]'} />
-      </svg>
-      <span className={`text-xs font-medium leading-[14px] ${active ? 'text-[#5F2EFC]' : 'text-[#5F5971]'}`}>{label}</span>
+      <FilterPlusIcon className={cn(active ? "text-[#5F2EFC]" : "text-[#5F5971]")} />
+      <span className={cn("text-[12px] font-medium leading-[14px] font-['Neue_Montreal']", active ? "text-[#5F2EFC]" : "text-[#5F5971]")}>{label}</span>
     </button>
   );
 }
@@ -357,7 +364,7 @@ function FilterDropdown({ title, showCalendar, showCurrency, onApply }: { title:
   );
 }
 
-function ProductRow({ product, index, totalCount, isMenuOpen, onMenuToggle, onViewDetails }: { product: any; index: number; totalCount: number; isMenuOpen: boolean; onMenuToggle: () => void; onViewDetails: () => void }) {
+function ProductRow({ product, isMenuOpen, onMenuToggle, onViewDetails, menuRef }: { product: Product; isMenuOpen: boolean; onMenuToggle: () => void; onViewDetails: () => void; menuRef: React.RefObject<HTMLDivElement> | null }) {
   const statusConfig = {
     active: '#239B73',
     rejected: '#CD110A',
@@ -365,14 +372,12 @@ function ProductRow({ product, index, totalCount, isMenuOpen, onMenuToggle, onVi
   };
 
   const statusColor = statusConfig[product.status as keyof typeof statusConfig] || '#5F5971';
-  const isLastRows = index >= totalCount - 3;
-
   return (
     <div className="flex items-center h-[50px] bg-white border-b border-[#EBEBEB] last:border-0" style={{ padding: '10px 24px', gap: '16px' }}>
       {/* Product */}
-      <div className="flex items-center gap-1.5 flex-1 relative">
+      <div className="flex items-center gap-1.5 w-[240px] relative">
         <div className="w-[30px] h-[30px] rounded bg-gray-200 flex-shrink-0" />
-        <span className="text-[13.5px] font-medium text-[#2B2834] leading-4">{product.name}</span>
+        <span className="text-[13.5px] font-medium text-[#2B2834] leading-4 truncate">{product.name}</span>
         <div
           className="absolute left-[22.6px] top-[-1.38px] w-2.5 h-2.5 rounded-full border border-white"
           style={{ backgroundColor: statusColor }}
@@ -380,30 +385,31 @@ function ProductRow({ product, index, totalCount, isMenuOpen, onMenuToggle, onVi
       </div>
 
       {/* Creator */}
-      <div className="flex flex-col flex-1">
-        <span className="text-[13.5px] font-medium text-[#2B2834] leading-4">{product.creator.name}</span>
-        <span className="text-xs text-[#5F5971] leading-[14px]">{product.creator.username}</span>
+      <div className="flex flex-col w-[180px]">
+        <span className="text-[13.5px] font-medium text-[#2B2834] leading-4 truncate">{product.creator?.name ?? '—'}</span>
+        <span className="text-xs text-[#5F5971] leading-[14px] truncate">{product.creator?.username ?? ''}</span>
       </div>
 
       {/* Type */}
-      <div className="w-20 text-[13.5px] text-[#2B2834] leading-4">{product.type}</div>
+      <div className="w-[120px] text-[13.5px] text-[#2B2834] leading-4 truncate">{product.type}</div>
 
       {/* Date Created */}
-      <div className="w-[102px] text-[13.5px] text-[#2B2834] leading-4">{product.dateCreated}</div>
+      <div className="w-[120px] text-[13.5px] text-[#2B2834] leading-4">{product.dateCreated}</div>
 
       {/* Price */}
       <div className="w-[100px] text-[13.5px] text-[#2B2834] leading-4">₦{product.price.toLocaleString()}</div>
 
       {/* Sales */}
-      <div className="w-20 text-[13.5px] text-[#2B2834] leading-4">{product.sales}</div>
+      <div className="w-[80px] text-[13.5px] text-[#2B2834] leading-4">{product.sales}</div>
 
       {/* Revenue */}
       <div className="w-[120px] text-[13.5px] text-[#2B2834] leading-4">₦{product.revenue.toLocaleString()}</div>
 
       {/* Actions */}
-      <div className="relative w-[18px] h-[18px] flex-shrink-0">
+      <div className="flex-1 min-w-[18px] flex justify-end items-center" ref={isMenuOpen ? menuRef : null}>
         <button
           onClick={onMenuToggle}
+          aria-label={`Open actions for ${product.name}`}
           className="w-[18px] h-[18px] flex items-center justify-center"
         >
           <MoreVertical className="h-[18px] w-[18px] text-[#5F5971]" />
@@ -416,7 +422,6 @@ function ProductRow({ product, index, totalCount, isMenuOpen, onMenuToggle, onVi
             option2Label="Ban Product"
             onOption1={onViewDetails}
             onOption2={() => {
-              console.log('Ban product');
               onMenuToggle();
             }}
           />

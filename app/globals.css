@@ -4,6 +4,31 @@
 
 @layer base {
   :root {
+    /* Semantic color tokens */
+    --brand-primary: #5F2EFC;
+    --brand-purple: #5B3DF5;
+    
+    --text-primary: #2B2834;
+    --text-secondary: #5F5971;
+    --text-tertiary: #A5A1AF;
+    --text-brand: #5F2EFC;
+    --text-success: #239B73;
+    --text-warning: #FB6A00;
+    --text-danger: #CD110A;
+    
+    --surface-primary: #FFFFFF;
+    --surface-secondary: #F9F9FB;
+    --surface-tertiary: #F7F7FB;
+    --surface-active: #F7F5FF;
+    --surface-success: #E7F3EF;
+    --surface-warning: #FFF3EB;
+    --surface-danger: #FBECEB;
+    
+    --border-primary: #EBEBEB;
+    --border-secondary: #F0EBF4;
+    --border-brand: #5F2EFC;
+
+    /* Legacy shadcn/ui tokens */
     --background: 0 0% 97%;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
@@ -35,6 +60,28 @@
   }
 
   .dark {
+    /* Dark mode semantic tokens */
+    --text-primary: #FFFFFF;
+    --text-secondary: #A5A1AF;
+    --text-tertiary: #5F5971;
+    --text-brand: #7C4DFF;
+    --text-success: #4ADE80;
+    --text-warning: #FBBF24;
+    --text-danger: #F87171;
+    
+    --surface-primary: #1A1A1A;
+    --surface-secondary: #2A2A2A;
+    --surface-tertiary: #3A3A3A;
+    --surface-active: #2D1B69;
+    --surface-success: #1F2937;
+    --surface-warning: #1F2937;
+    --surface-danger: #1F2937;
+    
+    --border-primary: #404040;
+    --border-secondary: #505050;
+    --border-brand: #7C4DFF;
+
+    /* Legacy shadcn/ui dark tokens */
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;

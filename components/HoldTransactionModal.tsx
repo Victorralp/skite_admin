@@ -30,8 +30,14 @@ export default function HoldTransactionModal({ isOpen, onClose, onConfirm }: Hol
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 overflow-hidden">
-      <div className="w-[420px] h-[245px] bg-white rounded-[10px] p-5 flex flex-col justify-end items-end gap-6">
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] overflow-hidden"
+      onClick={onClose}
+    >
+      <div 
+        className="w-[420px] h-[245px] bg-white rounded-[10px] p-5 flex flex-col justify-end items-end gap-6"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Title */}
         <h2 className="font-['Neue_Montreal'] font-bold text-base leading-[19px] text-[#2B2834] w-full">
           Hold transaction

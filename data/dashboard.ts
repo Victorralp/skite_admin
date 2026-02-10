@@ -119,15 +119,15 @@ export const topCreators = [
   {
     rank: 1,
     name: 'Mfonobong Essien',
-    username: '@SkiteMaster',
+    username: '@SkitMaster',
     email: 'mfonobongessien@gmail.com',
-    revenue: '₦1.8M'
+    revenue: '₦1.1B'
   },
   {
     rank: 2,
     name: 'Tolulope Adebayo',
-    username: '@apokjie',
-    email: 'tolulopeadebayo@gmail.com',
+    username: '@paigelee',
+    email: 'tolulopeadebayo4@gmail.com',
     revenue: '₦12.4M'
   },
   {
@@ -140,15 +140,15 @@ export const topCreators = [
   {
     rank: 4,
     name: 'Yetunde Bakare',
-    username: '@cleverking',
+    username: '@oliverking',
     email: 'yetundebakare@gmail.com',
     revenue: '₦5.3M'
   },
   {
     rank: 5,
     name: 'Chidi Nwachukwu',
-    username: '@ellerose',
-    email: 'chidinwachukwu@gmail.com',
+    username: '@ellierose',
+    email: 'chidinwachukwu22@gmail.com',
     revenue: '₦4.43M'
   }
 ];
@@ -1139,7 +1139,7 @@ export type User = {
   spent: number;
   subscriptions: number;
   lastActive: string;
-  status: 'Active' | 'Inactive' | 'Pending' | 'Suspended';
+  status: 'Active' | 'Inactive' | 'Pending';
 };
 
 export const allUsers: User[] = [
@@ -1362,7 +1362,7 @@ export const allUsers: User[] = [
     spent: 123000,
     subscriptions: 3,
     lastActive: '11.03.2025 20:15',
-    status: 'Suspended'
+    status: 'Inactive'
   },
   {
     id: 'USR-018',

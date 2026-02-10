@@ -9,39 +9,36 @@ const config: Config = {
 	theme: {
 		extend: {
 			colors: {
+				// Semantic color tokens for dark mode support
 				brand: {
-					purple: '#5B3DF5',
-					primary: '#5F2EFC'
+					primary: 'var(--brand-primary)',
+					purple: 'var(--brand-purple)'
 				},
 				text: {
-					main: '#2B2834',
-					muted: '#5F5971',
-					light: '#A5A1AF'
+					primary: 'var(--text-primary)',
+					secondary: 'var(--text-secondary)',
+					tertiary: 'var(--text-tertiary)',
+					brand: 'var(--text-brand)',
+					success: 'var(--text-success)',
+					warning: 'var(--text-warning)',
+					danger: 'var(--text-danger)'
 				},
-				ink: '#0B0B0F',
-				line: '#ECECF2',
+				surface: {
+					primary: 'var(--surface-primary)',
+					secondary: 'var(--surface-secondary)',
+					tertiary: 'var(--surface-tertiary)',
+					active: 'var(--surface-active)',
+					success: 'var(--surface-success)',
+					warning: 'var(--surface-warning)',
+					danger: 'var(--surface-danger)'
+				},
 				border: {
-					DEFAULT: 'hsl(var(--border))',
-					subtle: '#EBEBEB'
+					primary: 'var(--border-primary)',
+					secondary: 'var(--border-secondary)',
+					brand: 'var(--border-brand)',
+					DEFAULT: 'hsl(var(--border))'
 				},
-				soft: '#F7F7FB',
-				surface: '#F9F9FB',
-				active: '#F7F5FF',
-				success: {
-					DEFAULT: '#18B26B',
-					soft: '#E7F3EF',
-					text: '#239B73'
-				},
-				warning: {
-					DEFAULT: '#F59E0B',
-					soft: '#FFF3EB',
-					text: '#FB6A00'
-				},
-				danger: {
-					DEFAULT: '#EF4444',
-					soft: '#FBECEB',
-					text: '#CD110A'
-				},
+				// Legacy shadcn/ui tokens (keep for compatibility)
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				card: {
@@ -82,12 +79,60 @@ const config: Config = {
 					'5': 'hsl(var(--chart-5))'
 				}
 			},
+			// Table system spacing
+			spacing: {
+				'table-header': '2rem', // 32px - Header row height
+				'table-row': '3.125rem', // 50px - Data row height  
+				'table-padding-x': '1.5rem', // 24px - Horizontal padding
+				'table-padding-y': '0.625rem', // 10px - Vertical padding
+				'table-gap': '1rem', // 16px - Gap between columns
+				'avatar-sm': '1.875rem', // 30px - Small avatar size
+				'status-dot': '0.5625rem', // 9px - Status indicator
+				'action-button': '1.125rem', // 18px - Action button size
+				'menu-item': '2.3125rem', // 37px - Menu item height
+			},
+			fontSize: {
+				'heading-xl': ['24px', { lineHeight: '29px', letterSpacing: '-0.01em', fontWeight: '700' }],
+				'heading-lg': ['20px', { lineHeight: '24px', letterSpacing: '-0.01em', fontWeight: '600' }],
+				'heading-md': ['18px', { lineHeight: '22px', letterSpacing: '-0.01em', fontWeight: '600' }],
+				'heading-sm': ['16px', { lineHeight: '19px', letterSpacing: '-0.01em', fontWeight: '500' }],
+				'body-lg': ['16px', { lineHeight: '19px', letterSpacing: '0', fontWeight: '700' }],
+				'body-md': ['14px', { lineHeight: '17px', letterSpacing: '0', fontWeight: '500' }],
+				'body-sm': ['13.5px', { lineHeight: '16px', letterSpacing: '0', fontWeight: '500' }],
+				'caption-lg': ['12px', { lineHeight: '14px', letterSpacing: '0', fontWeight: '500' }],
+				'caption-md': ['11px', { lineHeight: '13px', letterSpacing: '0', fontWeight: '400' }],
+				'caption-sm': ['10px', { lineHeight: '12px', letterSpacing: '0', fontWeight: '500' }]
+			},
 			fontFamily: {
 				sans: ['"Neue Montreal"'],
 			},
 			boxShadow: {
-				card: '0 8px 24px rgba(17, 16, 35, 0.08)',
-				pop: '0 12px 24px rgba(26, 24, 44, 0.18)'
+				// Standard shadow scale
+				'xs': '0 1px 2px rgba(0, 0, 0, 0.05)',
+				'sm': '0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)',
+				'md': '0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06)',
+				'lg': '0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)',
+				'xl': '0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04)',
+				'2xl': '0 25px 50px rgba(0, 0, 0, 0.25)',
+				
+				// Semantic shadows for components
+				'card': '0 8px 24px rgba(17, 16, 35, 0.08)',
+				'card-hover': '0 12px 24px rgba(26, 24, 44, 0.18)',
+				'popover': '0 12px 24px rgba(26, 24, 44, 0.18)',
+				'modal': '0 25px 50px rgba(0, 0, 0, 0.25)',
+				'dropdown': '0px 116px 46px rgba(0, 0, 0, 0.01), 0px 65px 39px rgba(0, 0, 0, 0.05), 0px 29px 29px rgba(0, 0, 0, 0.09), 0px 7px 16px rgba(0, 0, 0, 0.1)',
+				
+				// Button shadows
+				'button': '0 1px 2px rgba(0, 0, 0, 0.05)',
+				'button-inset': 'inset 0 1px 1px rgba(255, 255, 255, 0.11)',
+				'button-active': 'inset 0 2px 4px rgba(0, 0, 0, 0.1)',
+				
+				// Input shadows
+				'input': '0 1px 2px rgba(0, 0, 0, 0.05)',
+				'input-focus': '0 0 0 3px rgba(95, 46, 252, 0.1)',
+				
+				// Tab shadows
+				'tab-active': '0 0 3px rgba(22, 0, 155, 0.35)'
 			},
 			borderRadius: {
 				panel: '14px',

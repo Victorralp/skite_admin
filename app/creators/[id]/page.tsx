@@ -15,7 +15,8 @@ import {
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { useClickOutside } from '@/lib/hooks';
 import CustomDropdown from '@/components/ui/CustomDropdown';
 import ActionMenu from '@/components/ActionMenu';
 import PersonalInfo from '@/components/creator/PersonalInfo';
@@ -123,6 +124,12 @@ export default function CreatorDetailsPage({ params }: { params: any }) {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('Overview');
     const [showActionMenu, setShowActionMenu] = useState(false);
+    const actionMenuRef = useRef<HTMLDivElement>(null);
+
+    // Close action menu when clicking outside
+    useClickOutside(actionMenuRef, () => {
+        setShowActionMenu(false);
+    });
 
     useEffect(() => {
         // Handle params asynchronously if needed, or directly
@@ -202,7 +209,7 @@ export default function CreatorDetailsPage({ params }: { params: any }) {
                                 </span>
                             </button>
 
-                            <div className="relative">
+                            <div className="relative" ref={actionMenuRef}>
                                 <button
                                     onClick={() => setShowActionMenu(!showActionMenu)}
                                     className="flex items-center justify-center w-[32px] h-[32px] bg-white border border-[#EBEBEB] rounded-[9px] shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] hover:bg-gray-50 transition-colors"

@@ -4,7 +4,7 @@ import { Creator } from '@/data/dashboard';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { MoreVertical } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 type CreatorsTableProps = {
     creators: Creator[];
@@ -36,21 +36,21 @@ export default function CreatorsTable({
     }, [openMenuId]);
 
     return (
-        <Card className="rounded-lg border border-[#EBEBEB] flex flex-col w-full shadow-none p-1 gap-1" style={{ backgroundColor: '#F9F9FB' }}>
+        <Card className="rounded-lg border border-border-primary flex flex-col w-full shadow-none p-1 gap-1 bg-surface-secondary">
             {/* Header Row - Outside white container */}
-            <div className="flex items-center h-[30px] shrink-0" style={{ padding: '8px 24px', gap: '16px' }}>
-                <div className="w-[201.38px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Creator</div>
-                <div className="w-[179.18px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px] flex-grow">Revenue</div>
-                <div className="w-[91.81px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Products</div>
-                <div className="w-[96.4px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Sales Count</div>
-                <div className="w-[97.24px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Subscribers</div>
-                <div className="w-[100px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Hub Views</div>
-                <div className="w-[150px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Last Active</div>
-                <div className="w-[18px] opacity-0">1</div>
+            <div className="flex items-center h-table-header shrink-0 px-table-padding-x gap-table-gap">
+                <div className="flex-1 min-w-[200px] text-caption-lg text-text-primary">Creator</div>
+                <div className="flex-1 min-w-[120px] text-caption-lg text-text-primary">Revenue</div>
+                <div className="w-[100px] text-caption-lg text-text-primary">Products</div>
+                <div className="w-[100px] text-caption-lg text-text-primary">Sales Count</div>
+                <div className="w-[120px] text-caption-lg text-text-primary">Subscribers</div>
+                <div className="w-[100px] text-caption-lg text-text-primary">Hub Views</div>
+                <div className="flex-1 min-w-[120px] text-caption-lg text-text-primary">Last Active</div>
+                <div className="w-action-button opacity-0">1</div>
             </div>
 
             {/* White container with border */}
-            <div className="flex flex-col bg-white border border-[#EBEBEB] rounded-lg">
+            <div className="flex flex-col bg-white border border-border-primary rounded-lg">
                 {/* Table area */}
                 <div className="">
                     {creators.length === 0 ? (
@@ -61,76 +61,75 @@ export default function CreatorsTable({
                         creators.map((creator) => (
                             <div
                                 key={creator.id}
-                                className="flex items-center h-[50px] bg-white border-b border-[#EBEBEB] last:border-0 hover:bg-gray-50/50 transition-colors cursor-pointer"
-                                style={{ padding: '10px 24px', gap: '16px' }}
+                                className="flex items-center h-table-row bg-white border-b border-border-primary last:border-0 hover:bg-gray-50/50 transition-colors cursor-pointer px-table-padding-x gap-table-gap"
                                 onClick={() => onCreatorClick(creator)}
                             >
-                                <div className="w-[201.38px] flex items-center gap-1.5 relative">
+                                <div className="flex-1 min-w-[200px] flex items-center gap-1.5 relative">
                                     <div className="relative">
                                         <img
                                             src={creator.avatar}
                                             alt={creator.name}
-                                            className="h-[30px] w-[30px] rounded-full object-cover"
+                                            className="h-avatar-sm w-avatar-sm rounded-full object-cover"
                                         />
                                         {/* Status Dot */}
                                         {creator.status === 'Active' && (
-                                            <div className="absolute left-[21.6px] -top-[1.38px] h-[9px] w-[9px] rounded-full bg-[#239B73] border border-white box-border z-10" />
+                                            <div className="absolute left-5 -top-0.5 h-status-dot w-status-dot rounded-full bg-green-600 border border-white box-border z-10" />
                                         )}
                                         {creator.status === 'Suspended' && (
-                                            <div className="absolute left-[21.6px] -top-[1.38px] h-[9px] w-[9px] rounded-full bg-[#FF8C00] border border-white box-border z-10" />
+                                            <div className="absolute left-5 -top-0.5 h-status-dot w-status-dot rounded-full bg-orange-500 border border-white box-border z-10" />
                                         )}
                                         {creator.status === 'Banned' && (
-                                            <div className="absolute left-[21.6px] -top-[1.38px] h-[9px] w-[9px] rounded-full bg-[#FF4444] border border-white box-border z-10" />
+                                            <div className="absolute left-5 -top-0.5 h-status-dot w-status-dot rounded-full bg-red-500 border border-white box-border z-10" />
                                         )}
                                     </div>
-                                    <div className="flex flex-col flex-1">
-                                        <span className="text-[13.5px] font-medium text-[#2B2834] leading-4 font-['Neue_Montreal']">
+                                    <div className="flex flex-col flex-1 min-w-0">
+                                        <span className="text-body-sm font-medium text-text-primary leading-4 truncate">
                                             {creator.name}
                                         </span>
-                                        <span className="text-xs text-[#5F5971] leading-[14px] font-normal font-['Neue_Montreal']">
+                                        <span className="text-caption-lg text-text-secondary leading-[14px] font-normal truncate">
                                             {creator.username}
                                         </span>
                                     </div>
                                 </div>
 
                                 {/* Revenue Column */}
-                                <div className="w-[179.18px] flex-grow">
-                                    <span className="text-[13.5px] font-normal text-[#2B2834] leading-4 font-['Neue_Montreal']">
+                                <div className="flex-1 min-w-[120px]">
+                                    <span className="text-body-sm font-normal text-text-primary leading-4">
                                         {creator.revenue}
                                     </span>
                                 </div>
 
                                 {/* Products Column */}
-                                <div className="w-[91.81px]">
-                                    <span className="text-[13.5px] font-normal text-[#2B2834] leading-4 font-['Neue_Montreal']">
+                                <div className="w-[100px]">
+                                    <span className="text-body-sm font-normal text-text-primary leading-4">
                                         {creator.products}
                                     </span>
                                 </div>
 
                                 {/* Sales Count Column */}
-                                <div className="w-[96.4px]">
-                                    <span className="text-[13.5px] font-normal text-[#2B2834] leading-4 font-['Neue_Montreal']">
+                                <div className="w-[100px]">
+                                    <span className="text-body-sm font-normal text-text-primary leading-4">
                                         {creator.salesCount}
                                     </span>
                                 </div>
 
                                 {/* Subscribers Column */}
-                                <div className="w-[97.24px]">
-                                    <span className="text-[13.5px] font-normal text-[#2B2834] leading-4 font-['Neue_Montreal']">
+                                <div className="w-[120px]">
+                                    <span className="text-body-sm font-normal text-text-primary leading-4">
                                         {creator.subscribers.toLocaleString()}
                                     </span>
                                 </div>
 
                                 {/* Hub Views Column */}
                                 <div className="w-[100px]">
-                                    <span className="text-[13.5px] font-normal text-[#2B2834] leading-4 font-['Neue_Montreal']">
+                                    <span className="text-body-sm font-normal text-text-primary leading-4">
                                         {creator.hubViews}
                                     </span>
                                 </div>
 
                                 {/* Last Active Column */}
-                                <div className="w-[150px]">
-                                    <span className="text-xs font-normal text-[#5F5971] leading-[14px] font-['Neue_Montreal']">
+                                <div className="flex-1 min-w-[120px]">
+                                    <span className="text-caption-lg font-normal text-text-secondary leading-[14px]">
                                         {creator.lastActive}
                                     </span>
                                 </div>
@@ -138,15 +137,14 @@ export default function CreatorsTable({
                                 {/* Actions Column */}
                                 <div
                                     id={`menu-container-${creator.id}`}
-                                    className="w-[18px] flex items-center justify-center relative"
+                                    className="w-action-button flex items-center justify-center relative"
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     <button
                                         className="p-0 hover:bg-gray-100 rounded-full transition-colors"
-
                                         onClick={() => setOpenMenuId(openMenuId === creator.id ? null : creator.id)}
                                     >
-                                        <MoreVertical className="h-[18px] w-[18px] text-[#5F5971]" />
+                                        <MoreVertical className="h-action-button w-action-button text-text-secondary" />
                                     </button>
                                     {openMenuId === creator.id && (
                                         <ActionMenu
@@ -173,22 +171,22 @@ export default function CreatorsTable({
             </div>
 
             {/* Pagination Footer - Outside white container, matching header */}
-            <div className="flex items-center justify-between h-[30px] shrink-0" style={{ padding: '0px 0px 0px 24px' }}>
-                <span className="text-xs text-[rgba(0,0,0,0.5)] font-normal font-['Neue_Montreal'] leading-[14px]" style={{ textShadow: '0px 2px 20px rgba(0, 0, 0, 0.25)' }}>
+            <div className="flex items-center justify-between h-table-header shrink-0 pl-table-padding-x">
+                <span className="text-caption-lg text-text-tertiary font-normal leading-[14px]">
                     Showing 1 to {creators.length} of 200 results
                 </span>
 
-                <div className="flex" style={{ gap: '8px' }}>
+                <div className="flex gap-2">
                     {/* Previous Button - Disabled */}
-                    <div className="w-[87.5px] h-[30px] bg-[#F9F9FB] rounded-md shadow-[0px_2px_5.4px_rgba(0,0,0,0.05)] p-[1px] opacity-30">
-                        <div className="w-full h-full bg-white rounded-[5px] shadow-[0px_4px_27px_rgba(0,0,0,0.18)] flex items-center justify-center px-[14px]">
-                            <span className="text-[13px] font-medium text-[#5F5971] font-['Neue_Montreal'] leading-4" style={{ textShadow: '0px -1px 19.4px rgba(0, 0, 0, 0.25)' }}>Previous</span>
+                    <div className="w-20 h-8 bg-surface-secondary rounded-md shadow-button p-0.5 opacity-30">
+                        <div className="w-full h-full bg-white rounded shadow-button-inset flex items-center justify-center px-3">
+                            <span className="text-caption-md font-medium text-text-secondary">Previous</span>
                         </div>
                     </div>
                     {/* Next Button - Active */}
-                    <div className="w-[87.5px] h-[30px] bg-[#F9F9FB] rounded-md shadow-[0px_2px_5.4px_rgba(0,0,0,0.05)] p-[1px] cursor-pointer hover:opacity-90 transition-opacity">
-                        <div className="w-full h-full bg-white rounded-[5px] shadow-[0px_4px_27px_rgba(0,0,0,0.18)] flex items-center justify-center px-[14px]">
-                            <span className="text-[13px] font-medium text-[#5F5971] font-['Neue_Montreal'] leading-4" style={{ textShadow: '0px -1px 19.4px rgba(0, 0, 0, 0.25)' }}>Next</span>
+                    <div className="w-20 h-8 bg-surface-secondary rounded-md shadow-button p-0.5 cursor-pointer hover:opacity-90 transition-opacity">
+                        <div className="w-full h-full bg-white rounded shadow-button-inset flex items-center justify-center px-3">
+                            <span className="text-caption-md font-medium text-text-secondary">Next</span>
                         </div>
                     </div>
                 </div>

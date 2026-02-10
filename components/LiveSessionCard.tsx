@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Clock, Eye, X, MoreVertical } from 'lucide-react';
 
 type SessionType = '1-1' | 'Class';
@@ -18,6 +18,21 @@ type LiveSession = {
 
 export default function LiveSessionCard({ session }: { session: LiveSession }) {
   const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="flex-1 min-w-[350px] bg-white border border-[#EBEBEB] rounded p-4 flex flex-col justify-center gap-4">
@@ -41,7 +56,7 @@ export default function LiveSessionCard({ session }: { session: LiveSession }) {
         </div>
 
         {/* Menu Button */}
-        <div className="relative">
+        <div className="relative" ref={menuRef}>
           <button
             onClick={() => setShowMenu(!showMenu)}
             className="w-[18px] h-[18px] flex items-center justify-center text-[#5F5971] hover:text-[#2B2834]"

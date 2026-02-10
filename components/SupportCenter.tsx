@@ -109,12 +109,12 @@ export default function SupportCenter() {
 
       {/* Tabs and Chat Section */}
       <div className="flex flex-col gap-2">
-        <div className="flex items-center p-[3px] bg-[#F9F9FB] rounded-lg w-[249px] h-[34px] gap-[3px]">
+        <div className="flex items-center p-1 bg-surface-secondary rounded-lg w-60 h-9 gap-1">
           <button
             onClick={() => setActiveTab('all')}
-            className={`flex flex-col justify-center items-center px-6 h-7 text-xs font-medium leading-[14px] text-center rounded-[5px] transition-all ${activeTab === 'all'
-              ? 'bg-white text-[#17181C] shadow-[0px_0px_3px_rgba(22,0,155,0.35)]'
-              : 'bg-[#F8F7FC] text-[#999999]'
+            className={`flex flex-col justify-center items-center px-6 h-7 text-xs font-medium leading-[14px] text-center rounded transition-all ${activeTab === 'all'
+              ? 'bg-white text-text-primary shadow-tab-active'
+              : 'bg-surface-tertiary text-text-tertiary'
               }`}
             style={{ width: '61px' }}
           >
@@ -122,9 +122,9 @@ export default function SupportCenter() {
           </button>
           <button
             onClick={() => setActiveTab('pending')}
-            className={`flex flex-col justify-center items-center px-6 h-7 text-xs font-medium leading-[14px] text-center rounded-[5px] transition-all ${activeTab === 'pending'
-              ? 'bg-white text-[#17181C] shadow-[0px_0px_3px_rgba(22,0,155,0.35)]'
-              : 'bg-[#F8F7FC] text-[#999999]'
+            className={`flex flex-col justify-center items-center px-6 h-7 text-xs font-medium leading-[14px] text-center rounded transition-all ${activeTab === 'pending'
+              ? 'bg-white text-text-primary shadow-tab-active'
+              : 'bg-surface-tertiary text-text-tertiary'
               }`}
             style={{ width: '85px' }}
           >
@@ -132,9 +132,9 @@ export default function SupportCenter() {
           </button>
           <button
             onClick={() => setActiveTab('closed')}
-            className={`flex flex-col justify-center items-center px-6 h-7 text-xs font-medium leading-[14px] text-center rounded-[5px] transition-all ${activeTab === 'closed'
-              ? 'bg-white text-[#17181C] shadow-[0px_0px_3px_rgba(22,0,155,0.35)]'
-              : 'bg-[#F8F7FC] text-[#999999]'
+            className={`flex flex-col justify-center items-center px-6 h-7 text-xs font-medium leading-[14px] text-center rounded transition-all ${activeTab === 'closed'
+              ? 'bg-white text-text-primary shadow-tab-active'
+              : 'bg-surface-tertiary text-text-tertiary'
               }`}
             style={{ width: '91px' }}
           >
@@ -142,12 +142,12 @@ export default function SupportCenter() {
           </button>
         </div>
 
-        <div className="flex border border-[#EBEBEB] rounded-2xl overflow-hidden h-[656px]">
+        <div className="flex border border-border-primary rounded-2xl overflow-hidden h-[656px]">
           {/* Messages List */}
-          <div className="flex flex-col w-[388px] bg-white p-4 gap-2.5">
+          <div className="flex flex-col w-96 bg-white p-4 gap-2.5">
             {/* Search */}
-            <div className="flex items-center gap-2 px-2.5 py-2 bg-[#F9F9FB] border border-[#EBEBEB] rounded h-[30px]">
-              <Search className="w-3 h-3 text-[#5F5971] flex-shrink-0" />
+            <div className="flex items-center gap-2 px-2.5 py-2 bg-surface-secondary border border-border-primary rounded h-8">
+              <Search className="w-3 h-3 text-text-secondary flex-shrink-0" />
               <input
                 type="text"
                 placeholder="Search users, products, docs"

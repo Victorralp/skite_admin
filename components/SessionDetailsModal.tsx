@@ -31,8 +31,14 @@ export default function SessionDetailsModal({ isOpen, onClose, session }: Sessio
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-end z-50 overflow-hidden">
-      <div className="w-[600px] h-full bg-white flex flex-col">
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-end z-50 overflow-hidden"
+      onClick={onClose}
+    >
+      <div 
+        className="w-[600px] h-full bg-white flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex justify-between items-center px-6 py-4 h-[60px]">
           <span className="text-base font-medium leading-[19px] tracking-[-0.01em] text-[#2B2834]">

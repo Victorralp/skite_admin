@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MoreVertical } from 'lucide-react';
 
 type PastSession = {
@@ -30,32 +30,52 @@ const pastSessions: PastSession[] = [
   { id: '12', sessionTitle: 'HarperCollins', creator: 'Yetunde Bakare', username: '@jackwilson', date: '53 min ago', time: '06:41 pm', attendees: 957, duration: '10 min', status: 'Rejected' },
 ];
 
-export default function PastSessionsTable() {
+export default function PastSessionsTable({ statusFilter = 'all' }: { statusFilter?: 'all' | 'Success' | 'Failed' | 'Rejected' }) {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpenMenuId(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Filter sessions based on status
+  const filteredSessions = statusFilter === 'all' 
+    ? pastSessions 
+    : pastSessions.filter(session => session.status === statusFilter);
 
   return (
     <div className="w-full bg-[#F9F9FB] rounded-lg p-1 flex flex-col gap-1">
       {/* Table Header */}
       <div className="flex items-center px-6 py-2 gap-4 h-[30px]">
-        <div className="flex-1 min-w-[238px] text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
+        <div className="flex-1 min-w-[180px] text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
           Session Title
         </div>
-        <div className="flex-1 min-w-[238px] text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
+        <div className="flex-1 min-w-[160px] text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
           Creator
         </div>
-        <div className="w-[80px] text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
+        <div className="flex-1 min-w-[90px] text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
           Date
         </div>
-        <div className="w-[100px] text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
+        <div className="flex-1 min-w-[80px] text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
           Time
         </div>
-        <div className="w-[80px] text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
+        <div className="flex-1 min-w-[80px] text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
           Attendees
         </div>
-        <div className="w-[120px] text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
+        <div className="flex-1 min-w-[80px] text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
           Duration
         </div>
-        <div className="w-[60px] text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
+        <div className="flex-1 min-w-[70px] text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
           Status
         </div>
         <div className="w-[18px] opacity-0">1</div>
@@ -63,12 +83,13 @@ export default function PastSessionsTable() {
 
       {/* Table Body */}
       <div className="bg-white border border-[#EBEBEB] rounded-lg overflow-hidden">
-        {pastSessions.map((session) => (
+        {filteredSessions.map((session) => (
           <SessionRow
             key={session.id}
             session={session}
             isMenuOpen={openMenuId === session.id}
             onMenuToggle={() => setOpenMenuId(openMenuId === session.id ? null : session.id)}
+            menuRef={openMenuId === session.id ? menuRef : null}
           />
         ))}
       </div>
@@ -76,7 +97,7 @@ export default function PastSessionsTable() {
       {/* Pagination */}
       <div className="flex justify-between items-center pl-6 h-[30px]">
         <span className="text-[12px] text-black/50 font-['Neue_Montreal']">
-          Showing 1 to 12 of 200 results
+          Showing 1 to {filteredSessions.length} of {filteredSessions.length} results
         </span>
         <div className="flex gap-2">
           <button className="p-[1px] bg-[#F9F9FB] rounded-md opacity-30 shadow-[0px_2px_5.4px_rgba(0,0,0,0.05)] h-[30px] w-[87.5px]">
@@ -103,10 +124,12 @@ function SessionRow({
   session,
   isMenuOpen,
   onMenuToggle,
+  menuRef,
 }: {
   session: PastSession;
   isMenuOpen: boolean;
   onMenuToggle: () => void;
+  menuRef: React.RefObject<HTMLDivElement> | null;
 }) {
   const statusConfig = {
     Success: {
@@ -146,30 +169,30 @@ function SessionRow({
 
   return (
     <div className="flex items-center px-6 py-2.5 gap-4 border-b border-[#EBEBEB] last:border-b-0 h-[50px]">
-      <div className="flex-1 min-w-[238px] text-[13.5px] font-medium text-[#2B2834] leading-4 font-['Neue_Montreal']">
+      <div className="flex-1 min-w-[180px] text-[13.5px] font-medium text-[#2B2834] leading-4 font-['Neue_Montreal'] overflow-hidden text-ellipsis whitespace-nowrap">
         {session.sessionTitle}
       </div>
-      <div className="flex-1 min-w-[238px] flex flex-col">
-        <span className="text-[13.5px] font-medium text-[#2B2834] leading-4 font-['Neue_Montreal']">
+      <div className="flex-1 min-w-[160px] flex flex-col">
+        <span className="text-[13.5px] font-medium text-[#2B2834] leading-4 font-['Neue_Montreal'] overflow-hidden text-ellipsis whitespace-nowrap">
           {session.creator}
         </span>
-        <span className="text-[12px] font-normal text-[#5F5971] leading-[14px] font-['Neue_Montreal']">
+        <span className="text-[12px] font-normal text-[#5F5971] leading-[14px] font-['Neue_Montreal'] overflow-hidden text-ellipsis whitespace-nowrap">
           {session.username}
         </span>
       </div>
-      <div className="w-[80px] text-[13.5px] font-normal text-[#2B2834] leading-4 font-['Neue_Montreal']">
+      <div className="flex-1 min-w-[90px] text-[13.5px] font-normal text-[#2B2834] leading-4 font-['Neue_Montreal'] overflow-hidden text-ellipsis whitespace-nowrap">
         {session.date}
       </div>
-      <div className="w-[100px] text-[13.5px] font-normal text-[#2B2834] leading-4 font-['Neue_Montreal']">
+      <div className="flex-1 min-w-[80px] text-[13.5px] font-normal text-[#2B2834] leading-4 font-['Neue_Montreal'] overflow-hidden text-ellipsis whitespace-nowrap">
         {session.time}
       </div>
-      <div className="w-[80px] text-[13.5px] font-normal text-[#2B2834] leading-4 font-['Neue_Montreal']">
+      <div className="flex-1 min-w-[80px] text-[13.5px] font-normal text-[#2B2834] leading-4 font-['Neue_Montreal'] overflow-hidden text-ellipsis whitespace-nowrap">
         {session.attendees}
       </div>
-      <div className="w-[120px] text-[13.5px] font-normal text-[#2B2834] leading-4 font-['Neue_Montreal']">
+      <div className="flex-1 min-w-[80px] text-[13.5px] font-normal text-[#2B2834] leading-4 font-['Neue_Montreal'] overflow-hidden text-ellipsis whitespace-nowrap">
         {session.duration}
       </div>
-      <div className="w-[60px]">
+      <div className="flex-1 min-w-[70px]">
         <span
           className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium leading-3 font-['Neue_Montreal']"
           style={{ backgroundColor: status.bg, color: status.color }}
@@ -178,10 +201,24 @@ function SessionRow({
           {status.label}
         </span>
       </div>
-      <div className="relative w-[18px] h-[18px] flex-shrink-0">
+      <div className="relative w-[18px] h-[18px] flex-shrink-0" ref={menuRef}>
         <button onClick={onMenuToggle} className="w-[18px] h-[18px] flex items-center justify-center">
           <MoreVertical className="h-[18px] w-[18px] text-[#5F5971]" strokeWidth={2.25} />
         </button>
+        
+        {isMenuOpen && (
+          <div className="absolute right-0 top-[34px] w-[134px] bg-white border border-[#EBEBEB] rounded-xl shadow-[0px_116px_46px_rgba(0,0,0,0.01),0px_65px_39px_rgba(0,0,0,0.05),0px_29px_29px_rgba(0,0,0,0.09),0px_7px_16px_rgba(0,0,0,0.1)] z-10">
+            <button className="w-full h-[37px] px-4 py-2.5 text-left font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#2B2834] hover:bg-[#F9F9FB] border-b border-[#EBEBEB]">
+              View Details
+            </button>
+            <button className="w-full h-[37px] px-4 py-2.5 text-left font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#2B2834] hover:bg-[#F9F9FB] border-b border-[#EBEBEB]">
+              Creator Profile
+            </button>
+            <button className="w-full h-[37px] px-4 py-2.5 text-left font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#CD110A] hover:bg-[#F9F9FB]">
+              Delete Session
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

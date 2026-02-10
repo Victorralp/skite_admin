@@ -40,19 +40,25 @@ export default function TransactionDetailsModal({ isOpen, onClose, transaction }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-end z-50 overflow-hidden">
-      <div className="w-[600px] h-full bg-white flex flex-col">
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-end z-50 overflow-hidden"
+      onClick={onClose}
+    >
+      <div 
+        className="w-[600px] h-full bg-white flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="flex justify-between items-center px-6 py-4 h-[60px] border-b border-[#EBEBEB]">
-          <h2 className="font-['Neue_Montreal'] font-medium text-base leading-[19px] tracking-[-0.01em] text-[#2B2834]">
+        <div className="flex justify-between items-center px-6 py-4 h-16 border-b border-border-primary">
+          <h2 className="text-heading-sm text-text-primary">
             Transaction Details
           </h2>
           <button
             onClick={onClose}
-            className="flex items-center gap-1.5 px-2 py-1.5 bg-[#F9F9FB] rounded-md h-7"
+            className="flex items-center gap-1.5 px-2 py-1.5 bg-surface-secondary rounded-md h-7"
           >
-            <X size={16} className="text-[#5F2EFC]" />
-            <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#5F2EFC]">
+            <X size={16} className="text-brand-primary" />
+            <span className="text-caption-lg text-text-brand">
               Close
             </span>
           </button>
@@ -228,12 +234,9 @@ export default function TransactionDetailsModal({ isOpen, onClose, transaction }
 
           {/* Refund Button */}
           <button
-            className="flex items-center justify-center px-6 py-3.5 w-[91px] h-8 bg-[#CD110A] border border-[rgba(251,236,235,0.2)] rounded-[9px] shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)]"
+            className="flex items-center justify-center px-6 py-3.5 w-24 h-8 bg-red-600 border border-red-200 rounded-lg shadow-button-inset"
           >
-            <span
-              className="font-['Neue_Montreal'] font-medium text-[13.5px] leading-4 text-[#FFFCF8]"
-              style={{ textShadow: '0px -1px 6px rgba(0, 0, 0, 0.25)' }}
-            >
+            <span className="text-body-sm text-white">
               Refund
             </span>
           </button>

@@ -59,8 +59,14 @@ export default function EditPermissionsModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center">
-      <div className="flex flex-col justify-end items-end p-5 gap-6 w-[519px] h-[443px] bg-white rounded-[10px]">
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center"
+      onClick={onClose}
+    >
+      <div 
+        className="flex flex-col justify-end items-end p-5 gap-6 w-[519px] h-[443px] bg-white rounded-[10px]"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex flex-col items-start gap-1 w-[479px] h-[37px] self-start">
           <h3 className="text-base font-bold leading-[19px] text-[#2B2834] w-full">

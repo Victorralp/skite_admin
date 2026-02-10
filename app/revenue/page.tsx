@@ -2,17 +2,18 @@
 
 import StatsCard from '@/components/StatsCard';
 import RevenueTabs from '@/components/RevenueTabs';
+import PageContainer from '@/components/layout/PageContainer';
 import { revenueStats } from '@/data/dashboard';
 
 export default function RevenuePage() {
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col items-start gap-8 box-border px-4 py-6 md:px-12">
+    <PageContainer>
       {/* Revenue Stats Section */}
-      <div className="flex flex-col items-start gap-2 w-full">
-        <h2 className="font-['Neue_Montreal'] font-bold text-xl leading-6 tracking-[-0.01em] text-[#2B2834]">
+      <div className="flex flex-col items-start gap-2 w-full h-32">
+        <h1 className="font-['Neue_Montreal'] font-bold text-[20px] leading-6 tracking-[-0.01em] text-[#2B2834] w-[79px] h-6">
           Revenue
-        </h2>
-        <div className="flex flex-row items-start gap-2 w-full flex-wrap">
+        </h1>
+        <div className="flex flex-row items-start gap-2 w-full h-24">
           {revenueStats.map((stat, index) => (
             <StatsCard
               key={index}
@@ -27,6 +28,6 @@ export default function RevenuePage() {
 
       {/* Tabs and Charts Section */}
       <RevenueTabs />
-    </div>
+    </PageContainer>
   );
 }

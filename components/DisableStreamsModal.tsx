@@ -19,8 +19,14 @@ export default function DisableStreamsModal({ isOpen, onClose, onConfirm }: Disa
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center">
-      <div className="flex flex-col justify-end items-end p-5 gap-6 w-[420px] h-[196px] bg-white rounded-[10px]">
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center"
+      onClick={onClose}
+    >
+      <div 
+        className="flex flex-col justify-end items-end p-5 gap-6 w-[420px] h-[196px] bg-white rounded-[10px]"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Title */}
         <h3 className="text-base font-bold leading-[19px] text-[#2B2834] w-[380px] self-start">
           Disable New Streams
