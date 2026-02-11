@@ -8,8 +8,8 @@ const Toggle = ({ checked, onCheckedChange }: { checked: boolean; onCheckedChang
         aria-checked={checked}
         onClick={() => onCheckedChange(!checked)}
         className={cn(
-            "relative inline-flex h-[24px] w-[44px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#5F2EFC] focus:ring-offset-2",
-            checked ? "bg-[#5F2EFC]" : "bg-[#EBEBEB]"
+            "relative inline-flex h-[24px] w-[44px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2",
+            checked ? "bg-brand-primary" : "bg-[#EBEBEB]"
         )}
     >
         <span
@@ -34,11 +34,11 @@ const NotificationItem = ({
 }) => (
     <div className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
         <div className="flex flex-col gap-1">
-            <span className="font-['Neue_Montreal'] font-medium text-[16px] leading-[19px] text-[#2B2834]">
+            <span className="font-sans text-heading-sm text-text-primary">
                 {label}
             </span>
             {description && (
-                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-[16px] text-[#5F5971]">
+                <span className="font-sans text-body-sm-regular text-text-secondary">
                     {description}
                 </span>
             )}
@@ -64,8 +64,8 @@ export default function NotificationsTab() {
     return (
         <div className="flex flex-col w-full gap-8">
             {/* Email Notifications Section */}
-            <div className="flex flex-col w-full p-8 bg-white border border-[#EBEBEB] rounded-[16px]">
-                <h3 className="font-['Neue_Montreal'] font-bold text-[20px] leading-[24px] tracking-[-0.01em] text-[#2B2834] mb-6">
+            <div className="flex flex-col w-full p-8 bg-white border border-border-primary rounded-[16px]">
+                <h3 className="font-sans text-heading-lg-bold text-text-primary mb-6">
                     Email Notifications
                 </h3>
 
@@ -92,8 +92,8 @@ export default function NotificationsTab() {
             </div>
 
             {/* Push Notifications Section */}
-            <div className="flex flex-col w-full p-8 bg-white border border-[#EBEBEB] rounded-[16px]">
-                <h3 className="font-['Neue_Montreal'] font-bold text-[20px] leading-[24px] tracking-[-0.01em] text-[#2B2834] mb-6">
+            <div className="flex flex-col w-full p-8 bg-white border border-border-primary rounded-[16px]">
+                <h3 className="font-sans text-heading-lg-bold text-text-primary mb-6">
                     Push Notifications
                 </h3>
 

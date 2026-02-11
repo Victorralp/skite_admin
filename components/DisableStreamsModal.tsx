@@ -28,14 +28,14 @@ export default function DisableStreamsModal({ isOpen, onClose, onConfirm }: Disa
         onClick={(e) => e.stopPropagation()}
       >
         {/* Title */}
-        <h3 className="text-base font-bold leading-[19px] text-[#2B2834] w-[380px] self-start">
+        <h3 className="text-base font-bold leading-[19px] text-text-primary w-[380px] self-start">
           Disable New Streams
         </h3>
 
         {/* Content */}
         <div className="flex flex-col items-start gap-4 w-[380px] h-[53px]">
           <div className="flex flex-col items-start gap-[5px] w-[380px] h-[53px]">
-            <label className="text-xs font-normal leading-[14px] text-[#2B2834] w-full">
+            <label className="text-xs font-normal leading-[14px] text-text-primary w-full">
               Duration
             </label>
             
@@ -45,7 +45,7 @@ export default function DisableStreamsModal({ isOpen, onClose, onConfirm }: Disa
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
                 placeholder="How long do you want to disable new streams"
-                className="flex flex-row items-center px-3 py-1 w-full h-[34px] bg-[#F9F9FB] border border-[#EBEBEB] shadow-sm rounded-md text-xs font-normal text-[#2B2834] placeholder-[#A5A1AF] focus:outline-none focus:ring-2 focus:ring-[#5F2EFC]"
+                className="flex flex-row items-center px-3 py-1 w-full h-[34px] bg-surface-secondary border border-border-primary shadow-sm rounded-md text-xs font-normal text-text-primary placeholder-[#A5A1AF] focus:outline-none focus:ring-2 focus:ring-brand-primary"
               />
               <svg
                 className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
@@ -65,18 +65,18 @@ export default function DisableStreamsModal({ isOpen, onClose, onConfirm }: Disa
         <div className="flex flex-row items-start gap-2 w-[176px] h-9">
           <button
             onClick={onClose}
-            className="flex flex-row justify-center items-center px-6 py-2 h-9 bg-white border border-[#EBEBEB] rounded-lg shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] hover:bg-gray-50 transition-colors"
+            className="flex flex-row justify-center items-center px-6 py-2 h-9 bg-white border border-border-primary rounded-lg shadow-button-inset hover:bg-gray-50 transition-colors"
           >
-            <span className="text-[13.5px] font-medium leading-4 text-[#353A44]">
+            <span className="text-body-sm text-[#353A44]">
               Cancel
             </span>
           </button>
 
           <button
             onClick={handleConfirm}
-            className="flex flex-row justify-center items-center px-6 py-2 h-9 bg-gradient-to-b from-[#5F2EFC] to-[#4E18FC] rounded-lg shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] hover:opacity-90 transition-opacity"
+            className="flex flex-row justify-center items-center px-6 py-2 h-9 bg-gradient-to-b from-brand-primary to-brand-purple rounded-lg shadow-button-inset hover:opacity-90 transition-opacity"
           >
-            <span className="text-[13.5px] font-medium leading-4 text-[#FFFCF8]">
+            <span className="text-body-sm text-white">
               Save
             </span>
           </button>

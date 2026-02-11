@@ -31,16 +31,16 @@ export default function ComplianceModal({ isOpen, onClose }: ComplianceModalProp
           <div className="flex flex-row justify-between items-start w-full">
             <button
               onClick={onClose}
-              className="flex flex-row items-center px-2 py-1.5 gap-1.5 bg-[#F9F9FB] rounded-md hover:bg-gray-200 transition-colors"
+              className="flex flex-row items-center px-2 py-1.5 gap-1.5 bg-surface-secondary rounded-md hover:bg-gray-200 transition-colors"
             >
-              <X className="w-4 h-4 text-[#2B2834]" strokeWidth={1.5} />
-              <span className="text-[13.5px] font-medium leading-4 text-[#17181C]">
+              <X className="w-4 h-4 text-text-primary" strokeWidth={1.5} />
+              <span className="text-body-sm text-[#17181C]">
                 Close
               </span>
             </button>
 
-            <button className="flex flex-row justify-center items-center px-4 py-1.5 h-7 bg-gradient-to-b from-[#5F2EFC] to-[#4E18FC] rounded-lg shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] hover:opacity-90 transition-opacity">
-              <span className="text-[13.5px] font-medium leading-4 text-[#FFFCF8]">
+            <button className="flex flex-row justify-center items-center px-4 py-1.5 h-7 bg-gradient-to-b from-brand-primary to-brand-purple rounded-lg shadow-button-inset hover:opacity-90 transition-opacity">
+              <span className="text-body-sm text-white">
                 Save
               </span>
             </button>
@@ -51,13 +51,13 @@ export default function ComplianceModal({ isOpen, onClose }: ComplianceModalProp
           </h2>
         </div>
 
-        <div className="w-full h-px border-t border-[#F0EBF4]" />
+        <div className="w-full h-px border-t border-border-secondary" />
 
         {/* Content */}
         <div className="flex flex-col items-center px-6 py-6 gap-2 w-full overflow-y-auto">
           {/* Privacy Policy */}
-          <div className="flex flex-col items-start p-4 gap-3 w-full bg-[#F9F9FB] rounded-lg">
-            <h3 className="text-[13.5px] font-bold leading-4 text-[#2B2834] w-full">
+          <div className="flex flex-col items-start p-4 gap-3 w-full bg-surface-secondary rounded-lg">
+            <h3 className="text-[13.5px] font-bold leading-4 text-text-primary w-full">
               Privacy Policy
             </h3>
 
@@ -65,15 +65,15 @@ export default function ComplianceModal({ isOpen, onClose }: ComplianceModalProp
               <div className="flex flex-row items-center gap-0.5 flex-1">
                 <a 
                   href="#" 
-                  className="text-[13.5px] font-medium leading-4 text-[#5F2EFC] underline hover:no-underline"
+                  className="text-body-sm text-text-brand underline hover:no-underline"
                 >
                   Privacy Policy
                 </a>
-                <ExternalLink className="w-3.5 h-3.5 text-[#5F2EFC]" strokeWidth={1} />
+                <ExternalLink className="w-3.5 h-3.5 text-text-brand" strokeWidth={1} />
               </div>
 
-              <button className="flex flex-row justify-center items-center px-3 py-1.5 h-7 bg-white border border-[#EBEBEB] rounded-lg shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] hover:bg-gray-50 transition-colors">
-                <span className="text-[13.5px] font-medium leading-4 text-[#353A44]">
+              <button className="flex flex-row justify-center items-center px-3 py-1.5 h-7 bg-white border border-border-primary rounded-lg shadow-button-inset hover:bg-gray-50 transition-colors">
+                <span className="text-body-sm text-[#353A44]">
                   Update Policy
                 </span>
               </button>
@@ -81,22 +81,22 @@ export default function ComplianceModal({ isOpen, onClose }: ComplianceModalProp
           </div>
 
           {/* Data Retention */}
-          <div className="flex flex-col items-start p-4 gap-2 w-full bg-[#F9F9FB] rounded-lg">
-            <h3 className="text-[13.5px] font-bold leading-4 text-[#2B2834] w-full">
+          <div className="flex flex-col items-start p-4 gap-2 w-full bg-surface-secondary rounded-lg">
+            <h3 className="text-[13.5px] font-bold leading-4 text-text-primary w-full">
               Data Retention
             </h3>
 
             <div className="flex flex-col items-start w-full">
               {/* User Data */}
-              <div className="flex flex-row items-center py-2 gap-4 w-full border-b border-[#EBEBEB]">
-                <label className="text-[13.5px] font-normal leading-4 text-[#5F5971] flex-1">
+              <div className="flex flex-row items-center py-2 gap-4 w-full border-b border-border-primary">
+                <label className="text-body-sm-regular text-text-secondary flex-1">
                   User Data
                 </label>
                 <div className="relative">
                   <select
                     value={userDataRetention}
                     onChange={(e) => setUserDataRetention(e.target.value)}
-                    className="appearance-none flex flex-row items-center px-3 py-2 w-[95px] h-[30px] bg-white border border-[#EBEBEB] shadow-sm rounded-md text-xs font-medium text-[#2B2834] focus:outline-none focus:ring-2 focus:ring-[#5F2EFC] cursor-pointer"
+                    className="appearance-none flex flex-row items-center px-3 py-2 w-[95px] h-[30px] bg-white border border-border-primary shadow-sm rounded-md text-xs font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-primary cursor-pointer"
                   >
                     <option value="1 Year">1 Year</option>
                     <option value="2 Years">2 Years</option>
@@ -117,15 +117,15 @@ export default function ComplianceModal({ isOpen, onClose }: ComplianceModalProp
               </div>
 
               {/* Transaction Logs */}
-              <div className="flex flex-row items-center py-2 gap-4 w-full border-b border-[#EBEBEB]">
-                <label className="text-[13.5px] font-normal leading-4 text-[#5F5971] flex-1">
+              <div className="flex flex-row items-center py-2 gap-4 w-full border-b border-border-primary">
+                <label className="text-body-sm-regular text-text-secondary flex-1">
                   Transaction Logs
                 </label>
                 <div className="relative">
                   <select
                     value={transactionLogsRetention}
                     onChange={(e) => setTransactionLogsRetention(e.target.value)}
-                    className="appearance-none flex flex-row items-center px-3 py-2 w-[95px] h-[30px] bg-white border border-[#EBEBEB] shadow-sm rounded-md text-xs font-medium text-[#2B2834] focus:outline-none focus:ring-2 focus:ring-[#5F2EFC] cursor-pointer"
+                    className="appearance-none flex flex-row items-center px-3 py-2 w-[95px] h-[30px] bg-white border border-border-primary shadow-sm rounded-md text-xs font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-primary cursor-pointer"
                   >
                     <option value="5 Years">5 Years</option>
                     <option value="7 Years">7 Years</option>
@@ -146,14 +146,14 @@ export default function ComplianceModal({ isOpen, onClose }: ComplianceModalProp
 
               {/* Content */}
               <div className="flex flex-row items-center pt-2 gap-4 w-full">
-                <label className="text-[13.5px] font-normal leading-4 text-[#5F5971] flex-1">
+                <label className="text-body-sm-regular text-text-secondary flex-1">
                   Content
                 </label>
                 <div className="relative">
                   <select
                     value={contentRetention}
                     onChange={(e) => setContentRetention(e.target.value)}
-                    className="appearance-none flex flex-row items-center px-3 py-2 w-[95px] h-[30px] bg-white border border-[#EBEBEB] shadow-sm rounded-md text-xs font-medium text-[#2B2834] focus:outline-none focus:ring-2 focus:ring-[#5F2EFC] cursor-pointer"
+                    className="appearance-none flex flex-row items-center px-3 py-2 w-[95px] h-[30px] bg-white border border-border-primary shadow-sm rounded-md text-xs font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-primary cursor-pointer"
                   >
                     <option value="30 days">30 days</option>
                     <option value="90 days">90 days</option>
@@ -176,15 +176,15 @@ export default function ComplianceModal({ isOpen, onClose }: ComplianceModalProp
           </div>
 
           {/* Content Moderation */}
-          <div className="flex flex-col items-start p-4 gap-2 w-full bg-[#F9F9FB] rounded-lg">
-            <h3 className="text-[13.5px] font-bold leading-4 text-[#2B2834] w-full">
+          <div className="flex flex-col items-start p-4 gap-2 w-full bg-surface-secondary rounded-lg">
+            <h3 className="text-[13.5px] font-bold leading-4 text-text-primary w-full">
               Content Moderation
             </h3>
 
             <div className="flex flex-col items-start w-full">
               {/* Profanity Filter */}
-              <div className="flex flex-row items-center py-2 gap-4 w-full border-b border-[#EBEBEB]">
-                <label className="text-[13.5px] font-normal leading-4 text-[#5F5971] flex-1">
+              <div className="flex flex-row items-center py-2 gap-4 w-full border-b border-border-primary">
+                <label className="text-body-sm-regular text-text-secondary flex-1">
                   Profanity Filter
                 </label>
                 <button
@@ -203,7 +203,7 @@ export default function ComplianceModal({ isOpen, onClose }: ComplianceModalProp
 
               {/* Auto-remove non-consensual content */}
               <div className="flex flex-row items-center pt-2 gap-4 w-full">
-                <label className="text-[13.5px] font-normal leading-4 text-[#5F5971] flex-1">
+                <label className="text-body-sm-regular text-text-secondary flex-1">
                   Auto-remove non-consensual content
                 </label>
                 <button

@@ -36,18 +36,18 @@ export default function TabHeader({
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
                 <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A5A1AF]" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
                     <input
                         type="text"
                         placeholder={searchPlaceholder}
-                        className="pl-9 pr-4 py-2 w-[300px] h-[36px] bg-white border border-[#EBEBEB] rounded-lg text-[13.5px] placeholder-[#A5A1AF] focus:outline-none focus:border-[#5F2EFC]"
+                        className="pl-9 pr-4 py-2 w-[300px] h-[36px] bg-white border border-border-primary rounded-lg text-[13.5px] placeholder-[#A5A1AF] focus:outline-none focus:border-border-brand"
                         onChange={(e) => onSearch?.(e.target.value)}
                     />
                 </div>
                 {showFilterButton && (
                     <button
                         onClick={onFilter}
-                        className="flex items-center gap-2 px-3 py-2 h-[36px] bg-white border border-[#EBEBEB] rounded-lg text-[13.5px] font-medium text-[#2B2834] hover:bg-gray-50"
+                        className="flex items-center gap-2 px-3 py-2 h-[36px] bg-white border border-border-primary rounded-lg text-[13.5px] font-medium text-text-primary hover:bg-gray-50"
                     >
                         <Filter className="w-4 h-4" />
                         Filter
@@ -71,7 +71,7 @@ export default function TabHeader({
                     onClick={onAction}
                     className={cn(
                         "flex items-center gap-2 px-4 py-2 h-[36px] rounded-lg text-[13.5px] font-medium transition-colors",
-                        ActionIcon ? "bg-white border border-[#EBEBEB] text-[#2B2834] hover:bg-gray-50" : "bg-[#2B2834] text-white hover:bg-[#1a191f]"
+                        ActionIcon ? "bg-white border border-border-primary text-text-primary hover:bg-gray-50" : "bg-[#2B2834] text-white hover:bg-[#1a191f]"
                     )}
                 >
                     {ActionIcon && <ActionIcon className="w-4 h-4" />}

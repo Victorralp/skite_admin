@@ -94,14 +94,18 @@ const config: Config = {
 			fontSize: {
 				'heading-xl': ['24px', { lineHeight: '29px', letterSpacing: '-0.01em', fontWeight: '700' }],
 				'heading-lg': ['20px', { lineHeight: '24px', letterSpacing: '-0.01em', fontWeight: '600' }],
+				'heading-lg-bold': ['20px', { lineHeight: '24px', letterSpacing: '-0.01em', fontWeight: '700' }],
 				'heading-md': ['18px', { lineHeight: '22px', letterSpacing: '-0.01em', fontWeight: '600' }],
 				'heading-sm': ['16px', { lineHeight: '19px', letterSpacing: '-0.01em', fontWeight: '500' }],
 				'body-lg': ['16px', { lineHeight: '19px', letterSpacing: '0', fontWeight: '700' }],
 				'body-md': ['14px', { lineHeight: '17px', letterSpacing: '0', fontWeight: '500' }],
 				'body-sm': ['13.5px', { lineHeight: '16px', letterSpacing: '0', fontWeight: '500' }],
+				'body-sm-regular': ['13.5px', { lineHeight: '16px', letterSpacing: '0', fontWeight: '400' }],
 				'caption-lg': ['12px', { lineHeight: '14px', letterSpacing: '0', fontWeight: '500' }],
+				'caption-lg-regular': ['12px', { lineHeight: '14px', letterSpacing: '0', fontWeight: '400' }],
 				'caption-md': ['11px', { lineHeight: '13px', letterSpacing: '0', fontWeight: '400' }],
-				'caption-sm': ['10px', { lineHeight: '12px', letterSpacing: '0', fontWeight: '500' }]
+				'caption-sm': ['10px', { lineHeight: '12px', letterSpacing: '0', fontWeight: '500' }],
+				'caption-sm-regular': ['10px', { lineHeight: '12px', letterSpacing: '0', fontWeight: '400' }]
 			},
 			fontFamily: {
 				sans: ['"Neue Montreal"'],
@@ -126,6 +130,12 @@ const config: Config = {
 				'button': '0 1px 2px rgba(0, 0, 0, 0.05)',
 				'button-inset': 'inset 0 1px 1px rgba(255, 255, 255, 0.11)',
 				'button-active': 'inset 0 2px 4px rgba(0, 0, 0, 0.1)',
+				'button-soft': '0px 1px 4.8px rgba(0, 0, 0, 0.03)',
+				'segmented-outer': '0px 2px 5.4px rgba(0, 0, 0, 0.05)',
+				'segmented-inner': '0px 4px 27px rgba(0, 0, 0, 0.18)',
+				'tab-soft': '0px 0px 4px rgba(0, 0, 0, 0.18)',
+				'viewer-header': '0px 4px 4px rgba(0, 0, 0, 0.25)',
+				'toggle-knob': '0px 3px 8px rgba(0, 0, 0, 0.15), 0px 3px 1px rgba(0, 0, 0, 0.06)',
 				
 				// Input shadows
 				'input': '0 1px 2px rgba(0, 0, 0, 0.05)',

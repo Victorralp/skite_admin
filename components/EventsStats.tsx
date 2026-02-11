@@ -28,25 +28,25 @@ export default function EventsStats() {
 
   return (
     <div className="w-full flex flex-col gap-2">
-      <h2 className="font-['Neue_Montreal'] font-bold text-[20px] leading-[24px] tracking-[-0.01em] text-[#2B2834]">
+      <h2 className="font-sans text-heading-lg-bold text-text-primary">
         Events & Live
       </h2>
       <div className="w-full flex gap-2">
         {stats.map((stat, index) => (
           <div
             key={index}
-            className="flex-1 bg-white border border-[#EBEBEB] rounded-lg p-4 flex flex-col gap-3"
+            className="flex-1 bg-white border border-border-primary rounded-lg p-4 flex flex-col gap-3"
           >
             <div className="flex flex-col gap-1">
-              <span className="font-['Neue_Montreal'] font-normal text-[12px] leading-[14px] text-[#5F5971]">
+              <span className="font-sans text-caption-lg-regular text-text-secondary">
                 {stat.label}
               </span>
-              <span className="font-['Neue_Montreal'] font-medium text-[18px] leading-[22px] text-[#2B2834]">
+              <span className="font-sans text-heading-md text-text-primary">
                 {stat.value}
               </span>
             </div>
             <span
-              className="font-['Neue_Montreal'] font-normal text-[10px] leading-[12px]"
+              className="font-sans text-caption-sm-regular"
               style={{ color: stat.metaColor }}
             >
               {stat.meta}

@@ -105,7 +105,7 @@ const StatusBadge = ({ status }: { status: NotificationStatus }) => {
         {icon}
       </div>
       <span
-        className="font-['Neue_Montreal'] font-medium text-[10px] leading-3"
+        className="font-sans font-medium text-[10px] leading-3"
         style={{ color }}
       >
         {status}
@@ -127,7 +127,7 @@ const FilterPill = ({
     onClick={onClick}
     className={cn(
       "flex items-center justify-center gap-1 px-[7px] py-1 border border-dashed rounded-full h-[22px] transition-colors",
-      active ? "border-[#5F2EFC]" : "border-[#EBEBEB] hover:bg-gray-50"
+      active ? "border-border-brand" : "border-border-primary hover:bg-gray-50"
     )}
   >
     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -138,18 +138,18 @@ const FilterPill = ({
         stroke="currentColor" 
         strokeWidth="1.2" 
         fill="none" 
-        className={active ? 'text-[#5F2EFC]' : 'text-[#5F5971]'} 
+        className={active ? 'text-text-brand' : 'text-text-secondary'} 
       />
       <path 
         d="M6 3V9M3 6H9" 
         stroke="currentColor" 
         strokeWidth="1.2" 
-        className={active ? 'text-[#5F2EFC]' : 'text-[#5F5971]'} 
+        className={active ? 'text-text-brand' : 'text-text-secondary'} 
       />
     </svg>
     <span className={cn(
       "text-xs font-medium leading-[14px]",
-      active ? 'text-[#5F2EFC]' : 'text-[#5F5971]'
+      active ? 'text-text-brand' : 'text-text-secondary'
     )}>
       {label}
     </span>
@@ -259,65 +259,65 @@ export default function NotificationsTable({}: NotificationsTableProps = {}) {
           />
         </div>
         
-        <button className="flex items-center gap-0.5 px-2.5 py-1 bg-white border border-[#EBEBEB] rounded-lg shadow-[0px_1px_4.8px_rgba(0,0,0,0.03)] h-6">
+        <button className="flex items-center gap-0.5 px-2.5 py-1 bg-white border border-border-primary rounded-lg shadow-button-soft h-6">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M9.33337 10.5V3.5M9.33337 3.5L11.6667 5.90625M9.33337 3.5L7.00004 5.90625M4.66671 3.5V10.5M4.66671 10.5L7.00004 8.09375M4.66671 10.5L2.33337 8.09375" stroke="#5F5971" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          <span className="font-['Neue_Montreal'] font-normal text-xs leading-[14px] text-[#5F5971]">
+          <span className="font-sans font-normal text-xs leading-[14px] text-text-secondary">
             Sort
           </span>
         </button>
       </div>
 
       {/* Table Container */}
-      <div className="flex flex-col items-start p-1 gap-1 w-full bg-[#F9F9FB] rounded-lg">
+      <div className="flex flex-col items-start p-1 gap-1 w-full bg-surface-secondary rounded-lg">
         {/* Table Header */}
         <div className="flex items-center px-6 py-2 gap-4 w-full h-[30px]">
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] flex-1 min-w-[200px]">
+          <span className="font-sans font-medium text-xs leading-[14px] text-text-primary flex-[2.2] min-w-[180px]">
             Subject
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[80px]">
+          <span className="font-sans font-medium text-xs leading-[14px] text-text-primary flex-1 min-w-[90px]">
             Priority
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[120px]">
+          <span className="font-sans font-medium text-xs leading-[14px] text-text-primary flex-1 min-w-[100px]">
             Type
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[120px]">
+          <span className="font-sans font-medium text-xs leading-[14px] text-text-primary flex-1 min-w-[130px]">
             Status
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-[14px] text-[#2B2834] w-[140px]">
+          <span className="font-sans font-medium text-xs leading-[14px] text-text-primary flex-1 min-w-[130px]">
             Date
           </span>
           <div className="w-[18px]" />
         </div>
 
         {/* Table Body */}
-        <div className="flex flex-col items-start w-full bg-white border border-[#EBEBEB] rounded-lg overflow-hidden">
+        <div className="flex flex-col items-start w-full bg-white border border-border-primary rounded-lg overflow-hidden">
           {filteredNotifications.map((notification, index) => (
             <div
               key={notification.id}
               className={cn(
                 'flex items-center px-6 py-3 gap-4 w-full h-[42px] bg-white',
-                index < filteredNotifications.length - 1 && 'border-b border-[#EBEBEB]'
+                index < filteredNotifications.length - 1 && 'border-b border-border-primary'
               )}
             >
-              <span className="font-['Neue_Montreal'] font-medium text-[13.5px] leading-4 text-[#2B2834] flex-1 min-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap">
+              <span className="font-sans text-body-sm text-text-primary flex-[2.2] min-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap">
                 {notification.subject}
               </span>
               
-              <div className="w-[80px] flex justify-start">
+              <div className="flex-1 min-w-[90px] flex justify-start">
                 <StatusBadge status={notification.status} />
               </div>
               
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[120px]">
+              <span className="font-sans text-body-sm-regular text-text-primary flex-1 min-w-[100px]">
                 {notification.type}
               </span>
               
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[120px]">
+              <span className="font-sans text-body-sm-regular text-text-primary flex-1 min-w-[130px]">
                 {notification.readStatus}
               </span>
               
-              <span className="font-['Neue_Montreal'] font-normal text-xs leading-[14px] text-[#5F5971] w-[140px]">
+              <span className="font-sans font-normal text-xs leading-[14px] text-text-secondary flex-1 min-w-[130px]">
                 {notification.date}
               </span>
               
@@ -326,7 +326,7 @@ export default function NotificationsTable({}: NotificationsTableProps = {}) {
                   onClick={() => setOpenMenuId(openMenuId === notification.id ? null : notification.id)}
                   className="w-[18px] h-[18px] flex items-center justify-center"
                 >
-                  <MoreVertical size={18} className="text-[#5F5971]" />
+                  <MoreVertical size={18} className="text-text-secondary" />
                 </button>
                 {openMenuId === notification.id && (
                   <div className="absolute right-0 top-[22px] z-50">

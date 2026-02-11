@@ -46,13 +46,13 @@ export default function RejectPayoutModal({ isOpen, onClose, onConfirm }: Reject
         onClick={(e) => e.stopPropagation()}
       >
         {/* Title */}
-        <h2 className="font-['Neue_Montreal'] font-bold text-base leading-[19px] text-[#2B2834] w-full">
+        <h2 className="font-sans font-bold text-base leading-[19px] text-text-primary w-full">
           Reject Payout
         </h2>
 
         {/* Input Section */}
         <div className="flex flex-col items-start gap-[5px] w-full h-[102px]">
-          <label className="font-['Neue_Montreal'] font-normal text-xs leading-[14px] text-[#5F5971] w-full">
+          <label className="font-sans font-normal text-xs leading-[14px] text-text-secondary w-full">
             Reason for rejection
           </label>
           <div className="relative w-full h-[83px]">
@@ -60,7 +60,7 @@ export default function RejectPayoutModal({ isOpen, onClose, onConfirm }: Reject
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Why are you rejecting the payout?"
-              className="w-full h-full bg-[#F9F9FB] border border-[#EBEBEB] rounded-md resize-none font-['Neue_Montreal'] font-normal text-xs leading-[14px] text-[#2B2834] placeholder:text-[#A5A1AF] shadow-[0px_1px_2px_rgba(0,0,0,0.05)]"
+              className="w-full h-full bg-surface-secondary border border-border-primary rounded-md resize-none font-sans font-normal text-xs leading-[14px] text-text-primary placeholder:text-text-tertiary shadow-button"
               style={{ padding: '10px 12px' }}
             />
             {/* Resize Handle Icon */}
@@ -82,10 +82,10 @@ export default function RejectPayoutModal({ isOpen, onClose, onConfirm }: Reject
         <div className="flex items-start gap-2 w-[174px] h-9">
           <button
             onClick={handleClose}
-            className="flex items-center justify-center px-6 py-3.5 w-[90px] h-9 bg-white border border-[#EBEBEB] rounded-[9px] shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)]"
+            className="flex items-center justify-center px-6 py-3.5 w-[90px] h-9 bg-white border border-border-primary rounded-[9px] shadow-button-inset"
           >
             <span
-              className="font-['Neue_Montreal'] font-medium text-[13.5px] leading-4 text-[#353A44]"
+              className="font-sans text-body-sm text-[#353A44]"
               style={{ textShadow: '0px -1px 19.4px rgba(0, 0, 0, 0.25)' }}
             >
               Cancel
@@ -94,13 +94,13 @@ export default function RejectPayoutModal({ isOpen, onClose, onConfirm }: Reject
           <button
             onClick={handleSubmit}
             disabled={!reason.trim()}
-            className="flex items-center justify-center px-6 py-3.5 w-[76px] h-9 rounded-[9px] shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] disabled:opacity-50"
+            className="flex items-center justify-center px-6 py-3.5 w-[76px] h-9 rounded-[9px] shadow-button-inset disabled:opacity-50"
             style={{
               background: 'linear-gradient(180deg, #5F2EFC 22.58%, #4E18FC 100%)'
             }}
           >
             <span
-              className="font-['Neue_Montreal'] font-medium text-[13.5px] leading-4 text-[#FFFCF8]"
+              className="font-sans text-body-sm text-white"
               style={{ textShadow: '0px -1px 6px rgba(0, 0, 0, 0.25)' }}
             >
               Reject

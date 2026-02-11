@@ -54,35 +54,35 @@ export default function PastSessionsTable({ statusFilter = 'all' }: { statusFilt
     : pastSessions.filter(session => session.status === statusFilter);
 
   return (
-    <div className="w-full bg-[#F9F9FB] rounded-lg p-1 flex flex-col gap-1">
+    <div className="w-full bg-surface-secondary rounded-lg p-1 flex flex-col gap-1">
       {/* Table Header */}
       <div className="flex items-center px-6 py-2 gap-4 h-[30px]">
-        <div className="flex-1 min-w-[180px] text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
+        <div className="flex-1 min-w-[180px] text-[12px] font-medium text-text-primary leading-[14px] font-sans">
           Session Title
         </div>
-        <div className="flex-1 min-w-[160px] text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
+        <div className="flex-1 min-w-[160px] text-[12px] font-medium text-text-primary leading-[14px] font-sans">
           Creator
         </div>
-        <div className="flex-1 min-w-[90px] text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
+        <div className="flex-1 min-w-[90px] text-[12px] font-medium text-text-primary leading-[14px] font-sans">
           Date
         </div>
-        <div className="flex-1 min-w-[80px] text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
+        <div className="flex-1 min-w-[80px] text-[12px] font-medium text-text-primary leading-[14px] font-sans">
           Time
         </div>
-        <div className="flex-1 min-w-[80px] text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
+        <div className="flex-1 min-w-[80px] text-[12px] font-medium text-text-primary leading-[14px] font-sans">
           Attendees
         </div>
-        <div className="flex-1 min-w-[80px] text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
+        <div className="flex-1 min-w-[80px] text-[12px] font-medium text-text-primary leading-[14px] font-sans">
           Duration
         </div>
-        <div className="flex-1 min-w-[70px] text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
+        <div className="flex-1 min-w-[70px] text-[12px] font-medium text-text-primary leading-[14px] font-sans">
           Status
         </div>
         <div className="w-[18px] opacity-0">1</div>
       </div>
 
       {/* Table Body */}
-      <div className="bg-white border border-[#EBEBEB] rounded-lg overflow-hidden">
+      <div className="bg-white border border-border-primary rounded-lg overflow-hidden">
         {filteredSessions.map((session) => (
           <SessionRow
             key={session.id}
@@ -96,20 +96,20 @@ export default function PastSessionsTable({ statusFilter = 'all' }: { statusFilt
 
       {/* Pagination */}
       <div className="flex justify-between items-center pl-6 h-[30px]">
-        <span className="text-[12px] text-black/50 font-['Neue_Montreal']">
+        <span className="text-[12px] text-black/50 font-sans">
           Showing 1 to {filteredSessions.length} of {filteredSessions.length} results
         </span>
         <div className="flex gap-2">
-          <button className="p-[1px] bg-[#F9F9FB] rounded-md opacity-30 shadow-[0px_2px_5.4px_rgba(0,0,0,0.05)] h-[30px] w-[87.5px]">
-            <div className="flex items-center justify-center bg-white rounded-[5px] h-[28px] shadow-[0px_4px_27px_rgba(0,0,0,0.18)]">
-              <span className="text-[13px] font-medium text-[#5F5971] leading-4 font-['Neue_Montreal']">
+          <button className="p-[1px] bg-surface-secondary rounded-md opacity-30 shadow-segmented-outer h-[30px] w-[87.5px]">
+            <div className="flex items-center justify-center bg-white rounded-[5px] h-[28px] shadow-segmented-inner">
+              <span className="text-[13px] font-medium text-text-secondary leading-4 font-sans">
                 Previous
               </span>
             </div>
           </button>
-          <button className="p-[1px] bg-[#F9F9FB] rounded-md shadow-[0px_2px_5.4px_rgba(0,0,0,0.05)] h-[30px] w-[87.5px]">
-            <div className="flex items-center justify-center bg-white rounded-[5px] h-[28px] shadow-[0px_4px_27px_rgba(0,0,0,0.18)]">
-              <span className="text-[13px] font-medium text-[#5F5971] leading-4 font-['Neue_Montreal']">
+          <button className="p-[1px] bg-surface-secondary rounded-md shadow-segmented-outer h-[30px] w-[87.5px]">
+            <div className="flex items-center justify-center bg-white rounded-[5px] h-[28px] shadow-segmented-inner">
+              <span className="text-[13px] font-medium text-text-secondary leading-4 font-sans">
                 Next
               </span>
             </div>
@@ -168,33 +168,33 @@ function SessionRow({
   const status = statusConfig[session.status];
 
   return (
-    <div className="flex items-center px-6 py-2.5 gap-4 border-b border-[#EBEBEB] last:border-b-0 h-[50px]">
-      <div className="flex-1 min-w-[180px] text-[13.5px] font-medium text-[#2B2834] leading-4 font-['Neue_Montreal'] overflow-hidden text-ellipsis whitespace-nowrap">
+    <div className="flex items-center px-6 py-2.5 gap-4 border-b border-border-primary last:border-b-0 h-[50px]">
+      <div className="flex-1 min-w-[180px] text-[13.5px] font-medium text-text-primary leading-4 font-sans overflow-hidden text-ellipsis whitespace-nowrap">
         {session.sessionTitle}
       </div>
       <div className="flex-1 min-w-[160px] flex flex-col">
-        <span className="text-[13.5px] font-medium text-[#2B2834] leading-4 font-['Neue_Montreal'] overflow-hidden text-ellipsis whitespace-nowrap">
+        <span className="text-[13.5px] font-medium text-text-primary leading-4 font-sans overflow-hidden text-ellipsis whitespace-nowrap">
           {session.creator}
         </span>
-        <span className="text-[12px] font-normal text-[#5F5971] leading-[14px] font-['Neue_Montreal'] overflow-hidden text-ellipsis whitespace-nowrap">
+        <span className="text-[12px] font-normal text-text-secondary leading-[14px] font-sans overflow-hidden text-ellipsis whitespace-nowrap">
           {session.username}
         </span>
       </div>
-      <div className="flex-1 min-w-[90px] text-[13.5px] font-normal text-[#2B2834] leading-4 font-['Neue_Montreal'] overflow-hidden text-ellipsis whitespace-nowrap">
+      <div className="flex-1 min-w-[90px] text-[13.5px] font-normal text-text-primary leading-4 font-sans overflow-hidden text-ellipsis whitespace-nowrap">
         {session.date}
       </div>
-      <div className="flex-1 min-w-[80px] text-[13.5px] font-normal text-[#2B2834] leading-4 font-['Neue_Montreal'] overflow-hidden text-ellipsis whitespace-nowrap">
+      <div className="flex-1 min-w-[80px] text-[13.5px] font-normal text-text-primary leading-4 font-sans overflow-hidden text-ellipsis whitespace-nowrap">
         {session.time}
       </div>
-      <div className="flex-1 min-w-[80px] text-[13.5px] font-normal text-[#2B2834] leading-4 font-['Neue_Montreal'] overflow-hidden text-ellipsis whitespace-nowrap">
+      <div className="flex-1 min-w-[80px] text-[13.5px] font-normal text-text-primary leading-4 font-sans overflow-hidden text-ellipsis whitespace-nowrap">
         {session.attendees}
       </div>
-      <div className="flex-1 min-w-[80px] text-[13.5px] font-normal text-[#2B2834] leading-4 font-['Neue_Montreal'] overflow-hidden text-ellipsis whitespace-nowrap">
+      <div className="flex-1 min-w-[80px] text-[13.5px] font-normal text-text-primary leading-4 font-sans overflow-hidden text-ellipsis whitespace-nowrap">
         {session.duration}
       </div>
       <div className="flex-1 min-w-[70px]">
         <span
-          className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium leading-3 font-['Neue_Montreal']"
+          className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium leading-3 font-sans"
           style={{ backgroundColor: status.bg, color: status.color }}
         >
           {status.icon}
@@ -203,18 +203,18 @@ function SessionRow({
       </div>
       <div className="relative w-[18px] h-[18px] flex-shrink-0" ref={menuRef}>
         <button onClick={onMenuToggle} className="w-[18px] h-[18px] flex items-center justify-center">
-          <MoreVertical className="h-[18px] w-[18px] text-[#5F5971]" strokeWidth={2.25} />
+          <MoreVertical className="h-[18px] w-[18px] text-text-secondary" strokeWidth={2.25} />
         </button>
         
         {isMenuOpen && (
-          <div className="absolute right-0 top-[34px] w-[134px] bg-white border border-[#EBEBEB] rounded-xl shadow-[0px_116px_46px_rgba(0,0,0,0.01),0px_65px_39px_rgba(0,0,0,0.05),0px_29px_29px_rgba(0,0,0,0.09),0px_7px_16px_rgba(0,0,0,0.1)] z-10">
-            <button className="w-full h-[37px] px-4 py-2.5 text-left font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#2B2834] hover:bg-[#F9F9FB] border-b border-[#EBEBEB]">
+          <div className="absolute right-0 top-[34px] w-[134px] bg-white border border-border-primary rounded-xl shadow-dropdown z-10">
+            <button className="w-full h-[37px] px-4 py-2.5 text-left font-sans text-body-sm text-text-primary hover:bg-surface-secondary border-b border-border-primary">
               View Details
             </button>
-            <button className="w-full h-[37px] px-4 py-2.5 text-left font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#2B2834] hover:bg-[#F9F9FB] border-b border-[#EBEBEB]">
+            <button className="w-full h-[37px] px-4 py-2.5 text-left font-sans text-body-sm text-text-primary hover:bg-surface-secondary border-b border-border-primary">
               Creator Profile
             </button>
-            <button className="w-full h-[37px] px-4 py-2.5 text-left font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#CD110A] hover:bg-[#F9F9FB]">
+            <button className="w-full h-[37px] px-4 py-2.5 text-left font-sans text-body-sm text-text-danger hover:bg-surface-secondary">
               Delete Session
             </button>
           </div>
@@ -228,14 +228,14 @@ function SessionRow({
 function FilterDropdown({ title, onApply }: { title: string; onApply: () => void }) {
   return (
     <div
-      className="absolute left-[-0.75px] top-[27px] w-[185px] h-[154px] bg-white border border-[#5F2EFC] rounded-2xl flex flex-col justify-center items-start p-3 gap-[10px]"
+      className="absolute left-[-0.75px] top-[27px] w-[185px] h-[154px] bg-white border border-border-brand rounded-2xl flex flex-col justify-center items-start p-3 gap-[10px]"
       style={{
         boxShadow: '0px 116px 46px rgba(0, 0, 0, 0.01), 0px 65px 39px rgba(0, 0, 0, 0.05), 0px 29px 29px rgba(0, 0, 0, 0.09), 0px 7px 16px rgba(0, 0, 0, 0.1)',
         zIndex: 50
       }}
     >
       {/* Title */}
-      <span className="text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
+      <span className="text-[12px] font-medium text-text-primary leading-[14px] font-sans">
         {title}
       </span>
 
@@ -243,21 +243,21 @@ function FilterDropdown({ title, onApply }: { title: string; onApply: () => void
       <div className="flex flex-col items-start gap-1 w-[161px] h-16">
         {/* From Field */}
         <div className="flex items-center gap-[10px] w-[161px] h-[30px]">
-          <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal'] w-[32.91px]">
+          <span className="text-[12px] font-normal text-text-primary leading-[14px] font-sans w-[32.91px]">
             From
           </span>
-          <div className="flex-1 h-[30px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-md flex items-center justify-end px-2">
-            <span className="text-[12px] font-medium text-[#5F5971] leading-[14px] font-['Neue_Montreal']">@</span>
+          <div className="flex-1 h-[30px] bg-surface-secondary border border-border-primary rounded-md flex items-center justify-end px-2">
+            <span className="text-[12px] font-medium text-text-secondary leading-[14px] font-sans">@</span>
           </div>
         </div>
 
         {/* To Field */}
         <div className="flex items-center gap-[10px] w-[161px] h-[30px]">
-          <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal'] w-[32.91px]">
+          <span className="text-[12px] font-normal text-text-primary leading-[14px] font-sans w-[32.91px]">
             To
           </span>
-          <div className="flex-1 h-[30px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-md flex items-center justify-end px-2">
-            <span className="text-[12px] font-medium text-[#5F5971] leading-[14px] font-['Neue_Montreal']">@</span>
+          <div className="flex-1 h-[30px] bg-surface-secondary border border-border-primary rounded-md flex items-center justify-end px-2">
+            <span className="text-[12px] font-medium text-text-secondary leading-[14px] font-sans">@</span>
           </div>
         </div>
       </div>
@@ -272,7 +272,7 @@ function FilterDropdown({ title, onApply }: { title: string; onApply: () => void
         }}
       >
         <span
-          className="text-[13.5px] font-medium text-[#FFFCF8] leading-4 font-['Neue_Montreal']"
+          className="text-[13.5px] font-medium text-white leading-4 font-sans"
           style={{ textShadow: '0px -1px 6px rgba(0, 0, 0, 0.25)' }}
         >
           Apply

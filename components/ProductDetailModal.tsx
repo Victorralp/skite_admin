@@ -139,16 +139,16 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
             {/* Modal */}
             <div className="fixed right-0 top-0 h-full w-[600px] bg-white z-50 flex flex-col shadow-2xl animate-slide-in">
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 h-[60px] border-b border-[#F0EBF4]">
-                    <h2 className="font-['Neue_Montreal'] font-medium text-[16px] leading-[19px] tracking-[-0.01em] text-[#2B2834]">
+                <div className="flex items-center justify-between px-6 py-4 h-[60px] border-b border-border-secondary">
+                    <h2 className="font-sans text-heading-sm tracking-[-0.01em] text-text-primary">
                         Product Details
                     </h2>
                     <button
                         onClick={onClose}
-                        className="flex items-center gap-1.5 px-2 py-1.5 bg-[#F9F9FB] rounded-md hover:bg-gray-200 transition-colors"
+                        className="flex items-center gap-1.5 px-2 py-1.5 bg-surface-secondary rounded-md hover:bg-gray-200 transition-colors"
                     >
-                        <X className="w-4 h-4 text-[#5F2EFC]" />
-                        <span className="font-['Neue_Montreal'] font-medium text-[12px] leading-[14px] text-[#5F2EFC]">
+                        <X className="w-4 h-4 text-text-brand" />
+                        <span className="font-sans text-caption-lg text-text-brand">
                             Close
                         </span>
                     </button>
@@ -167,12 +167,12 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                                 className="w-full h-full object-cover"
                             />
                             <div className="absolute top-3 left-3 z-20">
-                                <div className="flex items-center gap-0.5 px-1.5 py-0.5 bg-[#E7F3EF] rounded-[13px]">
+                                <div className="flex items-center gap-0.5 px-1.5 py-0.5 bg-surface-success rounded-[13px]">
                                     <svg width="16" height="16" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M0.5 6.5C0.5 7.28793 0.655194 8.06815 0.956723 8.7961C1.25825 9.52405 1.70021 10.1855 2.25736 10.7426C2.81451 11.2998 3.47595 11.7417 4.2039 12.0433C4.93185 12.3448 5.71207 12.5 6.5 12.5C7.28793 12.5 8.06815 12.3448 8.7961 12.0433C9.52405 11.7417 10.1855 11.2998 10.7426 10.7426C11.2998 10.1855 11.7417 9.52405 12.0433 8.7961C12.3448 8.06815 12.5 7.28793 12.5 6.5C12.5 5.71207 12.3448 4.93185 12.0433 4.2039C11.7417 3.47595 11.2998 2.81451 10.7426 2.25736C10.1855 1.70021 9.52405 1.25825 8.7961 0.956723C8.06815 0.655195 7.28793 0.5 6.5 0.5C5.71207 0.5 4.93185 0.655195 4.2039 0.956723C3.47595 1.25825 2.81451 1.70021 2.25736 2.25736C1.70021 2.81451 1.25825 3.47595 0.956723 4.2039C0.655194 4.93185 0.5 5.71207 0.5 6.5Z" stroke="#239B73" strokeLinecap="round" strokeLinejoin="round" />
                                         <path d="M4.5 6.50008L5.83333 7.83341L8.5 5.16675" stroke="#239B73" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
-                                    <span className="font-['Neue_Montreal'] font-medium text-[13px] leading-[16px] text-[#239B73]">
+                                    <span className="font-sans font-medium text-[13px] leading-[16px] text-text-success">
                                         Approved
                                     </span>
                                 </div>
@@ -185,34 +185,34 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                             <div className="flex items-start justify-between gap-2">
                                 <div className="flex-1 flex flex-col gap-2">
                                     <div className="flex flex-col gap-0.5">
-                                        <h3 className="font-['Neue_Montreal'] font-bold text-[16px] leading-[19px] text-[#2B2834]">
+                                        <h3 className="font-sans text-body-lg text-text-primary">
                                             {product.name}
                                         </h3>
-                                        <span className="font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#5F5971]">
+                                        <span className="font-sans text-body-sm text-text-secondary">
                                             {product.type || 'Product'}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-4">
-                                        <span className="font-['Neue_Montreal'] font-bold text-[16px] leading-[19px] text-[#2B2834]">
+                                        <span className="font-sans text-body-lg text-text-primary">
                                             {formatCurrency(product.price)}
                                         </span>
                                         <div className="flex items-center gap-1">
                                             <StarIcon filled={true} />
-                                            <span className="font-['Neue_Montreal'] font-bold text-[16px] leading-[19px] text-[#2B2834]">
+                                            <span className="font-sans text-body-lg text-text-primary">
                                                 4.3
                                             </span>
                                         </div>
                                     </div>
                                 </div>
-                                <button className="flex items-center justify-center px-4 py-2 h-[32px] bg-[#CD110A] rounded-lg border border-[rgba(251,236,235,0.2)] shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)]">
-                                    <span className="font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#FFFCF8]">
+                                <button className="flex items-center justify-center px-4 py-2 h-[32px] bg-[#CD110A] rounded-lg border border-[rgba(251,236,235,0.2)] shadow-button-inset">
+                                    <span className="font-sans text-body-sm text-white">
                                         Ban Product
                                     </span>
                                 </button>
                             </div>
 
                             {/* Description */}
-                            <p className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-[16px] text-[#5F5971]">
+                            <p className="font-sans text-body-sm-regular text-text-secondary">
                                 {product.name} - A comprehensive digital product designed to help you achieve your goals. This product includes everything you need to get started and succeed.
                             </p>
                         </div>
@@ -222,7 +222,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
 
                         {/* Creator Info */}
                         <div className="flex flex-col gap-2">
-                            <span className="font-['Neue_Montreal'] font-normal text-[10px] leading-[12px] text-[#A5A1AF] uppercase">
+                            <span className="font-sans text-caption-sm-regular text-text-tertiary uppercase">
                                 CREATOR
                             </span>
                             <div className="flex items-center gap-2">
@@ -232,18 +232,18 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                                     className="w-[34px] h-[35px] rounded-full object-cover"
                                 />
                                 <div className="flex-1 flex flex-col gap-0.5">
-                                    <span className="font-['Neue_Montreal'] font-medium text-[16px] leading-[19px] text-[#2B2834]">
+                                    <span className="font-sans text-heading-sm text-text-primary">
                                         {product.creator?.name || 'Unknown Creator'}
                                     </span>
-                                    <span className="font-['Neue_Montreal'] font-normal text-[12px] leading-[14px] text-[#A5A1AF]">
+                                    <span className="font-sans text-caption-lg-regular text-text-tertiary">
                                         {product.creator?.username || '@creator'}
                                     </span>
                                 </div>
                                 <button
                                     onClick={handleViewCreatorProfile}
-                                    className="flex items-center justify-center px-4 py-2 h-[32px] bg-white border border-[#EBEBEB] rounded-lg shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] hover:bg-gray-50 transition-colors"
+                                    className="flex items-center justify-center px-4 py-2 h-[32px] bg-white border border-border-primary rounded-lg shadow-button-inset hover:bg-gray-50 transition-colors"
                                 >
-                                    <span className="font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#353A44]">
+                                    <span className="font-sans text-body-sm text-[#353A44]">
                                         View profile
                                     </span>
                                 </button>
@@ -252,59 +252,59 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                     </div>
 
                     {/* Tabs */}
-                    <div className="flex items-center border-b border-[#EBEBEB]">
+                    <div className="flex items-center border-b border-border-primary">
                         {['Overview', 'Content', 'Reviews'].map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
                                 className={cn(
-                                    "flex-1 flex flex-col items-center pt-2.5 gap-3 h-[38px] font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] transition-colors",
-                                    activeTab === tab ? "text-[#2B2834]" : "text-[#A5A1AF]"
+                                    "flex-1 flex flex-col items-center pt-2.5 gap-3 h-[38px] font-sans text-body-sm transition-colors",
+                                    activeTab === tab ? "text-text-primary" : "text-text-tertiary"
                                 )}
                             >
                                 <span>{tab}</span>
                                 <div className={cn(
                                     "w-full h-0",
-                                    activeTab === tab ? "border-b-2 border-[#5F2EFC]" : "border-b border-[#EBEBEB]"
+                                    activeTab === tab ? "border-b-2 border-border-brand" : "border-b border-border-primary"
                                 )} />
                             </button>
                         ))}
                     </div>
 
                     {/* Tab Content */}
-                    <div className="px-6 py-4 bg-[#F9F9FB] flex flex-col gap-4">
+                    <div className="px-6 py-4 bg-surface-secondary flex flex-col gap-4">
                         {activeTab === 'Overview' && (
                             <>
                                 {/* Product Info Grid */}
                                 <div className="flex flex-col gap-1">
-                                    <div className="flex items-center px-4 h-[32px] bg-white border border-[#EBEBEB] rounded">
-                                        <span className="w-[105px] font-['Neue_Montreal'] font-normal text-[12px] leading-[14px] text-[#5F5971]">
+                                    <div className="flex items-center px-4 h-[32px] bg-white border border-border-primary rounded">
+                                        <span className="w-[105px] font-sans text-caption-lg-regular text-text-secondary">
                                             Exclusive Access
                                         </span>
                                         <div className="w-px h-[32px] bg-[#EBEBEB] mx-4" />
-                                        <span className="flex-1 font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#2B2834]">
+                                        <span className="flex-1 font-sans text-body-sm text-text-primary">
                                             Active
                                         </span>
                                     </div>
-                                    <div className="flex items-center px-4 h-[32px] bg-white border border-[#EBEBEB] rounded">
-                                        <span className="w-[105px] font-['Neue_Montreal'] font-normal text-[12px] leading-[14px] text-[#5F5971]">
+                                    <div className="flex items-center px-4 h-[32px] bg-white border border-border-primary rounded">
+                                        <span className="w-[105px] font-sans text-caption-lg-regular text-text-secondary">
                                             Product Group Chat
                                         </span>
                                         <div className="w-px h-[32px] bg-[#EBEBEB] mx-4" />
-                                        <span className="flex-1 font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#2B2834]">
+                                        <span className="flex-1 font-sans text-body-sm text-text-primary">
                                             True
                                         </span>
-                                        <a href="#" className="flex items-center gap-1 font-['Neue_Montreal'] font-medium text-[12px] leading-[14px] text-[#5F2EFC] underline">
+                                        <a href="#" className="flex items-center gap-1 font-sans text-caption-lg text-text-brand underline">
                                             View Group Chat
                                             <ArrowUpRight className="w-3.5 h-3.5" />
                                         </a>
                                     </div>
-                                    <div className="flex items-center px-4 h-[32px] bg-white border border-[#EBEBEB] rounded">
-                                        <span className="w-[105px] font-['Neue_Montreal'] font-normal text-[12px] leading-[14px] text-[#5F5971]">
+                                    <div className="flex items-center px-4 h-[32px] bg-white border border-border-primary rounded">
+                                        <span className="w-[105px] font-sans text-caption-lg-regular text-text-secondary">
                                             Date Created
                                         </span>
                                         <div className="w-px h-[32px] bg-[#EBEBEB] mx-4" />
-                                        <span className="flex-1 font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#2B2834]">
+                                        <span className="flex-1 font-sans text-body-sm text-text-primary">
                                             {product.dateCreated}
                                         </span>
                                     </div>
@@ -312,16 +312,16 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
 
                                 {/* Comments Section */}
                                 <div className="flex flex-col gap-3">
-                                    <h4 className="font-['Neue_Montreal'] font-bold text-[16px] leading-[19px] text-[#1F1F1F]">
+                                    <h4 className="font-sans text-body-lg text-[#1F1F1F]">
                                         Comments
                                     </h4>
-                                    <div className="flex flex-col gap-4 p-4 bg-white border border-[#EBEBEB] rounded">
+                                    <div className="flex flex-col gap-4 p-4 bg-white border border-border-primary rounded">
                                         {mockComments.map((comment, index) => (
                                             <div
                                                 key={comment.id}
                                                 className={cn(
                                                     "flex gap-2 pb-4",
-                                                    index !== mockComments.length - 1 && "border-b border-[#EBEBEB]"
+                                                    index !== mockComments.length - 1 && "border-b border-border-primary"
                                                 )}
                                             >
                                                 <img
@@ -332,23 +332,23 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                                                 <div className="flex-1 flex flex-col gap-1.5">
                                                     <div className="flex items-center justify-between">
                                                         <span className={cn(
-                                                            "font-['Neue_Montreal'] text-[13.5px] leading-[16px] text-[#1F1F1F]",
+                                                            "font-sans text-[13.5px] leading-[16px] text-[#1F1F1F]",
                                                             comment.isCreator ? "font-bold" : "font-medium"
                                                         )}>
                                                             {comment.author}
                                                         </span>
-                                                        <span className="font-['Neue_Montreal'] font-normal text-[10px] leading-[12px] text-[#A5A1AF]">
+                                                        <span className="font-sans text-caption-sm-regular text-text-tertiary">
                                                             {comment.time}
                                                         </span>
                                                     </div>
                                                     {comment.isCreator ? (
-                                                        <div className="px-2 py-1 bg-[#F9F9FB] rounded-br-lg rounded-bl-lg rounded-tr-lg">
-                                                            <p className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-[16px] text-[#1F1F1F]">
+                                                        <div className="px-2 py-1 bg-surface-secondary rounded-br-lg rounded-bl-lg rounded-tr-lg">
+                                                            <p className="font-sans text-body-sm-regular text-[#1F1F1F]">
                                                                 {comment.text}
                                                             </p>
                                                         </div>
                                                     ) : (
-                                                        <p className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-[16px] text-[#5F5971]">
+                                                        <p className="font-sans text-body-sm-regular text-text-secondary">
                                                             {comment.text}
                                                         </p>
                                                     )}
@@ -365,10 +365,10 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                                 {/* Content Module */}
                                 <div className="flex flex-col p-4 gap-4 bg-white rounded-3xl">
                                     <div className="flex flex-col gap-4">
-                                        <h4 className="font-['Neue_Montreal'] font-bold text-[16px] leading-[19px] text-[#2B2834]">
+                                        <h4 className="font-sans text-body-lg text-text-primary">
                                             01 Introduction
                                         </h4>
-                                        <p className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-[16px] text-[#5F5971]">
+                                        <p className="font-sans text-body-sm-regular text-text-secondary">
                                             Explore the fascinating realm of interior design with our comprehensive book! You&apos;ll discover inspiring projects and gain personalized insights to ignite your creativity.
                                         </p>
 
@@ -389,10 +389,10 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                                                     </svg>
                                                 </div>
                                                 <div className="flex-1 flex flex-col gap-0.5">
-                                                    <span className="font-['Neue_Montreal'] font-medium text-[14px] leading-[17px] text-[#2B2834]">
+                                                    <span className="font-sans text-body-md text-text-primary">
                                                         Introduction to Interior Design
                                                     </span>
-                                                    <span className="font-['Neue_Montreal'] font-normal text-[11px] leading-[13px] text-[#A5A1AF]">
+                                                    <span className="font-sans text-caption-md text-text-tertiary">
                                                         Reading • 2 min
                                                     </span>
                                                 </div>
@@ -409,7 +409,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                                                     </button>
                                                     {openContentMenuId === 1 && (
                                                         <div
-                                                            className="absolute right-[10px] top-[33px] w-[128px] bg-white border border-[#EBEBEB] rounded-[12px] flex flex-col p-0 overflow-hidden z-50"
+                                                            className="absolute right-[10px] top-[33px] w-[128px] bg-white border border-border-primary rounded-[12px] flex flex-col p-0 overflow-hidden z-50"
                                                             style={{
                                                                 boxShadow: '0px 116px 46px rgba(0, 0, 0, 0.01), 0px 65px 39px rgba(0, 0, 0, 0.05), 0px 29px 29px rgba(0, 0, 0, 0.09), 0px 7px 16px rgba(0, 0, 0, 0.1)'
                                                             }}
@@ -427,7 +427,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                                                                     borderRadius: '0px'
                                                                 }}
                                                             >
-                                                                <span className="text-[13.5px] font-medium text-[#2B2834] leading-4 font-['Neue_Montreal']">
+                                                                <span className="text-[13.5px] font-medium text-text-primary leading-4 font-sans">
                                                                     View
                                                                 </span>
                                                             </button>
@@ -444,7 +444,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                                                                     borderRadius: '0px'
                                                                 }}
                                                             >
-                                                                <span className="text-[13.5px] font-medium text-[#CD110A] leading-4 font-['Neue_Montreal']">
+                                                                <span className="text-[13.5px] font-medium text-text-danger leading-4 font-sans">
                                                                     Reject Content
                                                                 </span>
                                                             </button>
@@ -465,10 +465,10 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                                                     </svg>
                                                 </div>
                                                 <div className="flex-1 flex flex-col gap-0.5">
-                                                    <span className="font-['Neue_Montreal'] font-medium text-[14px] leading-[17px] text-[#2B2834]">
+                                                    <span className="font-sans text-body-md text-text-primary">
                                                         Approaching Interior Design
                                                     </span>
-                                                    <span className="font-['Neue_Montreal'] font-normal text-[11px] leading-[13px] text-[#A5A1AF]">
+                                                    <span className="font-sans text-caption-md text-text-tertiary">
                                                         Video • 5 min
                                                     </span>
                                                 </div>
@@ -485,7 +485,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                                                     </button>
                                                     {openContentMenuId === 2 && (
                                                         <div
-                                                            className="absolute right-[10px] top-[33px] w-[128px] bg-white border border-[#EBEBEB] rounded-[12px] flex flex-col p-0 overflow-hidden z-50"
+                                                            className="absolute right-[10px] top-[33px] w-[128px] bg-white border border-border-primary rounded-[12px] flex flex-col p-0 overflow-hidden z-50"
                                                             style={{
                                                                 boxShadow: '0px 116px 46px rgba(0, 0, 0, 0.01), 0px 65px 39px rgba(0, 0, 0, 0.05), 0px 29px 29px rgba(0, 0, 0, 0.09), 0px 7px 16px rgba(0, 0, 0, 0.1)'
                                                             }}
@@ -503,7 +503,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                                                                     borderRadius: '0px'
                                                                 }}
                                                             >
-                                                                <span className="text-[13.5px] font-medium text-[#2B2834] leading-4 font-['Neue_Montreal']">
+                                                                <span className="text-[13.5px] font-medium text-text-primary leading-4 font-sans">
                                                                     View
                                                                 </span>
                                                             </button>
@@ -520,7 +520,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                                                                     borderRadius: '0px'
                                                                 }}
                                                             >
-                                                                <span className="text-[13.5px] font-medium text-[#CD110A] leading-4 font-['Neue_Montreal']">
+                                                                <span className="text-[13.5px] font-medium text-text-danger leading-4 font-sans">
                                                                     Reject Content
                                                                 </span>
                                                             </button>
@@ -537,24 +537,24 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                         {activeTab === 'Reviews' && (
                             <div className="flex flex-col gap-1 p-1">
                                 {/* Rating Summary */}
-                                <div className="flex items-center h-[100px] bg-white border border-[#EBEBEB] rounded">
+                                <div className="flex items-center h-[100px] bg-white border border-border-primary rounded">
                                     {/* Total Reviews */}
-                                    <div className="flex-1 flex flex-col items-center justify-center gap-1 py-4 px-4 border-r border-[#EBEBEB]">
-                                        <span className="font-['Neue_Montreal'] font-normal text-[12px] leading-[14px] text-[#5F5971]">
+                                    <div className="flex-1 flex flex-col items-center justify-center gap-1 py-4 px-4 border-r border-border-primary">
+                                        <span className="font-sans text-caption-lg-regular text-text-secondary">
                                             Total Reviews
                                         </span>
-                                        <span className="font-['Neue_Montreal'] font-medium text-[20px] leading-[24px] tracking-[-0.01em] text-[#2B2834]">
+                                        <span className="font-sans font-medium text-[20px] leading-[24px] tracking-[-0.01em] text-text-primary">
                                             10.0k
                                         </span>
                                     </div>
 
                                     {/* Average Rating */}
-                                    <div className="flex-1 flex flex-col items-center justify-center gap-1 py-4 px-4 border-r border-[#EBEBEB]">
-                                        <span className="font-['Neue_Montreal'] font-normal text-[12px] leading-[14px] text-[#5F5971]">
+                                    <div className="flex-1 flex flex-col items-center justify-center gap-1 py-4 px-4 border-r border-border-primary">
+                                        <span className="font-sans text-caption-lg-regular text-text-secondary">
                                             Average Rating
                                         </span>
                                         <div className="flex items-center gap-2.5">
-                                            <span className="font-['Neue_Montreal'] font-medium text-[20px] leading-[24px] tracking-[-0.01em] text-[#2B2834]">
+                                            <span className="font-sans font-medium text-[20px] leading-[24px] tracking-[-0.01em] text-text-primary">
                                                 4.0
                                             </span>
                                             <div className="flex items-center gap-1">
@@ -578,7 +578,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                                             <div key={item.stars} className="flex items-center gap-1.5">
                                                 <div className="flex items-center gap-0.5 w-6">
                                                     <SmallStarIcon filled={true} />
-                                                    <span className="font-['Neue_Montreal'] font-medium text-[10px] leading-[12px] text-[#5F5971] flex-1 text-center">
+                                                    <span className="font-sans text-caption-sm text-text-secondary flex-1 text-center">
                                                         {item.stars}
                                                     </span>
                                                 </div>
@@ -588,7 +588,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                                                         style={{ width: item.width, opacity: item.opacity }}
                                                     />
                                                 </div>
-                                                <span className="font-['Neue_Montreal'] font-medium text-[10px] leading-[12px] text-[#2B2834] w-8 text-right">
+                                                <span className="font-sans text-caption-sm text-text-primary w-8 text-right">
                                                     {item.count}
                                                 </span>
                                             </div>
@@ -597,13 +597,13 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                                 </div>
 
                                 {/* Reviews List */}
-                                <div className="flex flex-col bg-white border border-[#EBEBEB] rounded">
+                                <div className="flex flex-col bg-white border border-border-primary rounded">
                                     {mockReviews.map((review, index) => (
                                         <div
                                             key={review.id}
                                             className={cn(
                                                 "flex flex-col gap-2 p-4",
-                                                index !== mockReviews.length - 1 && "border-b border-[#EBEBEB]"
+                                                index !== mockReviews.length - 1 && "border-b border-border-primary"
                                             )}
                                         >
                                             {/* User Info */}
@@ -614,10 +614,10 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                                                     className="w-[45px] h-[45px] rounded-full object-cover"
                                                 />
                                                 <div className="flex flex-col gap-1">
-                                                    <span className="font-['Neue_Montreal'] font-bold text-[18px] leading-[22px] text-[#2B2834]">
+                                                    <span className="font-sans font-bold text-[18px] leading-[22px] text-text-primary">
                                                         {review.author}
                                                     </span>
-                                                    <span className="font-['Neue_Montreal'] font-medium text-[16px] leading-[19px] tracking-[-0.02em] text-[#8E8E8D]">
+                                                    <span className="font-sans text-heading-sm tracking-[-0.02em] text-[#8E8E8D]">
                                                         {review.handle}
                                                     </span>
                                                 </div>
@@ -633,13 +633,13 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                                                         />
                                                     ))}
                                                 </div>
-                                                <span className="font-['Neue_Montreal'] font-normal text-[14px] leading-[17px] tracking-[-0.02em] text-[#8E8E8D]">
+                                                <span className="font-sans font-normal text-[14px] leading-[17px] tracking-[-0.02em] text-[#8E8E8D]">
                                                     {review.date}
                                                 </span>
                                             </div>
 
                                             {/* Review Text */}
-                                            <p className="font-['Neue_Montreal'] font-normal text-[16px] leading-[19px] text-[#090A07]">
+                                            <p className="font-sans font-normal text-[16px] leading-[19px] text-[#090A07]">
                                                 {review.text}
                                             </p>
                                         </div>

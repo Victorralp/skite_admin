@@ -63,7 +63,7 @@ export default function SettingsPage() {
   return (
     <PageContainer>
       <div className="flex flex-col gap-2">
-        <h1 className="text-[20px] font-bold text-[#2B2834] leading-[100%] tracking-[-0.01em] font-['Neue_Montreal']">
+        <h1 className="text-[20px] font-bold text-text-primary leading-[100%] tracking-[-0.01em] font-sans">
           Settings
         </h1>
 
@@ -83,17 +83,17 @@ export default function SettingsPage() {
                     router.push(card.href);
                   }
                 }}
-                className="flex flex-row items-start p-3 gap-2 w-full max-w-[268px] h-[78px] bg-[#F9F9FB] rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
+                className="flex flex-row items-start p-3 gap-2 w-full max-w-[268px] h-[78px] bg-surface-secondary rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
               >
                 <div className="flex flex-col justify-center items-center w-7 h-7 rounded flex-shrink-0">
                   {card.icon}
                 </div>
 
                 <div className="flex flex-col justify-center items-start gap-1.5 flex-1 min-w-0 h-[54px]">
-                  <h3 className="text-[13.5px] font-bold leading-4 text-[#5F2EFC] w-full">
+                  <h3 className="text-[13.5px] font-bold leading-4 text-text-brand w-full">
                     {card.title}
                   </h3>
-                  <p className="text-[13.5px] font-normal leading-4 text-[#2B2834] w-full">
+                  <p className="text-body-sm-regular text-text-primary w-full">
                     {card.description}
                   </p>
                 </div>

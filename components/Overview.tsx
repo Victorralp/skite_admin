@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { overviewMetrics as fallbackOverviewMetrics } from '@/data/dashboard';
 import {
   getAdminDashboardMetrics,
   type AdminDashboardMetricsResponse,
@@ -116,19 +115,10 @@ function mapApiMetrics(
   });
 }
 
-function fallbackCards(): OverviewMetricCard[] {
-  return fallbackOverviewMetrics.map((metric) => ({
-    title: metric.title,
-    value: metric.value,
-    delta: metric.delta,
-    tone: 'up'
-  }));
-}
-
 export default function Overview() {
-  const [metrics, setMetrics] = useState<OverviewMetricCard[]>(fallbackCards);
+  const [metrics, setMetrics] = useState<OverviewMetricCard[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [usingFallback, setUsingFallback] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -138,11 +128,11 @@ export default function Overview() {
         const response = await getAdminDashboardMetrics();
         if (!isMounted) return;
         setMetrics(mapApiMetrics(response));
-        setUsingFallback(false);
+        setHasError(false);
       } catch {
         if (!isMounted) return;
-        setMetrics(fallbackCards());
-        setUsingFallback(true);
+        setMetrics([]);
+        setHasError(true);
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -164,8 +154,8 @@ export default function Overview() {
         <span className="text-caption-sm text-text-secondary">
           {isLoading
             ? 'Loading metrics...'
-            : usingFallback
-              ? 'Showing fallback data'
+            : hasError
+              ? 'Metrics unavailable'
               : 'Updated this month'}
         </span>
       </div>
@@ -190,6 +180,11 @@ export default function Overview() {
             </span>
           </div>
         ))}
+        {!isLoading && metrics.length === 0 && (
+          <div className="text-caption-sm text-text-secondary">
+            No overview metrics available.
+          </div>
+        )}
       </div>
     </div>
   );

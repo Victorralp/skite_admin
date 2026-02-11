@@ -35,21 +35,21 @@ export default function LiveSessionCard({ session }: { session: LiveSession }) {
   }, []);
 
   return (
-    <div className="flex-1 min-w-[350px] bg-white border border-[#EBEBEB] rounded p-4 flex flex-col justify-center gap-4">
+    <div className="flex-1 min-w-[350px] bg-white border border-border-primary rounded p-4 flex flex-col justify-center gap-4">
       {/* Header */}
       <div className="flex justify-between items-start">
         <div className="flex items-start gap-2">
           {/* Live Badge */}
           <div className="flex items-center gap-0.5 px-1.5 py-1 bg-[rgba(205,17,10,0.1)] rounded-full">
             <div className="w-[6.26px] h-[6.26px] bg-[#CD110A] rounded-full" />
-            <span className="font-['Neue_Montreal'] font-medium text-[12px] leading-[14px] text-[#CD110A]">
+            <span className="font-sans text-caption-lg text-text-danger">
               Live
             </span>
           </div>
 
           {/* Type Badge */}
-          <div className="flex items-center justify-center px-3 py-1 bg-[#F9F9FB] rounded-full">
-            <span className="font-['Neue_Montreal'] font-bold text-[12px] leading-[14px] text-[#2B2834]">
+          <div className="flex items-center justify-center px-3 py-1 bg-surface-secondary rounded-full">
+            <span className="font-sans font-bold text-[12px] leading-[14px] text-text-primary">
               {session.type}
             </span>
           </div>
@@ -59,21 +59,21 @@ export default function LiveSessionCard({ session }: { session: LiveSession }) {
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="w-[18px] h-[18px] flex items-center justify-center text-[#5F5971] hover:text-[#2B2834]"
+            className="w-[18px] h-[18px] flex items-center justify-center text-text-secondary hover:text-text-primary"
           >
             <MoreVertical size={18} strokeWidth={2.25} />
           </button>
 
           {/* Dropdown Menu */}
           {showMenu && (
-            <div className="absolute right-0 top-[34px] w-[134px] bg-white border border-[#EBEBEB] rounded-xl shadow-[0px_116px_46px_rgba(0,0,0,0.01),0px_65px_39px_rgba(0,0,0,0.05),0px_29px_29px_rgba(0,0,0,0.09),0px_7px_16px_rgba(0,0,0,0.1)] z-10">
-              <button className="w-full h-[37px] px-4 py-2.5 text-left font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#2B2834] hover:bg-[#F9F9FB] border-b border-[#EBEBEB]">
+            <div className="absolute right-0 top-[34px] w-[134px] bg-white border border-border-primary rounded-xl shadow-dropdown z-10">
+              <button className="w-full h-[37px] px-4 py-2.5 text-left font-sans text-body-sm text-text-primary hover:bg-surface-secondary border-b border-border-primary">
                 Alert Creator
               </button>
-              <button className="w-full h-[37px] px-4 py-2.5 text-left font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#2B2834] hover:bg-[#F9F9FB] border-b border-[#EBEBEB]">
+              <button className="w-full h-[37px] px-4 py-2.5 text-left font-sans text-body-sm text-text-primary hover:bg-surface-secondary border-b border-border-primary">
                 Creator Profile
               </button>
-              <button className="w-full h-[37px] px-4 py-2.5 text-left font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#CD110A] hover:bg-[#F9F9FB]">
+              <button className="w-full h-[37px] px-4 py-2.5 text-left font-sans text-body-sm text-text-danger hover:bg-surface-secondary">
                 Disable Session
               </button>
             </div>
@@ -83,7 +83,7 @@ export default function LiveSessionCard({ session }: { session: LiveSession }) {
 
       {/* Content */}
       <div className="flex flex-col gap-3">
-        <h3 className="font-['Neue_Montreal'] font-bold text-[16px] leading-[19px] text-[#2B2834]">
+        <h3 className="font-sans text-body-lg text-text-primary">
           {session.title}
         </h3>
 
@@ -93,7 +93,7 @@ export default function LiveSessionCard({ session }: { session: LiveSession }) {
             className="w-6 h-6 rounded-full bg-cover bg-center"
             style={{ backgroundImage: `url(${session.avatar})` }}
           />
-          <span className="flex-1 font-['Neue_Montreal'] font-medium text-[16px] leading-[19px] text-[#5F5971]">
+          <span className="flex-1 font-sans text-heading-sm text-text-secondary">
             {session.creator}
           </span>
         </div>
@@ -101,8 +101,8 @@ export default function LiveSessionCard({ session }: { session: LiveSession }) {
         {/* Meta Info */}
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-1">
-            <Clock size={16} strokeWidth={1.3} className="text-[#2B2834]" />
-            <span className="font-['Neue_Montreal'] font-normal text-[12px] leading-[14px] text-[#5F5971]">
+            <Clock size={16} strokeWidth={1.3} className="text-text-primary" />
+            <span className="font-sans text-caption-lg-regular text-text-secondary">
               {session.time}
             </span>
           </div>
@@ -117,7 +117,7 @@ export default function LiveSessionCard({ session }: { session: LiveSession }) {
                 </clipPath>
               </defs>
             </svg>
-            <span className="font-['Neue_Montreal'] font-normal text-[12px] leading-[14px] text-[#5F5971]">
+            <span className="font-sans text-caption-lg-regular text-text-secondary">
               {session.duration}
             </span>
           </div>
@@ -128,7 +128,7 @@ export default function LiveSessionCard({ session }: { session: LiveSession }) {
               <path d="M6.00001 14.0013C8.57734 14.0013 10.6667 12.8074 10.6667 11.3346C10.6667 9.86188 8.57734 8.66797 6.00001 8.66797C3.42268 8.66797 1.33334 9.86188 1.33334 11.3346C1.33334 12.8074 3.42268 14.0013 6.00001 14.0013Z" stroke="#2B2834" strokeWidth="1.3"/>
               <path d="M12 9.33398C13.1693 9.59065 14 10.24 14 11.0007C14 11.6873 13.324 12.2827 12.3333 12.5807" stroke="#2B2834" strokeWidth="1.3" strokeLinecap="round"/>
             </svg>
-            <span className="font-['Neue_Montreal'] font-normal text-[12px] leading-[14px] text-[#5F5971]">
+            <span className="font-sans text-caption-lg-regular text-text-secondary">
               {session.participants}
             </span>
           </div>
@@ -137,15 +137,15 @@ export default function LiveSessionCard({ session }: { session: LiveSession }) {
 
       {/* Actions */}
       <div className="flex items-center gap-1">
-        <button className="flex-1 h-8 px-6 py-3.5 bg-white border border-[#EBEBEB] rounded-[9px] shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] flex items-center justify-center gap-1 hover:bg-[#F9F9FB]">
+        <button className="flex-1 h-8 px-6 py-3.5 bg-white border border-border-primary rounded-[9px] shadow-button-inset flex items-center justify-center gap-1 hover:bg-surface-secondary">
           <Eye size={12} strokeWidth={1.5} className="text-[#17181C]" />
-          <span className="font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#353A44]">
+          <span className="font-sans text-body-sm text-[#353A44]">
             Monitor
           </span>
         </button>
-        <button className="flex-1 h-8 px-6 py-3.5 bg-white border border-[#EBEBEB] rounded-[9px] shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] flex items-center justify-center gap-1 hover:bg-[#F9F9FB]">
+        <button className="flex-1 h-8 px-6 py-3.5 bg-white border border-border-primary rounded-[9px] shadow-button-inset flex items-center justify-center gap-1 hover:bg-surface-secondary">
           <X size={12} strokeWidth={1.5} className="text-[#17181C]" />
-          <span className="font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#353A44]">
+          <span className="font-sans text-body-sm text-[#353A44]">
             End Session
           </span>
         </button>

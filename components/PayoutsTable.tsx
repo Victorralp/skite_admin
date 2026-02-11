@@ -142,7 +142,7 @@ const StatusBadge = ({ status }: { status: 'Success' | 'Pending' | 'Rejected' })
     >
       {icon}
       <span 
-        className="font-['Neue_Montreal'] font-medium text-[10px] leading-3"
+        className="font-sans font-medium text-[10px] leading-3"
         style={{ color }}
       >
         {label}
@@ -156,14 +156,14 @@ const FilterPill = ({ label, active, onClick }: { label: string; active: boolean
     onClick={onClick}
     className={cn(
       "flex items-center justify-center gap-1 px-[9px] py-1 border border-dashed rounded-full h-[22px] transition-colors",
-      active ? 'border-[#5F2EFC]' : 'border-[#EBEBEB] hover:bg-gray-50'
+      active ? 'border-border-brand' : 'border-border-primary hover:bg-gray-50'
     )}
   >
     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-      <circle cx="6" cy="6" r="5.25" stroke="currentColor" strokeWidth="1.2" fill="none" className={active ? 'text-[#5F2EFC]' : 'text-[#5F5971]'} />
-      <path d="M6 3V9M3 6H9" stroke="currentColor" strokeWidth="1.2" className={active ? 'text-[#5F2EFC]' : 'text-[#5F5971]'} />
+      <circle cx="6" cy="6" r="5.25" stroke="currentColor" strokeWidth="1.2" fill="none" className={active ? 'text-text-brand' : 'text-text-secondary'} />
+      <path d="M6 3V9M3 6H9" stroke="currentColor" strokeWidth="1.2" className={active ? 'text-text-brand' : 'text-text-secondary'} />
     </svg>
-    <span className={cn("text-xs font-medium leading-[14px] font-['Neue_Montreal']", active ? 'text-[#5F2EFC]' : 'text-[#5F5971]')}>{label}</span>
+    <span className={cn("text-xs font-medium leading-[14px] font-sans", active ? 'text-text-brand' : 'text-text-secondary')}>{label}</span>
   </button>
 );
 
@@ -227,69 +227,69 @@ export default function PayoutsTable() {
             }}
           />
         </div>
-        <button className="flex items-center gap-0.5 px-2 py-1 bg-white border border-[#EBEBEB] rounded-lg shadow-[0px_1px_4.8px_rgba(0,0,0,0.03)]">
+        <button className="flex items-center gap-0.5 px-2 py-1 bg-white border border-border-primary rounded-lg shadow-button-soft">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M9.33337 10.5V3.5M9.33337 3.5L11.6667 5.90625M9.33337 3.5L7.00004 5.90625M4.66671 3.5V10.5M4.66671 10.5L7.00004 8.09375M4.66671 10.5L2.33337 8.09375" stroke="#5F5971" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          <span className="font-['Neue_Montreal'] font-normal text-xs leading-none text-[#5F5971]">
+          <span className="font-sans font-normal text-xs leading-none text-text-secondary">
             Sort
           </span>
         </button>
       </div>
 
       {/* Table Container */}
-      <div className="flex flex-col items-start p-1 gap-1 w-full bg-[#F9F9FB] rounded-lg">
+      <div className="flex flex-col items-start p-1 gap-1 w-full bg-surface-secondary rounded-lg">
         {/* Table Header */}
         <div className="flex items-center px-6 py-2 gap-4 w-full h-[30px]">
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[10%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[10%]">
             Payout ID
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[15%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[15%]">
             Date
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[25%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[25%]">
             Creator
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[20%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[20%]">
             Balance
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[15%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[15%]">
             Payout Amount
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[10%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[10%]">
             Status
           </span>
           <div className="w-[5%] opacity-0">1</div>
         </div>
 
         {/* Table Body */}
-        <div className="flex flex-col items-start w-full bg-white border border-[#EBEBEB] rounded-lg">
+        <div className="flex flex-col items-start w-full bg-white border border-border-primary rounded-lg">
           {filteredPayouts.map((payout, index) => (
             <div
               key={`${payout.id}-${index}`}
               className={cn(
                 'flex items-center px-6 py-2.5 gap-4 w-full h-[50px] bg-white',
-                index < filteredPayouts.length - 1 && 'border-b border-[#EBEBEB]'
+                index < filteredPayouts.length - 1 && 'border-b border-border-primary'
               )}
             >
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[10%] truncate">
+              <span className="font-sans text-body-sm-regular text-text-primary w-[10%] truncate">
                 {payout.id}
               </span>
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[15%] truncate">
+              <span className="font-sans text-body-sm-regular text-text-primary w-[15%] truncate">
                 {payout.date}
               </span>
               <div className="w-[25%] flex flex-col items-start">
-                <span className="font-['Neue_Montreal'] font-medium text-[13.5px] leading-4 text-[#2B2834] truncate w-full">
+                <span className="font-sans text-body-sm text-text-primary truncate w-full">
                   {payout.creatorName}
                 </span>
-                <span className="font-['Neue_Montreal'] font-normal text-xs leading-[14px] text-[#5F5971] truncate w-full">
+                <span className="font-sans font-normal text-xs leading-[14px] text-text-secondary truncate w-full">
                   {payout.creatorHandle}
                 </span>
               </div>
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[20%] truncate">
+              <span className="font-sans text-body-sm-regular text-text-primary w-[20%] truncate">
                 {payout.balance}
               </span>
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[15%] truncate">
+              <span className="font-sans text-body-sm-regular text-text-primary w-[15%] truncate">
                 {payout.payoutAmount}
               </span>
               <div className="w-[10%] flex items-center">
@@ -300,7 +300,7 @@ export default function PayoutsTable() {
                   onClick={() => setOpenMenuId(openMenuId === `${payout.id}-${index}` ? null : `${payout.id}-${index}`)}
                   className="w-[18px] h-[18px] flex items-center justify-center"
                 >
-                  <MoreVertical size={18} className="text-[#5F5971]" strokeWidth={2.25} />
+                  <MoreVertical size={18} className="text-text-secondary" strokeWidth={2.25} />
                 </button>
               </div>
             </div>
@@ -309,20 +309,20 @@ export default function PayoutsTable() {
 
         {/* Pagination */}
         <div className="flex justify-between items-center pl-6 h-[30px] w-full">
-          <span className="text-xs text-black/50 font-['Neue_Montreal']">
+          <span className="text-xs text-black/50 font-sans">
             Showing 1 to 12 of 200 results
           </span>
           <div className="flex gap-2">
-            <button className="p-[1px] bg-[#F9F9FB] rounded-md opacity-30 shadow-[0px_2px_5.4px_rgba(0,0,0,0.05)] h-[30px] w-[87.5px]">
-              <div className="flex items-center justify-center bg-white rounded-[5px] h-[28px] shadow-[0px_4px_27px_rgba(0,0,0,0.18)]">
-                <span className="text-[13px] font-medium text-[#5F5971] leading-4 font-['Neue_Montreal']">
+            <button className="p-[1px] bg-surface-secondary rounded-md opacity-30 shadow-segmented-outer h-[30px] w-[87.5px]">
+              <div className="flex items-center justify-center bg-white rounded-[5px] h-[28px] shadow-segmented-inner">
+                <span className="text-[13px] font-medium text-text-secondary leading-4 font-sans">
                   Previous
                 </span>
               </div>
             </button>
-            <button className="p-[1px] bg-[#F9F9FB] rounded-md shadow-[0px_2px_5.4px_rgba(0,0,0,0.05)] h-[30px] w-[87.5px]">
-              <div className="flex items-center justify-center bg-white rounded-[5px] h-[28px] shadow-[0px_4px_27px_rgba(0,0,0,0.18)]">
-                <span className="text-[13px] font-medium text-[#5F5971] leading-4 font-['Neue_Montreal']">
+            <button className="p-[1px] bg-surface-secondary rounded-md shadow-segmented-outer h-[30px] w-[87.5px]">
+              <div className="flex items-center justify-center bg-white rounded-[5px] h-[28px] shadow-segmented-inner">
+                <span className="text-[13px] font-medium text-text-secondary leading-4 font-sans">
                   Next
                 </span>
               </div>

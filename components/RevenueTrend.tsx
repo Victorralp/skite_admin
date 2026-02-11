@@ -1,6 +1,7 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   AreaChart,
   Area,
@@ -10,25 +11,24 @@ import {
   Tooltip,
   ResponsiveContainer
 } from 'recharts';
+import {
+  getAdminDashboardRevenueTrend,
+  type RevenueTrendFilter
+} from '@/lib/api';
+import { getDashboardUiState, setDashboardUiState } from '@/lib/dashboardUiState';
 import { cn } from '@/lib/utils';
 
-const revenueData = [
-  { day: '1', revenue: 2400000 },
-  { day: '3', revenue: 1800000 },
-  { day: '5', revenue: 3200000 },
-  { day: '7', revenue: 2800000 },
-  { day: '9', revenue: 4100000 },
-  { day: '11', revenue: 3600000 },
-  { day: '13', revenue: 4800000 },
-  { day: '15', revenue: 5200000 },
-  { day: '17', revenue: 4400000 },
-  { day: '19', revenue: 6100000 },
-  { day: '21', revenue: 5800000 },
-  { day: '23', revenue: 6400000 },
-  { day: '25', revenue: 7200000 },
-  { day: '27', revenue: 6800000 },
-  { day: '29', revenue: 7800000 },
-  { day: '30', revenue: 8200000 }
+type RevenueTrendPoint = {
+  _id: string;
+  revenue: number;
+};
+
+const FILTER_OPTIONS: Array<{ label: string; value: RevenueTrendFilter }> = [
+  { label: 'Today', value: 'today' },
+  { label: 'Yesterday', value: 'yesterday' },
+  { label: 'Last 7 days', value: 'week' },
+  { label: 'Last 30 days', value: 'month' },
+  { label: 'Last 6 months', value: 'six_months' }
 ];
 
 const formatCurrency = (value: number) => {
@@ -38,7 +38,90 @@ const formatCurrency = (value: number) => {
   return `₦${(value / 1000).toFixed(0)}K`;
 };
 
+const formatDateLabel = (dateString: string) => {
+  const date = new Date(`${dateString}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return dateString;
+  return new Intl.DateTimeFormat('en-NG', {
+    month: 'short',
+    day: 'numeric'
+  }).format(date);
+};
+
+const formatTooltipDate = (dateString: string) => {
+  const date = new Date(`${dateString}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return dateString;
+  return new Intl.DateTimeFormat('en-NG', {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  }).format(date);
+};
+
 export default function RevenueTrend() {
+  const [selectedFilter, setSelectedFilter] = useState<RevenueTrendFilter>(
+    () => getDashboardUiState('revenueTrendFilter')
+  );
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [revenueData, setRevenueData] = useState<RevenueTrendPoint[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const selectedFilterLabel = useMemo(
+    () => FILTER_OPTIONS.find((option) => option.value === selectedFilter)?.label ?? 'Today',
+    [selectedFilter]
+  );
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchRevenueTrend = async () => {
+      setIsLoading(true);
+      try {
+        const response = await getAdminDashboardRevenueTrend(selectedFilter);
+        if (!isMounted) return;
+
+        const normalized = response
+          .map((point) => ({
+            _id: point._id,
+            revenue: Number(point.revenue ?? 0)
+          }))
+          .sort((a, b) => a._id.localeCompare(b._id));
+
+        setRevenueData(normalized);
+        setHasError(false);
+      } catch {
+        if (!isMounted) return;
+        setRevenueData([]);
+        setHasError(true);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchRevenueTrend();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedFilter]);
+
   return (
     <section className="w-full">
       <Card className="w-full min-h-[285px] rounded-lg p-0 bg-white border-none shadow-none">
@@ -46,73 +129,106 @@ export default function RevenueTrend() {
           <div className="w-full h-[30px] flex justify-between items-center">
             <div className="font-sans text-xs font-medium leading-none tracking-normal text-text-main">Daily Revenue</div>
 
-            {/* Custom Dropdown Trigger & Menu */}
-            <div className="relative group">
-              {/* Trigger Button */}
-              <button className="w-[69px] h-[30px] flex items-center py-[5px] pl-2.5 pr-[7px] bg-white border border-border-subtle rounded-lg shadow-[0px_1px_4.8px_rgba(0,0,0,0.03)] cursor-pointer gap-1">
-                <span className="font-sans font-normal text-xs leading-[14px] text-text-muted whitespace-nowrap">Today</span>
+            <div className="relative" ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={() => setIsDropdownOpen((prev) => !prev)}
+                className="min-w-[105px] h-[30px] flex items-center py-[5px] pl-2.5 pr-[7px] bg-white border border-border-subtle rounded-lg shadow-button-soft cursor-pointer gap-1"
+              >
+                <span className="font-sans font-normal text-xs leading-[14px] text-text-muted whitespace-nowrap">
+                  {selectedFilterLabel}
+                </span>
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path fillRule="evenodd" clipRule="evenodd" d="M5.83337 7.5L10 11.6667L14.1667 7.5H5.83337Z" fill="#5F5971" />
                 </svg>
               </button>
 
-              {/* Dropdown Menu */}
-              <div className="hidden group-hover:flex absolute right-0 top-[34px] z-50 rounded-lg flex-col overflow-hidden bg-white w-[114px] h-[165px] border border-border-subtle shadow-[0px_116px_46px_rgba(0,0,0,0.01),0px_65px_39px_rgba(0,0,0,0.05),0px_29px_29px_rgba(0,0,0,0.09),0px_7px_16px_rgba(0,0,0,0.1)] p-0">
-                {['Today', 'Yesterday', 'Last 7 days', 'Last 30 days', 'Custom'].map((item, i) => (
-                  <div key={item} className={cn(
-                    "w-[114px] h-[33px] flex items-center px-4 py-2 gap-2.5 bg-white cursor-pointer hover:bg-surface",
-                    i < 4 && "border-b border-border-subtle"
-                  )}>
-                    <span className="font-sans font-normal text-[13.5px] leading-4 text-text-muted">{item}</span>
-                  </div>
-                ))}
-              </div>
+              {isDropdownOpen && (
+                <div className="absolute right-0 top-[34px] z-50 rounded-lg flex flex-col overflow-hidden bg-white w-[130px] border border-border-subtle shadow-dropdown p-0">
+                  {FILTER_OPTIONS.map((item, i) => (
+                    <button
+                      key={item.value}
+                      type="button"
+                      onClick={() => {
+                        setDashboardUiState('revenueTrendFilter', item.value);
+                        setSelectedFilter(item.value);
+                        setIsDropdownOpen(false);
+                      }}
+                      className={cn(
+                        'w-full h-[33px] flex items-center px-4 py-2 gap-2.5 bg-white cursor-pointer hover:bg-surface text-left',
+                        i < FILTER_OPTIONS.length - 1 && 'border-b border-border-subtle',
+                        selectedFilter === item.value && 'bg-surface'
+                      )}
+                    >
+                      <span className="font-sans text-body-sm-regular text-text-muted">
+                        {item.label}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
           <div className="w-full h-0 border border-border-subtle"></div>
           <div className="h-[207px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={revenueData}>
-                <defs>
-                  <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#6ac19a" stopOpacity={0.25} />
-                    <stop offset="100%" stopColor="#6ac19a" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                <XAxis
-                  dataKey="day"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-                  tickFormatter={formatCurrency}
-                  width={60}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'hsl(var(--card))',
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                  }}
-                  labelStyle={{ color: 'hsl(var(--muted-foreground))', marginBottom: 4 }}
-                  formatter={(value: number | undefined) => [formatCurrency(value || 0), 'Revenue']}
-                  labelFormatter={(label) => `Day ${label}`}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="#6ac19a"
-                  strokeWidth={2}
-                  fill="url(#revenueGradient)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            {isLoading && (
+              <div className="h-full w-full flex items-center justify-center text-caption-sm text-text-secondary">
+                Loading revenue trend...
+              </div>
+            )}
+
+            {!isLoading && revenueData.length > 0 && (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={revenueData}>
+                  <defs>
+                    <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#6ac19a" stopOpacity={0.25} />
+                      <stop offset="100%" stopColor="#6ac19a" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                  <XAxis
+                    dataKey="_id"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    tickFormatter={(value) => formatDateLabel(String(value))}
+                    minTickGap={24}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    tickFormatter={formatCurrency}
+                    width={60}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--card))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                    }}
+                    labelStyle={{ color: 'hsl(var(--muted-foreground))', marginBottom: 4 }}
+                    formatter={(value) => [formatCurrency(Number(value) || 0), 'Revenue']}
+                    labelFormatter={(label) => formatTooltipDate(String(label))}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="#6ac19a"
+                    strokeWidth={2}
+                    fill="url(#revenueGradient)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
+
+            {!isLoading && revenueData.length === 0 && (
+              <div className="h-full w-full flex items-center justify-center text-caption-sm text-text-secondary">
+                {hasError ? 'Revenue trend unavailable.' : 'No revenue trend data available.'}
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

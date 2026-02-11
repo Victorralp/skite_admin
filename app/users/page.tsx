@@ -90,7 +90,7 @@ export default function UsersPage() {
       <PageContainer>
         {/* Stats Section */}
         <div className="flex flex-col items-start gap-2 w-full">
-          <h1 className="m-0 text-[20px] leading-6 font-bold tracking-[-0.01em] text-text-primary">
+          <h1 className="m-0 text-heading-lg-bold text-text-primary">
             Users
           </h1>
 
@@ -178,7 +178,7 @@ export default function UsersPage() {
                 )}
               >
                 <FilterPlusIcon className={cn(statusFilter !== 'all' ? "text-brand-primary" : "text-text-secondary")} />
-                <span className={cn("text-[12px] font-medium leading-[14px] font-['Neue_Montreal']", statusFilter !== 'all' ? "text-brand-primary" : "text-text-secondary")}>
+                <span className={cn("text-caption-lg font-sans", statusFilter !== 'all' ? "text-brand-primary" : "text-text-secondary")}>
                   {statusFilter === 'all' ? 'Status' :
                     statusFilter === 'active' ? 'Active' :
                       statusFilter === 'inactive' ? 'Inactive' : 'Pending'}
@@ -187,7 +187,7 @@ export default function UsersPage() {
             </div>
             <button className="flex items-center gap-[2px] pl-[7px] pr-[10px] py-[5px] h-[24px] bg-white border border-border-primary rounded-lg shadow-button hover:bg-gray-50 transition-colors box-border">
               <SlidersHorizontalIcon className="h-[14px] w-[14px] text-text-secondary" />
-              <span className="text-[12px] font-normal text-text-secondary leading-[14px] font-['Neue_Montreal']">Sort</span>
+              <span className="text-[12px] font-normal text-text-secondary leading-[14px] font-sans">Sort</span>
             </button>
           </div>
 
@@ -261,7 +261,7 @@ function FilterPill({ label, active, onClick }: { label: string; active: boolean
       )}
     >
       <FilterPlusIcon className={cn(active ? "text-brand-primary" : "text-text-secondary")} />
-      <span className={cn("text-[12px] font-medium leading-[14px] font-['Neue_Montreal']", active ? "text-brand-primary" : "text-text-secondary")}>{label}</span>
+      <span className={cn("text-caption-lg font-sans", active ? "text-brand-primary" : "text-text-secondary")}>{label}</span>
     </button>
   );
 }
@@ -275,7 +275,7 @@ function FilterDropdown({ title, showCalendar, showCurrency, onApply }: { title:
       className="absolute left-[-0.75px] top-[27px] w-[185px] h-[154px] bg-white border border-brand-primary rounded-[16px] flex flex-col justify-center items-start p-3 gap-[10px] shadow-dropdown z-50"
     >
       {/* Title */}
-      <span className="text-[12px] font-medium text-text-primary leading-[14px] font-['Neue_Montreal']">
+      <span className="text-[12px] font-medium text-text-primary leading-[14px] font-sans">
         {title}
       </span>
 
@@ -283,7 +283,7 @@ function FilterDropdown({ title, showCalendar, showCurrency, onApply }: { title:
       <div className="flex flex-col items-start gap-1 w-[161px] h-16">
         {/* From Field */}
         <div className="flex items-center gap-[10px] w-[161px] h-[30px]">
-          <span className="text-[12px] font-normal text-text-primary leading-[14px] font-['Neue_Montreal'] w-[32.91px] shrink-0">
+          <span className="text-[12px] font-normal text-text-primary leading-[14px] font-sans w-[32.91px] shrink-0">
             From
           </span>
           <div className="w-[118px] h-[30px] bg-surface-secondary border border-border-primary rounded-[6px] flex items-center justify-end px-2 gap-[10px] overflow-hidden">
@@ -291,18 +291,18 @@ function FilterDropdown({ title, showCalendar, showCurrency, onApply }: { title:
               type={showCalendar ? "date" : "number"}
               value={fromValue}
               onChange={(e) => setFromValue(e.target.value)}
-              className="w-full bg-transparent text-[12px] font-medium text-text-primary leading-[14px] font-['Neue_Montreal'] outline-none border-none text-right"
+              className="w-full bg-transparent text-[12px] font-medium text-text-primary leading-[14px] font-sans outline-none border-none text-right"
               placeholder=""
             />
             {showCurrency && (
-              <span className="text-[12px] font-medium text-text-secondary leading-[14px] font-['Neue_Montreal'] shrink-0">₦</span>
+              <span className="text-[12px] font-medium text-text-secondary leading-[14px] font-sans shrink-0">₦</span>
             )}
           </div>
         </div>
 
         {/* To Field */}
         <div className="flex items-center gap-[10px] w-[161px] h-[30px]">
-          <span className="text-[12px] font-normal text-text-primary leading-[14px] font-['Neue_Montreal'] w-[32.91px] shrink-0">
+          <span className="text-[12px] font-normal text-text-primary leading-[14px] font-sans w-[32.91px] shrink-0">
             To
           </span>
           <div className="w-[118px] h-[30px] bg-surface-secondary border border-border-primary rounded-[6px] flex items-center justify-end px-2 gap-[10px] overflow-hidden">
@@ -310,11 +310,11 @@ function FilterDropdown({ title, showCalendar, showCurrency, onApply }: { title:
               type={showCalendar ? "date" : "number"}
               value={toValue}
               onChange={(e) => setToValue(e.target.value)}
-              className="w-full bg-transparent text-[12px] font-medium text-text-primary leading-[14px] font-['Neue_Montreal'] outline-none border-none text-right"
+              className="w-full bg-transparent text-[12px] font-medium text-text-primary leading-[14px] font-sans outline-none border-none text-right"
               placeholder=""
             />
             {showCurrency && (
-              <span className="text-[12px] font-medium text-text-secondary leading-[14px] font-['Neue_Montreal'] shrink-0">₦</span>
+              <span className="text-[12px] font-medium text-text-secondary leading-[14px] font-sans shrink-0">₦</span>
             )}
           </div>
         </div>
@@ -325,7 +325,7 @@ function FilterDropdown({ title, showCalendar, showCurrency, onApply }: { title:
         onClick={onApply}
         className="w-[161px] h-8 flex items-center justify-center px-6 py-[14px] rounded-[9px] bg-gradient-to-b from-brand-primary to-brand-purple shadow-button-inset"
       >
-        <span className="text-[13.5px] font-medium text-white leading-4 font-['Neue_Montreal']">
+        <span className="text-[13.5px] font-medium text-white leading-4 font-sans">
           Apply
         </span>
       </button>
@@ -399,7 +399,7 @@ function UserRow({ user, isMenuOpen, onMenuToggle, onViewDetails, menuRef }: { u
       {/* Status */}
       <div className="w-[50px]">
         <span className={cn(
-          "inline-flex items-center gap-0.5 px-[6px] py-[1px] pl-[3px] rounded text-[10px] font-medium leading-[12px] h-[14px] w-fit",
+          "inline-flex items-center gap-0.5 px-[6px] py-[1px] pl-[3px] rounded text-caption-sm h-[14px] w-fit",
           status.bg,
           status.color
         )}>
@@ -409,7 +409,7 @@ function UserRow({ user, isMenuOpen, onMenuToggle, onViewDetails, menuRef }: { u
       </div>
 
       {/* Actions */}
-      <div className="flex-1 min-w-[18px] flex justify-end items-center" ref={menuRef}>
+      <div className="relative flex-1 min-w-[18px] flex justify-end items-center" ref={menuRef}>
         <button
           onClick={onMenuToggle}
           className="w-[18px] h-[18px] flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors"

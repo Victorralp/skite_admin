@@ -39,7 +39,7 @@ export default function HoldTransactionModal({ isOpen, onClose, onConfirm }: Hol
         onClick={(e) => e.stopPropagation()}
       >
         {/* Title */}
-        <h2 className="font-['Neue_Montreal'] font-bold text-base leading-[19px] text-[#2B2834] w-full">
+        <h2 className="font-sans font-bold text-base leading-[19px] text-text-primary w-full">
           Hold transaction
         </h2>
 
@@ -49,7 +49,7 @@ export default function HoldTransactionModal({ isOpen, onClose, onConfirm }: Hol
           <div className="flex flex-col items-start gap-[5px] w-full">
             <label 
               htmlFor="reason" 
-              className="font-['Neue_Montreal'] font-normal text-xs leading-[14px] text-[#5F5971] w-full"
+              className="font-sans font-normal text-xs leading-[14px] text-text-secondary w-full"
             >
               Reason for hold
             </label>
@@ -58,7 +58,7 @@ export default function HoldTransactionModal({ isOpen, onClose, onConfirm }: Hol
                 id="reason"
                 name="reason"
                 placeholder="Why are you putting the transaction on hold?"
-                className="w-full h-full bg-[#F9F9FB] border border-[#EBEBEB] rounded-md font-['Neue_Montreal'] font-normal text-xs leading-[14px] text-[#2B2834] placeholder:text-[#A5A1AF] resize-none shadow-[0px_1px_2px_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-[#5F2EFC] focus:border-transparent"
+                className="w-full h-full bg-surface-secondary border border-border-primary rounded-md font-sans font-normal text-xs leading-[14px] text-text-primary placeholder:text-text-tertiary resize-none shadow-button focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent"
                 style={{ padding: '10px 12px' }}
                 required
               />
@@ -85,10 +85,10 @@ export default function HoldTransactionModal({ isOpen, onClose, onConfirm }: Hol
             <button
               type="button"
               onClick={onClose}
-              className="flex items-center justify-center px-6 py-3.5 w-[90px] h-9 bg-white border border-[#EBEBEB] rounded-[9px] shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)]"
+              className="flex items-center justify-center px-6 py-3.5 w-[90px] h-9 bg-white border border-border-primary rounded-[9px] shadow-button-inset"
             >
               <span 
-                className="font-['Neue_Montreal'] font-medium text-[13.5px] leading-4 text-[#353A44]"
+                className="font-sans text-body-sm text-[#353A44]"
                 style={{ textShadow: '0px -1px 19.4px rgba(0, 0, 0, 0.25)' }}
               >
                 Cancel
@@ -96,13 +96,13 @@ export default function HoldTransactionModal({ isOpen, onClose, onConfirm }: Hol
             </button>
             <button
               type="submit"
-              className="flex items-center justify-center px-6 py-3.5 w-[76px] h-9 rounded-[9px] shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)]"
+              className="flex items-center justify-center px-6 py-3.5 w-[76px] h-9 rounded-[9px] shadow-button-inset"
               style={{
                 background: 'linear-gradient(180deg, #5F2EFC 22.58%, #4E18FC 100%)'
               }}
             >
               <span 
-                className="font-['Neue_Montreal'] font-medium text-[13.5px] leading-4 text-[#FFFCF8]"
+                className="font-sans text-body-sm text-white"
                 style={{ textShadow: '0px -1px 6px rgba(0, 0, 0, 0.25)' }}
               >
                 Hold

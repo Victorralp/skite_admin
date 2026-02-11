@@ -73,36 +73,36 @@ export default function SupportCenter() {
     <PageContainer>
       {/* Header and Stats */}
       <div className="flex flex-col gap-2">
-        <h1 className="text-[20px] font-bold text-[#2B2834] leading-6 tracking-[-0.01em]">Support Center</h1>
+        <h1 className="text-[20px] font-bold text-text-primary leading-6 tracking-[-0.01em]">Support Center</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 w-full">
-          <div className="flex flex-col items-start bg-white border border-[#EBEBEB] rounded-lg p-4 gap-3">
+          <div className="flex flex-col items-start bg-white border border-border-primary rounded-lg p-4 gap-3">
             <div className="flex flex-col gap-1 w-full">
-              <span className="text-xs leading-[14px] text-[#5F5971]">Open Tickets</span>
-              <span className="text-lg leading-[22px] font-medium text-[#2B2834]">1,247</span>
+              <span className="text-xs leading-[14px] text-text-secondary">Open Tickets</span>
+              <span className="text-lg leading-[22px] font-medium text-text-primary">1,247</span>
             </div>
-            <span className="text-[10px] leading-3 text-[#239B73]">+23 today</span>
+            <span className="text-[10px] leading-3 text-text-success">+23 today</span>
           </div>
-          <div className="flex flex-col items-start bg-white border border-[#EBEBEB] rounded-lg p-4 gap-3">
+          <div className="flex flex-col items-start bg-white border border-border-primary rounded-lg p-4 gap-3">
             <div className="flex flex-col gap-1 w-full">
-              <span className="text-xs leading-[14px] text-[#5F5971]">User Tickets</span>
-              <span className="text-lg leading-[22px] font-medium text-[#2B2834]">892</span>
+              <span className="text-xs leading-[14px] text-text-secondary">User Tickets</span>
+              <span className="text-lg leading-[22px] font-medium text-text-primary">892</span>
             </div>
-            <span className="text-[10px] leading-3 text-[#A5A1AF]">72%</span>
+            <span className="text-[10px] leading-3 text-text-tertiary">72%</span>
           </div>
-          <div className="flex flex-col items-start bg-white border border-[#EBEBEB] rounded-lg p-4 gap-3">
+          <div className="flex flex-col items-start bg-white border border-border-primary rounded-lg p-4 gap-3">
             <div className="flex flex-col gap-1 w-full">
-              <span className="text-xs leading-[14px] text-[#5F5971]">Creator Tickets</span>
-              <span className="text-lg leading-[22px] font-medium text-[#2B2834]">355</span>
+              <span className="text-xs leading-[14px] text-text-secondary">Creator Tickets</span>
+              <span className="text-lg leading-[22px] font-medium text-text-primary">355</span>
             </div>
-            <span className="text-[10px] leading-3 text-[#A5A1AF]">28%</span>
+            <span className="text-[10px] leading-3 text-text-tertiary">28%</span>
           </div>
-          <div className="flex flex-col items-start bg-white border border-[#EBEBEB] rounded-lg p-4 gap-3">
+          <div className="flex flex-col items-start bg-white border border-border-primary rounded-lg p-4 gap-3">
             <div className="flex flex-col gap-1 w-full">
-              <span className="text-xs leading-[14px] text-[#5F5971]">Auto-Resolved</span>
-              <span className="text-lg leading-[22px] font-medium text-[#2B2834]">156</span>
+              <span className="text-xs leading-[14px] text-text-secondary">Auto-Resolved</span>
+              <span className="text-lg leading-[22px] font-medium text-text-primary">156</span>
             </div>
-            <span className="text-[10px] leading-3 text-[#A5A1AF]">12%</span>
+            <span className="text-[10px] leading-3 text-text-tertiary">12%</span>
           </div>
         </div>
       </div>
@@ -151,7 +151,7 @@ export default function SupportCenter() {
               <input
                 type="text"
                 placeholder="Search users, products, docs"
-                className="flex-1 bg-transparent text-xs leading-[14px] text-[#A5A1AF] outline-none placeholder:text-[#A5A1AF]"
+                className="flex-1 bg-transparent text-xs leading-[14px] text-text-tertiary outline-none placeholder:text-text-tertiary"
               />
             </div>
 
@@ -167,15 +167,15 @@ export default function SupportCenter() {
                   <div className="w-11 h-11 rounded-full bg-gray-200 flex-shrink-0" />
                   <div className="flex-1 flex flex-col gap-1 min-w-0">
                     <div className="flex justify-between items-start">
-                      <span className="font-bold text-base leading-[19px] text-[#2B2834] truncate">
+                      <span className="font-bold text-base leading-[19px] text-text-primary truncate">
                         {msg.sender}
                       </span>
-                      <span className="text-xs leading-[14px] text-[#5F5971] flex-shrink-0 ml-2">
+                      <span className="text-xs leading-[14px] text-text-secondary flex-shrink-0 ml-2">
                         {msg.time}
                       </span>
                     </div>
                     <div className="flex items-center gap-2.5">
-                      <p className="text-[13.5px] leading-4 text-[#5F5971] truncate flex-1">
+                      <p className="text-[13.5px] leading-4 text-text-secondary truncate flex-1">
                         {msg.message}
                       </p>
                       {msg.unread && (
@@ -191,7 +191,7 @@ export default function SupportCenter() {
           </div>
 
           {/* Chat Area */}
-          <div className="flex-1 flex flex-col bg-[#F3F0FF] border-l border-[#F0EBF4]">
+          <div className="flex-1 flex flex-col bg-[#F3F0FF] border-l border-border-secondary">
             {!selectedMessage ? (
               /* Empty State - Show until a chat is clicked */
               <div className="flex flex-col items-center justify-center h-full gap-2">
@@ -209,10 +209,10 @@ export default function SupportCenter() {
                   <div className="flex items-center gap-2 w-full">
                     <div className="w-12 h-12 rounded-full bg-gray-200 flex-shrink-0" />
                     <div className="flex flex-col justify-center">
-                      <span className="font-bold text-base leading-[19px] text-[#2B2834]">
+                      <span className="font-bold text-base leading-[19px] text-text-primary">
                         {selectedMessage.sender}
                       </span>
-                      <span className="text-[13.5px] leading-4 font-medium text-[#5F5971]">
+                      <span className="text-[13.5px] leading-4 font-medium text-text-secondary">
                         {selectedMessage.role}
                       </span>
                     </div>

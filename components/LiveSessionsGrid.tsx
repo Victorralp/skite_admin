@@ -219,10 +219,10 @@ export default function LiveSessionsGrid() {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`flex-1 h-8 px-4 py-2 rounded-md font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] transition-colors ${
+            className={`flex-1 h-8 px-4 py-2 rounded-md font-sans text-body-sm transition-colors ${
               activeTab === tab
-                ? 'bg-white border border-[#5F2EFC] text-[#5F2EFC]'
-                : 'bg-white border border-[#EBEBEB] text-[#5F5971]'
+                ? 'bg-white border border-border-brand text-text-brand'
+                : 'bg-white border border-border-primary text-text-secondary'
             }`}
           >
             {tab}
@@ -239,11 +239,11 @@ export default function LiveSessionsGrid() {
               onClick={() => setCreatorFilterActive(!creatorFilterActive)}
               className={cn(
                 "flex items-center gap-[4px] pl-[7px] pr-[9px] py-[4px] h-[22px] rounded-full border border-dashed transition-colors box-border",
-                creatorFilterActive ? "border-[#5F2EFC]" : "border-[#EBEBEB] hover:bg-gray-50"
+                creatorFilterActive ? "border-border-brand" : "border-border-primary hover:bg-gray-50"
               )}
             >
-              <FilterPlusIcon className={cn(creatorFilterActive ? "text-[#5F2EFC]" : "text-[#5F5971]")} />
-              <span className={cn("text-[12px] font-medium leading-[14px] font-['Neue_Montreal']", creatorFilterActive ? "text-[#5F2EFC]" : "text-[#5F5971]")}>Creator</span>
+              <FilterPlusIcon className={cn(creatorFilterActive ? "text-text-brand" : "text-text-secondary")} />
+              <span className={cn("text-caption-lg font-sans", creatorFilterActive ? "text-text-brand" : "text-text-secondary")}>Creator</span>
             </button>
             {creatorFilterActive && (
               <FilterDropdown
@@ -264,11 +264,11 @@ export default function LiveSessionsGrid() {
               onClick={() => setCreatorFilterActive(!creatorFilterActive)}
               className={cn(
                 "flex items-center gap-[4px] pl-[7px] pr-[9px] py-[4px] h-[22px] rounded-full border border-dashed transition-colors box-border",
-                creatorFilterActive ? "border-[#5F2EFC]" : "border-[#EBEBEB] hover:bg-gray-50"
+                creatorFilterActive ? "border-border-brand" : "border-border-primary hover:bg-gray-50"
               )}
             >
-              <FilterPlusIcon className={cn(creatorFilterActive ? "text-[#5F2EFC]" : "text-[#5F5971]")} />
-              <span className={cn("text-[12px] font-medium leading-[14px] font-['Neue_Montreal']", creatorFilterActive ? "text-[#5F2EFC]" : "text-[#5F5971]")}>Creator</span>
+              <FilterPlusIcon className={cn(creatorFilterActive ? "text-text-brand" : "text-text-secondary")} />
+              <span className={cn("text-caption-lg font-sans", creatorFilterActive ? "text-text-brand" : "text-text-secondary")}>Creator</span>
             </button>
             {creatorFilterActive && (
               <FilterDropdown
@@ -288,11 +288,11 @@ export default function LiveSessionsGrid() {
             )}
             className={cn(
               "flex items-center gap-[4px] pl-[7px] pr-[9px] py-[4px] h-[22px] rounded-full border border-dashed transition-colors box-border",
-              statusFilter !== 'all' ? "border-[#5F2EFC]" : "border-[#EBEBEB] hover:bg-gray-50"
+              statusFilter !== 'all' ? "border-border-brand" : "border-border-primary hover:bg-gray-50"
             )}
           >
-            <FilterPlusIcon className={cn(statusFilter !== 'all' ? "text-[#5F2EFC]" : "text-[#5F5971]")} />
-            <span className={cn("text-[12px] font-medium leading-[14px] font-['Neue_Montreal']", statusFilter !== 'all' ? "text-[#5F2EFC]" : "text-[#5F5971]")}>
+            <FilterPlusIcon className={cn(statusFilter !== 'all' ? "text-text-brand" : "text-text-secondary")} />
+            <span className={cn("text-caption-lg font-sans", statusFilter !== 'all' ? "text-text-brand" : "text-text-secondary")}>
               {statusFilter === 'all' ? 'Status' : statusFilter}
             </span>
           </button>
@@ -303,15 +303,15 @@ export default function LiveSessionsGrid() {
       {activeTab === 'Past' ? (
         <PastSessionsTable statusFilter={statusFilter} />
       ) : (
-        <div className="w-full bg-[#F9F9FB] rounded-lg p-1 flex flex-col gap-1">
+        <div className="w-full bg-surface-secondary rounded-lg p-1 flex flex-col gap-1">
           {/* Header */}
           <div className="flex items-center justify-between px-2 py-1 gap-4 h-8">
-            <span className="flex-1 font-['Neue_Montreal'] font-medium text-[16px] leading-[19px] text-[#2B2834]">
+            <span className="flex-1 font-sans text-heading-sm text-text-primary">
               {activeTab}
             </span>
             {activeTab === 'Upcoming' && (
-              <button className="flex items-center gap-1 h-6 px-2.5 py-1.5 bg-white border border-[#EBEBEB] rounded-lg shadow-[0px_1px_4.8px_rgba(0,0,0,0.03)]">
-                <span className="font-['Neue_Montreal'] font-normal text-[12px] leading-[14px] text-[#5F5971]">
+              <button className="flex items-center gap-1 h-6 px-2.5 py-1.5 bg-white border border-border-primary rounded-lg shadow-button-soft">
+                <span className="font-sans text-caption-lg-regular text-text-secondary">
                   Today
                 </span>
                 <svg width="10" height="5" viewBox="0 0 10 5" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -343,14 +343,14 @@ function FilterDropdown({ title, onApply }: { title: string; onApply: () => void
 
   return (
     <div
-      className="absolute left-[-0.75px] top-[27px] w-[185px] h-[154px] bg-white border border-[#5F2EFC] rounded-[16px] flex flex-col justify-center items-start p-3 gap-[10px]"
+      className="absolute left-[-0.75px] top-[27px] w-[185px] h-[154px] bg-white border border-border-brand rounded-[16px] flex flex-col justify-center items-start p-3 gap-[10px]"
       style={{
         boxShadow: '0px 116px 46px rgba(0, 0, 0, 0.01), 0px 65px 39px rgba(0, 0, 0, 0.05), 0px 29px 29px rgba(0, 0, 0, 0.09), 0px 7px 16px rgba(0, 0, 0, 0.1)',
         zIndex: 50
       }}
     >
       {/* Title */}
-      <span className="text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
+      <span className="text-[12px] font-medium text-text-primary leading-[14px] font-sans">
         {title}
       </span>
 
@@ -358,35 +358,35 @@ function FilterDropdown({ title, onApply }: { title: string; onApply: () => void
       <div className="flex flex-col items-start gap-1 w-[161px] h-16">
         {/* From Field */}
         <div className="flex items-center gap-[10px] w-[161px] h-[30px]">
-          <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal'] w-[32.91px] shrink-0">
+          <span className="text-[12px] font-normal text-text-primary leading-[14px] font-sans w-[32.91px] shrink-0">
             From
           </span>
-          <div className="w-[118px] h-[30px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-[6px] flex items-center justify-end px-2 gap-[10px] overflow-hidden">
+          <div className="w-[118px] h-[30px] bg-surface-secondary border border-border-primary rounded-[6px] flex items-center justify-end px-2 gap-[10px] overflow-hidden">
             <input
               type="text"
               value={fromValue}
               onChange={(e) => setFromValue(e.target.value)}
-              className="w-full bg-transparent text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal'] outline-none border-none text-right"
+              className="w-full bg-transparent text-[12px] font-medium text-text-primary leading-[14px] font-sans outline-none border-none text-right"
               placeholder=""
             />
-            <span className="text-[12px] font-medium text-[#5F5971] leading-[14px] font-['Neue_Montreal'] shrink-0">@</span>
+            <span className="text-[12px] font-medium text-text-secondary leading-[14px] font-sans shrink-0">@</span>
           </div>
         </div>
 
         {/* To Field */}
         <div className="flex items-center gap-[10px] w-[161px] h-[30px]">
-          <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal'] w-[32.91px] shrink-0">
+          <span className="text-[12px] font-normal text-text-primary leading-[14px] font-sans w-[32.91px] shrink-0">
             To
           </span>
-          <div className="w-[118px] h-[30px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-[6px] flex items-center justify-end px-2 gap-[10px] overflow-hidden">
+          <div className="w-[118px] h-[30px] bg-surface-secondary border border-border-primary rounded-[6px] flex items-center justify-end px-2 gap-[10px] overflow-hidden">
             <input
               type="text"
               value={toValue}
               onChange={(e) => setToValue(e.target.value)}
-              className="w-full bg-transparent text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal'] outline-none border-none text-right"
+              className="w-full bg-transparent text-[12px] font-medium text-text-primary leading-[14px] font-sans outline-none border-none text-right"
               placeholder=""
             />
-            <span className="text-[12px] font-medium text-[#5F5971] leading-[14px] font-['Neue_Montreal'] shrink-0">@</span>
+            <span className="text-[12px] font-medium text-text-secondary leading-[14px] font-sans shrink-0">@</span>
           </div>
         </div>
       </div>
@@ -401,7 +401,7 @@ function FilterDropdown({ title, onApply }: { title: string; onApply: () => void
         }}
       >
         <span
-          className="text-[13.5px] font-medium text-[#FFFCF8] leading-4 font-['Neue_Montreal']"
+          className="text-[13.5px] font-medium text-white leading-4 font-sans"
           style={{ textShadow: '0px -1px 6px rgba(0, 0, 0, 0.25)' }}
         >
           Apply

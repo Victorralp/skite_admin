@@ -198,7 +198,7 @@ const StatusBadge = ({ status }: { status: Transaction['status'] }) => {
     >
       {icon}
       <span
-        className="font-['Neue_Montreal'] font-medium text-[10px] leading-3"
+        className="font-sans font-medium text-[10px] leading-3"
         style={{ color }}
       >
         {label}
@@ -210,10 +210,10 @@ const FilterPill = ({ label, active, onClick }: { label: string; active: boolean
   <button
     onClick={onClick}
     className={cn(
-      "flex items-center justify-center px-2 py-1 gap-1 rounded-full border font-['Neue_Montreal'] font-medium text-xs leading-none h-[22px]",
+      "flex items-center justify-center px-2 py-1 gap-1 rounded-full border font-sans font-medium text-xs leading-none h-[22px]",
       active
-        ? "bg-[#5F2EFC] border-[#5F2EFC] text-white"
-        : "bg-white border-dashed border-[#EBEBEB] text-[#5F5971]"
+        ? "bg-brand-primary border-border-brand text-white"
+        : "bg-white border-dashed border-border-primary text-text-secondary"
     )}
   >
     {!active && (
@@ -227,32 +227,32 @@ const FilterPill = ({ label, active, onClick }: { label: string; active: boolean
 );
 const FilterDropdown = ({ title, onApply }: { title: string; onApply: () => void }) => (
   <div
-    className="absolute left-[-0.75px] top-[27px] w-[185px] bg-white border border-[#5F2EFC] rounded-2xl flex flex-col justify-center items-start p-3 gap-[10px]"
+    className="absolute left-[-0.75px] top-[27px] w-[185px] bg-white border border-border-brand rounded-2xl flex flex-col justify-center items-start p-3 gap-[10px]"
     style={{
       boxShadow: '0px 116px 46px rgba(0, 0, 0, 0.01), 0px 65px 39px rgba(0, 0, 0, 0.05), 0px 29px 29px rgba(0, 0, 0, 0.09), 0px 7px 16px rgba(0, 0, 0, 0.1)',
       zIndex: 10
     }}
   >
-    <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834]">
+    <span className="font-sans font-medium text-xs leading-none text-text-primary">
       {title}
     </span>
     <div className="flex flex-col items-start gap-2 w-full">
       <label className="flex items-center gap-2 cursor-pointer">
         <input type="checkbox" className="w-3 h-3" />
-        <span className="font-['Neue_Montreal'] font-normal text-xs leading-none text-[#5F5971]">
+        <span className="font-sans font-normal text-xs leading-none text-text-secondary">
           Option 1
         </span>
       </label>
       <label className="flex items-center gap-2 cursor-pointer">
         <input type="checkbox" className="w-3 h-3" />
-        <span className="font-['Neue_Montreal'] font-normal text-xs leading-none text-[#5F5971]">
+        <span className="font-sans font-normal text-xs leading-none text-text-secondary">
           Option 2
         </span>
       </label>
     </div>
     <button
       onClick={onApply}
-      className="w-full py-2 bg-[#5F2EFC] text-white rounded-lg font-['Neue_Montreal'] font-medium text-xs"
+      className="w-full py-2 bg-brand-primary text-white rounded-lg font-sans font-medium text-xs"
     >
       Apply
     </button>
@@ -261,44 +261,48 @@ const FilterDropdown = ({ title, onApply }: { title: string; onApply: () => void
 const ActionMenu = ({ onClose, isLastRows, onHold, onView }: { onClose: () => void; isLastRows?: boolean; onHold: () => void; onView: () => void }) => (
   <div
     className={cn(
-      "absolute right-0 w-[83px] h-[111px] bg-white border border-[#EBEBEB] rounded-xl flex flex-col items-center p-0 overflow-hidden",
+      "absolute right-0 w-[83px] h-[111px] bg-white border border-border-primary rounded-xl flex flex-col items-center p-0 overflow-hidden",
       isLastRows ? "bottom-[22px]" : "top-[22px]"
     )}
+    onClick={(e) => e.stopPropagation()}
     style={{
       boxShadow: '0px 116px 46px rgba(0, 0, 0, 0.01), 0px 65px 39px rgba(0, 0, 0, 0.05), 0px 29px 29px rgba(0, 0, 0, 0.09), 0px 7px 16px rgba(0, 0, 0, 0.1)',
       zIndex: 2
     }}
   >
     <button
-      onClick={() => {
+      onClick={(e) => {
+        e.stopPropagation();
         onClose();
         onView();
       }}
-      className="flex items-center w-[83px] h-[37px] px-4 py-2.5 bg-white border-b-[0.5px] border-[#EBEBEB]"
+      className="flex items-center w-[83px] h-[37px] px-4 py-2.5 bg-white border-b-[0.5px] border-border-primary"
     >
-      <span className="font-['Neue_Montreal'] font-medium text-[13.5px] leading-4 text-[#2B2834]">
+      <span className="font-sans text-body-sm text-text-primary">
         View
       </span>
     </button>
     <button
-      onClick={() => {
+      onClick={(e) => {
+        e.stopPropagation();
         console.log('Refund transaction');
         onClose();
       }}
-      className="flex items-center w-[83px] h-[37px] px-4 py-2.5 bg-white border-b-[0.5px] border-[#EBEBEB]"
+      className="flex items-center w-[83px] h-[37px] px-4 py-2.5 bg-white border-b-[0.5px] border-border-primary"
     >
-      <span className="font-['Neue_Montreal'] font-medium text-[13.5px] leading-4 text-[#2B2834]">
+      <span className="font-sans text-body-sm text-text-primary">
         Refund
       </span>
     </button>
     <button
-      onClick={() => {
+      onClick={(e) => {
+        e.stopPropagation();
         onClose();
         onHold();
       }}
       className="flex items-center w-[83px] h-[37px] px-4 py-2.5 bg-white"
     >
-      <span className="font-['Neue_Montreal'] font-medium text-[13.5px] leading-4 text-[#CD110A]">
+      <span className="font-sans text-body-sm text-text-danger">
         Hold
       </span>
     </button>
@@ -391,50 +395,50 @@ export default function TransactionsTable() {
             />
           </div>
         </div>
-        <button className="flex items-center gap-0.5 px-2.5 py-1.25 bg-white border border-[#EBEBEB] rounded-lg shadow-[0px_1px_4.8px_rgba(0,0,0,0.03)] h-6">
+        <button className="flex items-center gap-0.5 px-2.5 py-1.25 bg-white border border-border-primary rounded-lg shadow-button-soft h-6">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M9.33337 10.5V3.5M9.33337 3.5L11.6667 5.90625M9.33337 3.5L7.00004 5.90625M4.66671 3.5V10.5M4.66671 10.5L7.00004 8.09375M4.66671 10.5L2.33337 8.09375" stroke="#5F5971" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          <span className="font-['Neue_Montreal'] font-normal text-xs leading-none text-[#5F5971]">
+          <span className="font-sans font-normal text-xs leading-none text-text-secondary">
             Sort
           </span>
         </button>
       </div>
       {/* Table Container */}
-      <div className="flex flex-col items-start p-1 gap-1 w-full bg-[#F9F9FB] rounded-lg">
+      <div className="flex flex-col items-start p-1 gap-1 w-full bg-surface-secondary rounded-lg">
         {/* Table Header */}
         <div className="flex items-center px-6 py-2 gap-4 w-full h-[30px]">
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[72.67px] whitespace-nowrap">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[72.67px] whitespace-nowrap">
             TXN ID
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[98.88px] whitespace-nowrap">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[98.88px] whitespace-nowrap">
             Date
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[129.05px] whitespace-nowrap flex-grow">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[129.05px] whitespace-nowrap flex-grow">
             Creator
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[129.05px] whitespace-nowrap flex-grow">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[129.05px] whitespace-nowrap flex-grow">
             Buyer
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[129.05px] whitespace-nowrap flex-grow">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[129.05px] whitespace-nowrap flex-grow">
             Product/Service
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[82.12px] whitespace-nowrap">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[82.12px] whitespace-nowrap">
             Amount
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[54.77px] whitespace-nowrap">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[54.77px] whitespace-nowrap">
             Fee
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[81.39px] whitespace-nowrap">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[81.39px] whitespace-nowrap">
             Creator Net
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[59px] whitespace-nowrap">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[59px] whitespace-nowrap">
             Status
           </span>
           <div className="w-[18px]" />
         </div>
         {/* Table Body */}
-        <div className="flex flex-col items-start w-full bg-white border border-[#EBEBEB] rounded-lg">
+        <div className="flex flex-col items-start w-full bg-white border border-border-primary rounded-lg">
           {filteredTransactions.map((txn, index) => {
             const isLastRows = index >= filteredTransactions.length - 3;
             return (
@@ -447,31 +451,31 @@ export default function TransactionsTable() {
                 }}
                 className={cn(
                   'flex items-center px-6 py-3.5 gap-4 w-full h-[46px] bg-white cursor-pointer hover:bg-gray-50 transition-colors',
-                  index < filteredTransactions.length - 1 && 'border-b border-[#EBEBEB]'
+                  index < filteredTransactions.length - 1 && 'border-b border-border-primary'
                 )}
               >
-                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[72.67px] whitespace-nowrap overflow-hidden text-ellipsis">
+                <span className="font-sans text-body-sm-regular text-text-primary w-[72.67px] whitespace-nowrap overflow-hidden text-ellipsis">
                   {txn.id}
                 </span>
-                <span className="font-['Neue_Montreal'] font-normal text-xs leading-none text-[#5F5971] w-[98.88px] whitespace-nowrap overflow-hidden text-ellipsis">
+                <span className="font-sans font-normal text-xs leading-none text-text-secondary w-[98.88px] whitespace-nowrap overflow-hidden text-ellipsis">
                   {txn.date}
                 </span>
-                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[129.05px] whitespace-nowrap overflow-hidden text-ellipsis flex-grow">
+                <span className="font-sans text-body-sm-regular text-text-primary w-[129.05px] whitespace-nowrap overflow-hidden text-ellipsis flex-grow">
                   {txn.creator}
                 </span>
-                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[129.05px] whitespace-nowrap overflow-hidden text-ellipsis flex-grow">
+                <span className="font-sans text-body-sm-regular text-text-primary w-[129.05px] whitespace-nowrap overflow-hidden text-ellipsis flex-grow">
                   {txn.buyer}
                 </span>
-                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[129.05px] whitespace-nowrap overflow-hidden text-ellipsis flex-grow">
+                <span className="font-sans text-body-sm-regular text-text-primary w-[129.05px] whitespace-nowrap overflow-hidden text-ellipsis flex-grow">
                   {txn.product}
                 </span>
-                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[82.12px] whitespace-nowrap overflow-hidden text-ellipsis">
+                <span className="font-sans text-body-sm-regular text-text-primary w-[82.12px] whitespace-nowrap overflow-hidden text-ellipsis">
                   {txn.amount}
                 </span>
-                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[54.77px] whitespace-nowrap overflow-hidden text-ellipsis">
+                <span className="font-sans text-body-sm-regular text-text-primary w-[54.77px] whitespace-nowrap overflow-hidden text-ellipsis">
                   {txn.fee}
                 </span>
-                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[81.39px] whitespace-nowrap overflow-hidden text-ellipsis">
+                <span className="font-sans text-body-sm-regular text-text-primary w-[81.39px] whitespace-nowrap overflow-hidden text-ellipsis">
                   {txn.creatorNet}
                 </span>
                 <div className="w-[59px] flex items-center">
@@ -485,7 +489,7 @@ export default function TransactionsTable() {
                     }}
                     className="w-[18px] h-[18px] flex items-center justify-center"
                   >
-                    <MoreVertical size={18} className="text-[#5F5971]" />
+                    <MoreVertical size={18} className="text-text-secondary" />
                   </button>
                   {openMenuId === `${txn.id}-${index}` && (
                     <ActionMenu

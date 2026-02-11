@@ -69,27 +69,27 @@ export default function EditPermissionsModal({
       >
         {/* Header */}
         <div className="flex flex-col items-start gap-1 w-[479px] h-[37px] self-start">
-          <h3 className="text-base font-bold leading-[19px] text-[#2B2834] w-full">
+          <h3 className="text-base font-bold leading-[19px] text-text-primary w-full">
             Edit Permissions
           </h3>
-          <p className="text-xs font-medium leading-[14px] text-[#A5A1AF] w-full">
+          <p className="text-xs font-medium leading-[14px] text-text-tertiary w-full">
             Click the check boxes to modify permissions
           </p>
         </div>
 
         {/* Permissions Table */}
-        <div className="flex flex-col items-start p-1 gap-1 w-[479px] h-[282px] bg-[#F9F9FB] rounded-lg">
+        <div className="flex flex-col items-start p-1 gap-1 w-[479px] h-[282px] bg-surface-secondary rounded-lg">
           {/* Table Header */}
           <div className="flex flex-row items-center px-6 py-2 gap-4 w-[471px] h-[30px]">
-            <div className="w-[90.84px] text-xs font-medium leading-[14px] text-[#2B2834]">
+            <div className="w-[90.84px] text-xs font-medium leading-[14px] text-text-primary">
               Permission
             </div>
-            <div className="w-0 h-[14px] border-l border-[#EBEBEB]" />
+            <div className="w-0 h-[14px] border-l border-border-primary" />
             <div className="flex flex-row justify-center items-center gap-2 flex-1">
               {roleNames.map((roleName, idx) => (
                 <div
                   key={idx}
-                  className="flex-1 text-xs font-medium leading-[14px] text-center text-[#2B2834]"
+                  className="flex-1 text-xs font-medium leading-[14px] text-center text-text-primary"
                 >
                   {roleName}
                 </div>
@@ -98,18 +98,18 @@ export default function EditPermissionsModal({
           </div>
 
           {/* Table Body */}
-          <div className="flex flex-col items-start w-[471px] h-[240px] bg-white border border-[#EBEBEB] rounded-lg overflow-hidden">
+          <div className="flex flex-col items-start w-[471px] h-[240px] bg-white border border-border-primary rounded-lg overflow-hidden">
             {permissionNames.map((permissionName, permIdx) => (
               <div
                 key={permIdx}
                 className={`flex flex-row items-center px-6 py-3 gap-4 w-full h-10 ${
-                  permIdx !== permissionNames.length - 1 ? 'border-b border-[#EBEBEB]' : ''
+                  permIdx !== permissionNames.length - 1 ? 'border-b border-border-primary' : ''
                 }`}
               >
-                <div className="w-[90.84px] text-xs font-medium leading-[14px] text-[#2B2834]">
+                <div className="w-[90.84px] text-xs font-medium leading-[14px] text-text-primary">
                   {permissionName}
                 </div>
-                <div className="w-0 h-4 border-l border-[#EBEBEB]" />
+                <div className="w-0 h-4 border-l border-border-primary" />
                 <div className="flex flex-row justify-center items-center gap-2 flex-1">
                   {permissions.map((role: any, roleIdx: number) => {
                     const hasPermission = role.permissions[permissionKeys[permIdx]];
@@ -122,8 +122,8 @@ export default function EditPermissionsModal({
                           onClick={() => togglePermission(roleIdx, permissionKeys[permIdx])}
                           className={`w-4 h-4 rounded flex items-center justify-center transition-all hover:scale-110 cursor-pointer ${
                             hasPermission 
-                              ? 'bg-[#5F2EFC] border border-[#5F2EFC]' 
-                              : 'bg-white border border-[#EBEBEB]'
+                              ? 'bg-brand-primary border border-border-brand' 
+                              : 'bg-white border border-border-primary'
                           }`}
                         >
                           {hasPermission && (
@@ -143,18 +143,18 @@ export default function EditPermissionsModal({
         <div className="flex flex-row items-start gap-2 w-[176px] h-9">
           <button
             onClick={onClose}
-            className="flex flex-row justify-center items-center px-6 py-2 h-9 bg-white border border-[#EBEBEB] rounded-lg shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] hover:bg-gray-50 transition-colors"
+            className="flex flex-row justify-center items-center px-6 py-2 h-9 bg-white border border-border-primary rounded-lg shadow-button-inset hover:bg-gray-50 transition-colors"
           >
-            <span className="text-[13.5px] font-medium leading-4 text-[#353A44]">
+            <span className="text-body-sm text-[#353A44]">
               Cancel
             </span>
           </button>
 
           <button
             onClick={handleSave}
-            className="flex flex-row justify-center items-center px-6 py-2 h-9 bg-gradient-to-b from-[#5F2EFC] to-[#4E18FC] rounded-lg shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] hover:opacity-90 transition-opacity"
+            className="flex flex-row justify-center items-center px-6 py-2 h-9 bg-gradient-to-b from-brand-primary to-brand-purple rounded-lg shadow-button-inset hover:opacity-90 transition-opacity"
           >
-            <span className="text-[13.5px] font-medium leading-4 text-[#FFFCF8]">
+            <span className="text-body-sm text-white">
               Save
             </span>
           </button>

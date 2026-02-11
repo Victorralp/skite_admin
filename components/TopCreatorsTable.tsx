@@ -16,18 +16,18 @@ export default function TopCreatorsTable() {
   return (
     <section className="w-full h-[346px] p-4 flex flex-col gap-3 bg-white border border-border-primary rounded-lg">
       <div className="w-full h-[30px] flex justify-between items-center shrink-0">
-        <h3 className="font-medium text-[13.5px] leading-4 text-[#2B2834] font-['Neue_Montreal']">Top Creators</h3>
+        <h3 className="text-body-sm text-text-primary font-sans">Top Creators</h3>
         <CustomDropdown options={['Today', 'Yesterday', 'Last 7 days']} defaultLabel="Today" />
       </div>
 
-      <div className="w-full h-[272px] flex flex-col gap-1 p-1 bg-[#F9F9FB] rounded-xl">
+      <div className="w-full h-[272px] flex flex-col gap-1 p-1 bg-surface-secondary rounded-xl">
         <div className="w-full h-[30px] flex items-center px-6 gap-4">
-          <div className="w-[27px] text-[12px] leading-[14px] font-medium text-[#2B2834] font-['Neue_Montreal']">Rank</div>
-          <div className="flex-1 min-w-[220px] text-[12px] leading-[14px] font-medium text-[#2B2834] font-['Neue_Montreal']">Name</div>
-          <div className="w-[166px] text-[12px] leading-[14px] font-medium text-[#2B2834] font-['Neue_Montreal']">Username</div>
-          <div className="flex-1 min-w-[220px] text-[12px] leading-[14px] font-medium text-[#2B2834] font-['Neue_Montreal']">Email</div>
-          <div className="w-[162px] text-[12px] leading-[14px] font-medium text-[#2B2834] font-['Neue_Montreal']">Revenue Generated</div>
-          <div className="w-11 text-[12px] leading-[14px] font-medium text-[#2B2834] font-['Neue_Montreal']">Actions</div>
+          <div className="w-[27px] text-[12px] leading-[14px] font-medium text-text-primary font-sans">Rank</div>
+          <div className="flex-1 min-w-[220px] text-[12px] leading-[14px] font-medium text-text-primary font-sans">Name</div>
+          <div className="w-[166px] text-[12px] leading-[14px] font-medium text-text-primary font-sans">Username</div>
+          <div className="flex-1 min-w-[220px] text-[12px] leading-[14px] font-medium text-text-primary font-sans">Email</div>
+          <div className="w-[162px] text-[12px] leading-[14px] font-medium text-text-primary font-sans">Revenue Generated</div>
+          <div className="w-11 text-[12px] leading-[14px] font-medium text-text-primary font-sans">Actions</div>
         </div>
 
         <div className="w-full bg-white border border-border-primary rounded-lg">
@@ -36,11 +36,11 @@ export default function TopCreatorsTable() {
               key={creator.rank}
               className="w-full h-[46px] flex items-center px-6 gap-4 border-b border-border-primary last:border-b-0"
             >
-              <div className="w-[27px] text-[13.5px] leading-4 font-normal text-[#2B2834] font-['Neue_Montreal']">{creator.rank}</div>
-              <div className="flex-1 min-w-[220px] text-[13.5px] leading-4 font-normal text-[#2B2834] font-['Neue_Montreal']">{creator.name}</div>
-              <div className="w-[166px] text-[13.5px] leading-4 font-normal text-[#2B2834] font-['Neue_Montreal']">{creator.username}</div>
-              <div className="flex-1 min-w-[220px] text-[13.5px] leading-4 font-normal text-[#2B2834] font-['Neue_Montreal']">{creator.email}</div>
-              <div className="w-[162px] text-[13.5px] leading-4 font-normal text-[#2B2834] font-['Neue_Montreal']">{creator.revenue}</div>
+              <div className="w-[27px] text-[13.5px] leading-4 font-normal text-text-primary font-sans">{creator.rank}</div>
+              <div className="flex-1 min-w-[220px] text-[13.5px] leading-4 font-normal text-text-primary font-sans">{creator.name}</div>
+              <div className="w-[166px] text-[13.5px] leading-4 font-normal text-text-primary font-sans">{creator.username}</div>
+              <div className="flex-1 min-w-[220px] text-[13.5px] leading-4 font-normal text-text-primary font-sans">{creator.email}</div>
+              <div className="w-[162px] text-[13.5px] leading-4 font-normal text-text-primary font-sans">{creator.revenue}</div>
               <div className="w-11 flex justify-center">
                 <button
                   type="button"

@@ -25,13 +25,13 @@ export default function RevenueTabs() {
             className={cn(
               'flex-1 flex flex-col justify-center items-center pt-2.5 gap-3 h-[38px] cursor-pointer',
               'rounded-t-2xl',
-              activeTab === tab ? 'bg-[#F9F9FB]' : ''
+              activeTab === tab ? 'bg-surface-secondary' : ''
             )}
           >
             <span
               className={cn(
-                "font-['Neue_Montreal'] font-medium text-[13.5px] leading-4",
-                activeTab === tab ? 'text-[#2B2834]' : 'text-[#A5A1AF]'
+                "font-sans text-body-sm",
+                activeTab === tab ? 'text-text-primary' : 'text-text-tertiary'
               )}
             >
               {tab}
@@ -39,7 +39,7 @@ export default function RevenueTabs() {
             <div
               className={cn(
                 'w-full h-0',
-                activeTab === tab ? 'border-2 border-[#5F2EFC]' : 'border border-[#EBEBEB]'
+                activeTab === tab ? 'border-2 border-border-brand' : 'border border-border-primary'
               )}
             />
           </div>
@@ -47,7 +47,7 @@ export default function RevenueTabs() {
       </div>
 
       {/* Tab Content */}
-      <div className="w-full bg-[#F9F9FB] rounded-b-[36px] p-6">
+      <div className="w-full bg-surface-secondary rounded-b-[36px] p-6">
         {activeTab === 'Overview' && <RevenueOverview />}
         {activeTab === 'Transactions' && <TransactionsTable />}
         {activeTab === 'Payouts' && <PayoutsTable />}

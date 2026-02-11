@@ -9,6 +9,7 @@ import SkiteLogo from '@/components/SkiteLogo';
 import { Button } from '@/components/ui/button';
 
 const AUTH_LOG_STORAGE_KEY = 'skite_latest_auth_log';
+const AUTH_LOG_HISTORY_STORAGE_KEY = 'skite_auth_logs';
 
 function formatAuthTimestamp(date: Date) {
   const datePart = new Intl.DateTimeFormat('en-GB', {
@@ -22,6 +23,38 @@ function formatAuthTimestamp(date: Date) {
     hour12: false
   }).format(date);
   return `${datePart} ${timePart}`;
+}
+
+type AuthLogEntry = {
+  id: string;
+  timestamp: string;
+  user: string;
+  action: string;
+  message: string;
+  userAgent: string;
+  ipAddress: string;
+  status: 'Failed' | 'Success';
+};
+
+function appendAuthLog(entry: AuthLogEntry) {
+  const raw = localStorage.getItem(AUTH_LOG_HISTORY_STORAGE_KEY);
+  let logs: AuthLogEntry[] = [];
+
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        logs = parsed.filter((item) => item && typeof item === 'object') as AuthLogEntry[];
+      }
+    } catch {
+      logs = [];
+    }
+  }
+
+  logs.unshift(entry);
+  const trimmed = logs.slice(0, 100);
+  localStorage.setItem(AUTH_LOG_HISTORY_STORAGE_KEY, JSON.stringify(trimmed));
+  localStorage.setItem(AUTH_LOG_STORAGE_KEY, JSON.stringify(entry));
 }
 
 export default function LoginPage() {
@@ -55,19 +88,16 @@ export default function LoginPage() {
           ? loginResponse.user.email
           : email;
 
-      localStorage.setItem(
-        AUTH_LOG_STORAGE_KEY,
-        JSON.stringify({
-          id: `current-login-${Date.now()}`,
-          timestamp: formatAuthTimestamp(new Date()),
-          user: loginUser,
-          action: 'Login',
-          message: loginMessage,
-          userAgent: navigator.userAgent,
-          ipAddress: 'Current session',
-          status: 'Success'
-        })
-      );
+      appendAuthLog({
+        id: `current-login-${Date.now()}`,
+        timestamp: formatAuthTimestamp(new Date()),
+        user: loginUser,
+        action: 'Login',
+        message: loginMessage,
+        userAgent: navigator.userAgent,
+        ipAddress: 'Current session',
+        status: 'Success'
+      });
 
       router.replace('/logs');
       router.refresh();
@@ -103,7 +133,7 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-10 rounded-lg border border-border-primary bg-white px-3 text-body-sm text-text-primary placeholder:text-text-tertiary shadow-input outline-none focus:border-border-brand focus:ring-2 focus:ring-[#5F2EFC]/10"
+                className="h-10 rounded-lg border border-border-primary bg-white px-3 text-body-sm text-text-primary placeholder:text-text-tertiary shadow-input outline-none focus:border-border-brand focus:ring-2 focus:ring-brand-primary/10"
                 autoComplete="email"
                 required
               />
@@ -117,7 +147,7 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="h-10 rounded-lg border border-border-primary bg-white px-3 text-body-sm text-text-primary placeholder:text-text-tertiary shadow-input outline-none focus:border-border-brand focus:ring-2 focus:ring-[#5F2EFC]/10"
+                className="h-10 rounded-lg border border-border-primary bg-white px-3 text-body-sm text-text-primary placeholder:text-text-tertiary shadow-input outline-none focus:border-border-brand focus:ring-2 focus:ring-brand-primary/10"
                 autoComplete="current-password"
                 required
               />

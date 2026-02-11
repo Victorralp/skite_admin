@@ -224,8 +224,8 @@ export default function TransactionDetailsPage({ params }: TransactionDetailsPag
         return (
             <PageContainer>
                 <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-                    <h1 className="text-2xl font-bold text-[#2B2834]">Transaction Not Found</h1>
-                    <p className="text-[#5F5971]">The transaction you&apos;re looking for doesn&apos;t exist.</p>
+                    <h1 className="text-2xl font-bold text-text-primary">Transaction Not Found</h1>
+                    <p className="text-text-secondary">The transaction you&apos;re looking for doesn&apos;t exist.</p>
                     <button
                         onClick={() => router.back()}
                         className="flex items-center gap-2 px-4 py-2 bg-[#6366F1] text-white rounded-lg hover:bg-[#5856EB] transition-colors"
@@ -241,13 +241,13 @@ export default function TransactionDetailsPage({ params }: TransactionDetailsPag
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'Success':
-                return 'text-[#239B73] bg-[#E7F3EF]';
+                return 'text-text-success bg-surface-success';
             case 'Pending':
-                return 'text-[#FB6A00] bg-[#FFF3EB]';
+                return 'text-text-warning bg-surface-warning';
             case 'Failed':
                 return 'text-[#E53E3E] bg-[#FED7D7]';
             default:
-                return 'text-[#5F5971] bg-[#F7F7F9]';
+                return 'text-text-secondary bg-[#F7F7F9]';
         }
     };
 
@@ -289,28 +289,28 @@ export default function TransactionDetailsPage({ params }: TransactionDetailsPag
                     className="flex items-center gap-1.5 px-2 py-1.5 bg-surface rounded-md text-text-main hover:bg-muted w-fit transition-colors"
                 >
                     <ArrowLeft className="w-4 h-4" />
-                    <span className="text-[14px] font-medium leading-[17px] font-sans">Go back</span>
+                    <span className="text-body-md font-sans">Go back</span>
                 </button>
 
-                <h1 className="text-[20px] font-bold leading-[24px] tracking-[-0.01em] text-text-main font-sans">
+                <h1 className="text-heading-lg-bold text-text-main font-sans">
                     Transaction Details
                 </h1>
 
                 {/* Transaction Details Card */}
-                <div className="bg-white rounded-2xl border border-[#EBEBEB] p-6">
+                <div className="bg-white rounded-2xl border border-border-primary p-6">
                     {/* Transaction ID and Status */}
-                    <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#EBEBEB]">
+                    <div className="flex items-center justify-between mb-6 pb-4 border-b border-border-primary">
                         <div>
-                            <h2 className="font-['Neue_Montreal'] font-semibold text-lg text-[#2B2834] mb-1">
+                            <h2 className="font-sans font-semibold text-lg text-text-primary mb-1">
                                 {transaction.id}
                             </h2>
-                            <p className="font-['Neue_Montreal'] font-normal text-sm text-[#5F5971]">
+                            <p className="font-sans font-normal text-sm text-text-secondary">
                                 {transaction.description}
                             </p>
                         </div>
                         <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${getStatusColor(transaction.status)}`}>
                             {getStatusIcon(transaction.status)}
-                            <span className="font-['Neue_Montreal'] font-medium text-sm">
+                            <span className="font-sans font-medium text-sm">
                                 {transaction.status}
                             </span>
                         </div>
@@ -321,27 +321,27 @@ export default function TransactionDetailsPage({ params }: TransactionDetailsPag
                         {/* Left Column */}
                         <div className="space-y-4">
                             <div className="flex justify-between items-center py-2 border-b border-[#F5F5F5]">
-                                <span className="font-['Neue_Montreal'] font-medium text-sm text-[#5F5971]">Date & Time</span>
-                                <span className="font-['Neue_Montreal'] font-medium text-sm text-[#2B2834]">
+                                <span className="font-sans font-medium text-sm text-text-secondary">Date & Time</span>
+                                <span className="font-sans font-medium text-sm text-text-primary">
                                     {transaction.date} at {transaction.time}
                                 </span>
                             </div>
 
                             <div className="flex justify-between items-center py-2 border-b border-[#F5F5F5]">
-                                <span className="font-['Neue_Montreal'] font-medium text-sm text-[#5F5971]">Creator</span>
-                                <span className="font-['Neue_Montreal'] font-medium text-sm text-[#2B2834]">{transaction.creator}</span>
+                                <span className="font-sans font-medium text-sm text-text-secondary">Creator</span>
+                                <span className="font-sans font-medium text-sm text-text-primary">{transaction.creator}</span>
                             </div>
 
                             <div className="flex justify-between items-center py-2 border-b border-[#F5F5F5]">
-                                <span className="font-['Neue_Montreal'] font-medium text-sm text-[#5F5971]">Buyer</span>
-                                <span className="font-['Neue_Montreal'] font-medium text-sm text-[#2B2834]">{transaction.buyer}</span>
+                                <span className="font-sans font-medium text-sm text-text-secondary">Buyer</span>
+                                <span className="font-sans font-medium text-sm text-text-primary">{transaction.buyer}</span>
                             </div>
 
                             <div className="flex justify-between items-start py-2 border-b border-[#F5F5F5]">
-                                <span className="font-['Neue_Montreal'] font-medium text-sm text-[#5F5971]">Product</span>
+                                <span className="font-sans font-medium text-sm text-text-secondary">Product</span>
                                 <div className="text-right">
-                                    <div className="font-['Neue_Montreal'] font-medium text-sm text-[#2B2834]">{transaction.product}</div>
-                                    <div className="font-['Neue_Montreal'] font-normal text-xs text-[#5F5971]">{transaction.productType}</div>
+                                    <div className="font-sans font-medium text-sm text-text-primary">{transaction.product}</div>
+                                    <div className="font-sans font-normal text-xs text-text-secondary">{transaction.productType}</div>
                                 </div>
                             </div>
                         </div>
@@ -349,45 +349,45 @@ export default function TransactionDetailsPage({ params }: TransactionDetailsPag
                         {/* Right Column */}
                         <div className="space-y-4">
                             <div className="flex justify-between items-center py-2 border-b border-[#F5F5F5]">
-                                <span className="font-['Neue_Montreal'] font-medium text-sm text-[#5F5971]">Amount</span>
-                                <span className="font-['Neue_Montreal'] font-semibold text-sm text-[#2B2834]">{transaction.amount}</span>
+                                <span className="font-sans font-medium text-sm text-text-secondary">Amount</span>
+                                <span className="font-sans font-semibold text-sm text-text-primary">{transaction.amount}</span>
                             </div>
 
                             <div className="flex justify-between items-center py-2 border-b border-[#F5F5F5]">
-                                <span className="font-['Neue_Montreal'] font-medium text-sm text-[#5F5971]">Transaction Fee</span>
-                                <span className="font-['Neue_Montreal'] font-medium text-sm text-[#2B2834]">{transaction.fee}</span>
+                                <span className="font-sans font-medium text-sm text-text-secondary">Transaction Fee</span>
+                                <span className="font-sans font-medium text-sm text-text-primary">{transaction.fee}</span>
                             </div>
 
                             <div className="flex justify-between items-center py-2 border-b border-[#F5F5F5]">
-                                <span className="font-['Neue_Montreal'] font-medium text-sm text-[#5F5971]">Payment Method</span>
-                                <span className="font-['Neue_Montreal'] font-medium text-sm text-[#2B2834]">{transaction.paymentMethod}</span>
+                                <span className="font-sans font-medium text-sm text-text-secondary">Payment Method</span>
+                                <span className="font-sans font-medium text-sm text-text-primary">{transaction.paymentMethod}</span>
                             </div>
 
                             <div className="flex justify-between items-center py-2 border-b border-[#F5F5F5]">
-                                <span className="font-['Neue_Montreal'] font-medium text-sm text-[#5F5971]">Reference</span>
-                                <span className="font-['Neue_Montreal'] font-medium text-sm text-[#2B2834] font-mono">{transaction.reference}</span>
+                                <span className="font-sans font-medium text-sm text-text-secondary">Reference</span>
+                                <span className="font-sans font-medium text-sm text-text-primary font-mono">{transaction.reference}</span>
                             </div>
                         </div>
                     </div>
 
                     {/* Actions */}
-                    <div className="flex gap-3 mt-8 pt-6 border-t border-[#EBEBEB]">
+                    <div className="flex gap-3 mt-8 pt-6 border-t border-border-primary">
                         <button
                             onClick={() => router.back()}
-                            className="flex-1 px-4 py-2 border border-[#EBEBEB] rounded-lg font-['Neue_Montreal'] font-medium text-sm text-[#5F5971] hover:bg-gray-50 transition-colors"
+                            className="flex-1 px-4 py-2 border border-border-primary rounded-lg font-sans font-medium text-sm text-text-secondary hover:bg-gray-50 transition-colors"
                         >
                             Back to Transactions
                         </button>
-                        <button className="flex-1 px-4 py-2 bg-[#6366F1] rounded-lg font-['Neue_Montreal'] font-medium text-sm text-white hover:bg-[#5856EB] transition-colors">
+                        <button className="flex-1 px-4 py-2 bg-[#6366F1] rounded-lg font-sans font-medium text-sm text-white hover:bg-[#5856EB] transition-colors">
                             Download Receipt
                         </button>
                         {transaction.status === 'Pending' && (
-                            <button className="flex-1 px-4 py-2 bg-[#FB6A00] rounded-lg font-['Neue_Montreal'] font-medium text-sm text-white hover:bg-[#E55A00] transition-colors">
+                            <button className="flex-1 px-4 py-2 bg-[#FB6A00] rounded-lg font-sans font-medium text-sm text-white hover:bg-[#E55A00] transition-colors">
                                 Retry Payment
                             </button>
                         )}
                         {transaction.status === 'Failed' && (
-                            <button className="flex-1 px-4 py-2 bg-[#E53E3E] rounded-lg font-['Neue_Montreal'] font-medium text-sm text-white hover:bg-[#C53030] transition-colors">
+                            <button className="flex-1 px-4 py-2 bg-[#E53E3E] rounded-lg font-sans font-medium text-sm text-white hover:bg-[#C53030] transition-colors">
                                 Refund
                             </button>
                         )}

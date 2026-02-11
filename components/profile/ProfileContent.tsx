@@ -1,6 +1,16 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getMe } from '@/lib/api';
+
+function getInitials(name?: string | null) {
+  const safeName = (name ?? '').trim();
+  if (!safeName) return 'SK';
+  const parts = safeName.split(/\s+/).filter(Boolean);
+  const first = parts[0]?.[0] ?? '';
+  const last = parts.length > 1 ? parts[parts.length - 1]?.[0] ?? '' : '';
+  return `${first}${last}`.toUpperCase() || 'SK';
+}
 
 // Custom Edit Icon
 const EditIcon = ({ className }: { className?: string }) => (
@@ -40,8 +50,13 @@ const EyeIcon = ({ className }: { className?: string }) => (
 
 export default function ProfileContent() {
   const [editingField, setEditingField] = useState<string | null>(null);
-  const [email, setEmail] = useState('undiebekwa@gmail.com');
-  const [phone, setPhone] = useState('07065051560');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [profile, setProfile] = useState<{
+    name: string;
+    role?: string;
+    avatar?: string | null;
+  } | null>(null);
   const [tempValue, setTempValue] = useState('');
   const [passwordData, setPasswordData] = useState({
     current: '',
@@ -53,6 +68,34 @@ export default function ProfileContent() {
     new: false,
     confirm: false
   });
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const me = await getMe();
+        if (!mounted) return;
+        const name =
+          me?.name ??
+          ([me?.first_name, me?.last_name].filter(Boolean).join(' ').trim() ||
+            'User');
+        setProfile({
+          name,
+          role: me?.role ?? (me?.permissions ? 'Admin' : 'User'),
+          avatar: me?.avatar ?? me?.picture ?? null
+        });
+        setEmail(me?.email ?? me?.username ?? '');
+        setPhone(me?.phone ?? me?.phone_number ?? '');
+      } catch {
+        if (mounted) {
+          setProfile(null);
+        }
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const handleEdit = (field: string, currentValue: string) => {
     setEditingField(field);
@@ -87,49 +130,54 @@ export default function ProfileContent() {
     setShowPassword(prev => ({ ...prev, [field]: !prev[field] }));
   };
 
+  const avatarSeed = encodeURIComponent(getInitials(profile?.name));
+
   return (
     <div className="flex flex-col items-start gap-8 w-full">
       {/* Page Title */}
-      <h1 className="font-['Neue_Montreal'] font-bold text-[20px] leading-[24px] tracking-[-0.01em] text-[#2B2834]">
+      <h1 className="font-sans text-heading-lg-bold text-text-primary">
         Profile
       </h1>
 
       {/* Main Content Container - Two Cards Side by Side */}
       <div className="flex flex-col lg:flex-row items-start gap-6 w-full">
         {/* Left Column - Profile Card */}
-        <div className="flex flex-col items-center p-8 gap-4 w-full lg:w-[260px] lg:min-w-[260px] lg:max-w-[260px] h-[260px] bg-white border border-[#EBEBEB] rounded-[16px]">
+        <div className="flex flex-col items-center p-8 gap-4 w-full lg:w-[260px] lg:min-w-[260px] lg:max-w-[260px] h-[260px] bg-white border border-border-primary rounded-[16px]">
             {/* Profile Image Container */}
-            <div className="relative flex justify-center items-end w-[120px] h-[120px] rounded-[100px] bg-gray-100 border border-[#EBEBEB] overflow-hidden">
+            <div className="relative flex justify-center items-end w-[120px] h-[120px] rounded-[100px] bg-gray-100 border border-border-primary overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80"
-                alt="Profile"
+                src={
+                  profile?.avatar ||
+                  `https://api.dicebear.com/7.x/initials/svg?seed=${avatarSeed}`
+                }
+                alt={profile?.name ?? 'Profile'}
                 className="absolute inset-0 w-full h-full object-cover"
               />
               {/* Change Button */}
-              <div className="flex items-center justify-center gap-[4px] w-[120px] h-[22px] bg-white border border-[#F0EBF4] rounded-[6px] z-10 px-2 pb-[6px] pt-[4px]">
-                <span className="font-['Neue_Montreal'] font-medium text-[10px] leading-[12px] text-[#2B2834]">Change</span>
+              <div className="flex items-center justify-center gap-[4px] w-[120px] h-[22px] bg-white border border-border-secondary rounded-[6px] z-10 px-2 pb-[6px] pt-[4px]">
+                <span className="font-sans text-caption-sm text-text-primary">Change</span>
               </div>
             </div>
 
             {/* Name and Contact Info */}
             <div className="flex flex-col items-center gap-[2px]">
-              <h2 className="font-['Neue_Montreal'] font-medium text-[20px] leading-[24px] tracking-[-0.01em] text-[#2B2834]">
-                Bekwa Undie
+              <h2 className="font-sans font-medium text-[20px] leading-[24px] tracking-[-0.01em] text-text-primary">
+                {profile?.name ?? '—'}
               </h2>
-              <p className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-[16px] text-[#5F5971]">
-                undiebekwa@gmail.com
+              <p className="font-sans text-body-sm-regular text-text-secondary">
+                {email || '—'}
               </p>
-              <p className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-[16px] text-[#5F5971]">
-                07065051560
+              <p className="font-sans text-body-sm-regular text-text-secondary">
+                {profile?.role ?? '—'}
               </p>
             </div>
         </div>
 
         {/* Right Column - Account Information */}
-        <div className="flex flex-col items-start p-8 gap-6 w-full lg:flex-1 min-h-[400px] bg-white border border-[#EBEBEB] rounded-[16px]">
+        <div className="flex flex-col items-start p-8 gap-6 w-full lg:flex-1 min-h-[400px] bg-white border border-border-primary rounded-[16px]">
 
           {/* Account Information Title */}
-          <h3 className="font-['Neue_Montreal'] font-bold text-[20px] leading-[24px] tracking-[-0.01em] text-[#2B2834]">
+          <h3 className="font-sans text-heading-lg-bold text-text-primary">
             Account Information
           </h3>
 
@@ -137,7 +185,7 @@ export default function ProfileContent() {
           <div className="flex flex-col items-start gap-[18px] w-full">
             {/* Email Field */}
             <div className="flex flex-col items-start gap-1 w-full">
-              <span className="font-['Neue_Montreal'] font-medium text-[16px] leading-[19px] text-[#2B2834]">
+              <span className="font-sans text-heading-sm text-text-primary">
                 Email
               </span>
               {editingField === 'email' ? (
@@ -147,19 +195,19 @@ export default function ProfileContent() {
                     value={tempValue}
                     onChange={(e) => setTempValue(e.target.value)}
                     placeholder="undiebekwa@gmail.com"
-                    className="flex flex-row items-center px-3 py-[10px] w-full h-9 bg-[#F9F9FB] border border-[#EBEBEB] rounded-[6px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] font-['Neue_Montreal'] font-normal text-[13.5px] leading-[16px] text-[#2B2834] placeholder:text-[#A5A1AF] focus:outline-none focus:border-[#5F2EFC]"
+                    className="flex flex-row items-center px-3 py-[10px] w-full h-9 bg-surface-secondary border border-border-primary rounded-[6px] shadow-button font-sans text-body-sm-regular text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border-brand"
                   />
                   <div className="flex flex-row justify-end items-center gap-1 w-full h-7">
                     <button
                       onClick={handleCancel}
-                      className="flex flex-row justify-center items-center px-[14px] py-[14px] w-[70px] h-7 bg-white border border-[#EBEBEB] rounded-[9px] shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#353A44] hover:bg-gray-50 transition-colors"
+                      className="flex flex-row justify-center items-center px-[14px] py-[14px] w-[70px] h-7 bg-white border border-border-primary rounded-[9px] shadow-button-inset font-sans text-body-sm text-[#353A44] hover:bg-gray-50 transition-colors"
                       style={{ textShadow: '0px -1px 19.4px rgba(0, 0, 0, 0.25)' }}
                     >
                       Cancel
                     </button>
                     <button
                       onClick={() => handleSave('email')}
-                      className="flex flex-row justify-center items-center px-[14px] py-[14px] w-[58px] h-7 rounded-[9px] shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#FFFCF8] hover:opacity-90 transition-opacity"
+                      className="flex flex-row justify-center items-center px-[14px] py-[14px] w-[58px] h-7 rounded-[9px] shadow-button-inset font-sans text-body-sm text-white hover:opacity-90 transition-opacity"
                       style={{
                         background: 'linear-gradient(180deg, #5F2EFC 22.58%, #4E18FC 100%)',
                         textShadow: '0px -1px 6px rgba(0, 0, 0, 0.25)'
@@ -171,12 +219,12 @@ export default function ProfileContent() {
                 </div>
               ) : (
                 <div className="flex flex-row justify-between items-center gap-1 w-full">
-                  <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-[16px] text-[#5F5971]">
+                  <span className="font-sans text-body-sm-regular text-text-secondary">
                     {email}
                   </span>
                   <button
                     onClick={() => handleEdit('email', email)}
-                    className="text-[#5F5971] hover:text-[#2B2834] transition-colors"
+                    className="text-text-secondary hover:text-text-primary transition-colors"
                   >
                     <EditIcon className="w-4 h-4" />
                   </button>
@@ -184,9 +232,21 @@ export default function ProfileContent() {
               )}
             </div>
 
+            {/* Role Field */}
+            <div className="flex flex-col items-start gap-1 w-full">
+              <span className="font-sans text-heading-sm text-text-primary">
+                Role
+              </span>
+              <div className="flex flex-row justify-between items-center gap-1 w-full">
+                <span className="font-sans text-body-sm-regular text-text-secondary">
+                  {profile?.role ?? '—'}
+                </span>
+              </div>
+            </div>
+
             {/* Phone Number Field */}
             <div className="flex flex-col items-start gap-1 w-full">
-              <span className="font-['Neue_Montreal'] font-medium text-[16px] leading-[19px] text-[#2B2834]">
+              <span className="font-sans text-heading-sm text-text-primary">
                 Phone Number
               </span>
               {editingField === 'phone' ? (
@@ -196,19 +256,19 @@ export default function ProfileContent() {
                     value={tempValue}
                     onChange={(e) => setTempValue(e.target.value)}
                     placeholder="07065051560"
-                    className="flex flex-row items-center px-3 py-[10px] w-full h-9 bg-[#F9F9FB] border border-[#EBEBEB] rounded-[6px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] font-['Neue_Montreal'] font-normal text-[13.5px] leading-[16px] text-[#2B2834] placeholder:text-[#A5A1AF] focus:outline-none focus:border-[#5F2EFC]"
+                    className="flex flex-row items-center px-3 py-[10px] w-full h-9 bg-surface-secondary border border-border-primary rounded-[6px] shadow-button font-sans text-body-sm-regular text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border-brand"
                   />
                   <div className="flex flex-row justify-end items-center gap-1 w-full h-7">
                     <button
                       onClick={handleCancel}
-                      className="flex flex-row justify-center items-center px-[14px] py-[14px] w-[70px] h-7 bg-white border border-[#EBEBEB] rounded-[9px] shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#353A44] hover:bg-gray-50 transition-colors"
+                      className="flex flex-row justify-center items-center px-[14px] py-[14px] w-[70px] h-7 bg-white border border-border-primary rounded-[9px] shadow-button-inset font-sans text-body-sm text-[#353A44] hover:bg-gray-50 transition-colors"
                       style={{ textShadow: '0px -1px 19.4px rgba(0, 0, 0, 0.25)' }}
                     >
                       Cancel
                     </button>
                     <button
                       onClick={() => handleSave('phone')}
-                      className="flex flex-row justify-center items-center px-[14px] py-[14px] w-[58px] h-7 rounded-[9px] shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#FFFCF8] hover:opacity-90 transition-opacity"
+                      className="flex flex-row justify-center items-center px-[14px] py-[14px] w-[58px] h-7 rounded-[9px] shadow-button-inset font-sans text-body-sm text-white hover:opacity-90 transition-opacity"
                       style={{
                         background: 'linear-gradient(180deg, #5F2EFC 22.58%, #4E18FC 100%)',
                         textShadow: '0px -1px 6px rgba(0, 0, 0, 0.25)'
@@ -220,12 +280,12 @@ export default function ProfileContent() {
                 </div>
               ) : (
                 <div className="flex flex-row justify-between items-center gap-1 w-full">
-                  <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-[16px] text-[#5F5971]">
-                    {phone}
+                  <span className="font-sans text-body-sm-regular text-text-secondary">
+                    {phone || '—'}
                   </span>
                   <button
                     onClick={() => handleEdit('phone', phone)}
-                    className="text-[#5F5971] hover:text-[#2B2834] transition-colors"
+                    className="text-text-secondary hover:text-text-primary transition-colors"
                   >
                     <EditIcon className="w-4 h-4" />
                   </button>
@@ -235,10 +295,10 @@ export default function ProfileContent() {
           </div>
 
           {/* Divider Line */}
-          <div className="w-full h-0 border-t border-[#EBEBEB]" />
+          <div className="w-full h-0 border-t border-border-primary" />
 
           {/* Security Title */}
-          <h3 className="font-['Neue_Montreal'] font-bold text-[20px] leading-[24px] tracking-[-0.01em] text-[#2B2834]">
+          <h3 className="font-sans text-heading-lg-bold text-text-primary">
             Security
           </h3>
 
@@ -246,14 +306,14 @@ export default function ProfileContent() {
           <div className="flex flex-col items-start gap-[18px] w-full">
             {/* Password Field */}
             <div className="flex flex-col items-start gap-4 w-full">
-              <span className="font-['Neue_Montreal'] font-medium text-[16px] leading-[19px] text-[#2B2834]">
+              <span className="font-sans text-heading-sm text-text-primary">
                 Password
               </span>
               {editingField === 'password' ? (
                 <div className="flex flex-col items-start gap-4 w-full">
                   {/* Current Password */}
                   <div className="flex flex-col items-start gap-1 w-full">
-                    <label className="font-['Neue_Montreal'] font-medium text-[12px] leading-[14px] text-[#2B2834]">
+                    <label className="font-sans text-caption-lg text-text-primary">
                       Current Password
                     </label>
                     <div className="relative w-full">
@@ -262,7 +322,7 @@ export default function ProfileContent() {
                         value={passwordData.current}
                         onChange={(e) => setPasswordData(prev => ({ ...prev, current: e.target.value }))}
                         placeholder="0000000"
-                        className="flex flex-row items-center px-3 py-[10px] pr-10 w-full h-9 bg-[#F9F9FB] border border-[#EBEBEB] rounded-[6px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] font-['Neue_Montreal'] font-normal text-[13.5px] leading-[16px] text-[#2B2834] placeholder:text-[#A5A1AF] focus:outline-none focus:border-[#5F2EFC]"
+                        className="flex flex-row items-center px-3 py-[10px] pr-10 w-full h-9 bg-surface-secondary border border-border-primary rounded-[6px] shadow-button font-sans text-body-sm-regular text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border-brand"
                       />
                       <button
                         type="button"
@@ -278,7 +338,7 @@ export default function ProfileContent() {
                   <div className="flex flex-row items-start gap-2 w-full">
                     {/* New Password */}
                     <div className="flex flex-col items-start gap-1 flex-1">
-                      <label className="font-['Neue_Montreal'] font-medium text-[12px] leading-[14px] text-[#2B2834]">
+                      <label className="font-sans text-caption-lg text-text-primary">
                         New Password
                       </label>
                       <div className="relative w-full">
@@ -287,7 +347,7 @@ export default function ProfileContent() {
                           value={passwordData.new}
                           onChange={(e) => setPasswordData(prev => ({ ...prev, new: e.target.value }))}
                           placeholder="0000000"
-                          className="flex flex-row items-center px-3 py-[10px] pr-10 w-full h-9 bg-[#F9F9FB] border border-[#EBEBEB] rounded-[6px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] font-['Neue_Montreal'] font-normal text-[13.5px] leading-[16px] text-[#2B2834] placeholder:text-[#A5A1AF] focus:outline-none focus:border-[#5F2EFC]"
+                          className="flex flex-row items-center px-3 py-[10px] pr-10 w-full h-9 bg-surface-secondary border border-border-primary rounded-[6px] shadow-button font-sans text-body-sm-regular text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border-brand"
                         />
                         <button
                           type="button"
@@ -301,7 +361,7 @@ export default function ProfileContent() {
 
                     {/* Confirm Password */}
                     <div className="flex flex-col items-start gap-1 flex-1">
-                      <label className="font-['Neue_Montreal'] font-medium text-[12px] leading-[14px] text-[#2B2834]">
+                      <label className="font-sans text-caption-lg text-text-primary">
                         Confirm Password
                       </label>
                       <div className="relative w-full">
@@ -310,7 +370,7 @@ export default function ProfileContent() {
                           value={passwordData.confirm}
                           onChange={(e) => setPasswordData(prev => ({ ...prev, confirm: e.target.value }))}
                           placeholder="0000000"
-                          className="flex flex-row items-center px-3 py-[10px] pr-10 w-full h-9 bg-[#F9F9FB] border border-[#EBEBEB] rounded-[6px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] font-['Neue_Montreal'] font-normal text-[13.5px] leading-[16px] text-[#2B2834] placeholder:text-[#A5A1AF] focus:outline-none focus:border-[#5F2EFC]"
+                          className="flex flex-row items-center px-3 py-[10px] pr-10 w-full h-9 bg-surface-secondary border border-border-primary rounded-[6px] shadow-button font-sans text-body-sm-regular text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border-brand"
                         />
                         <button
                           type="button"
@@ -327,14 +387,14 @@ export default function ProfileContent() {
                   <div className="flex flex-row justify-end items-center gap-1 w-full h-7">
                     <button
                       onClick={handleCancel}
-                      className="flex flex-row justify-center items-center px-[14px] py-[14px] w-[70px] h-7 bg-white border border-[#EBEBEB] rounded-[9px] shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#353A44] hover:bg-gray-50 transition-colors"
+                      className="flex flex-row justify-center items-center px-[14px] py-[14px] w-[70px] h-7 bg-white border border-border-primary rounded-[9px] shadow-button-inset font-sans text-body-sm text-[#353A44] hover:bg-gray-50 transition-colors"
                       style={{ textShadow: '0px -1px 19.4px rgba(0, 0, 0, 0.25)' }}
                     >
                       Cancel
                     </button>
                     <button
                       onClick={() => handleSave('password')}
-                      className="flex flex-row justify-center items-center px-[14px] py-[14px] w-[58px] h-7 rounded-[9px] shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#FFFCF8] hover:opacity-90 transition-opacity"
+                      className="flex flex-row justify-center items-center px-[14px] py-[14px] w-[58px] h-7 rounded-[9px] shadow-button-inset font-sans text-body-sm text-white hover:opacity-90 transition-opacity"
                       style={{
                         background: 'linear-gradient(180deg, #5F2EFC 22.58%, #4E18FC 100%)',
                         textShadow: '0px -1px 6px rgba(0, 0, 0, 0.25)'
@@ -346,12 +406,12 @@ export default function ProfileContent() {
                 </div>
               ) : (
                 <div className="flex flex-row justify-between items-center gap-1 w-full">
-                  <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-[16px] text-[#5F5971]">
+                  <span className="font-sans text-body-sm-regular text-text-secondary">
                     Password Set
                   </span>
                   <button
                     onClick={() => handleEdit('password', '')}
-                    className="text-[#5F5971] hover:text-[#2B2834] transition-colors"
+                    className="text-text-secondary hover:text-text-primary transition-colors"
                   >
                     <EditIcon className="w-4 h-4" />
                   </button>
@@ -361,14 +421,14 @@ export default function ProfileContent() {
 
             {/* 2FA Field */}
             <div className="flex flex-col items-start gap-1 w-full">
-              <span className="font-['Neue_Montreal'] font-medium text-[16px] leading-[19px] text-[#2B2834]">
+              <span className="font-sans text-heading-sm text-text-primary">
                 Two - Factor Authentication
               </span>
               <div className="flex flex-row justify-between items-center gap-1 w-full">
-                <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-[16px] text-[#5F5971]">
+                <span className="font-sans text-body-sm-regular text-text-secondary">
                   Enabled
                 </span>
-                <button className="text-[#5F5971] hover:text-[#2B2834] transition-colors">
+                <button className="text-text-secondary hover:text-text-primary transition-colors">
                   <EditIcon className="w-4 h-4" />
                 </button>
               </div>

@@ -198,7 +198,7 @@ export default function AdminRolesPage() {
       {/* Go Back Button */}
       <button
         onClick={() => router.back()}
-        className="flex flex-row items-center px-2 py-1.5 gap-1.5 w-[88px] h-[29px] bg-[#F9F9FB] rounded-md hover:bg-gray-200 transition-colors"
+        className="flex flex-row items-center px-2 py-1.5 gap-1.5 w-[88px] h-[29px] bg-surface-secondary rounded-md hover:bg-gray-200 transition-colors"
         style={{
           padding: '6px 8px',
           gap: '6px',
@@ -229,7 +229,7 @@ export default function AdminRolesPage() {
           />
         </svg>
         <span 
-          className="text-sm font-medium leading-[17px] tracking-[-0.01em] text-[#2B2834]"
+          className="text-sm font-medium leading-[17px] tracking-[-0.01em] text-text-primary"
           style={{
             width: '50px',
             height: '17px',
@@ -250,26 +250,26 @@ export default function AdminRolesPage() {
       <div className="flex flex-col gap-2 w-full">
         {/* Header */}
         <div className="flex justify-between items-start w-full">
-          <h1 className="text-[20px] font-bold text-[#2B2834] leading-[100%] tracking-[-0.01em] font-['Neue_Montreal']">
+          <h1 className="text-[20px] font-bold text-text-primary leading-[100%] tracking-[-0.01em] font-sans">
             Admin Roles
           </h1>
 
           <div className="flex items-center gap-2">
             <button 
               onClick={() => setShowEditPermissionsModal(true)}
-              className="flex justify-center items-center px-4 py-2 h-8 bg-white border border-[#EBEBEB] rounded-lg shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] hover:bg-gray-50 transition-colors"
+              className="flex justify-center items-center px-4 py-2 h-8 bg-white border border-border-primary rounded-lg shadow-button-inset hover:bg-gray-50 transition-colors"
             >
-              <span className="text-[13.5px] font-medium leading-4 text-[#353A44]">
+              <span className="text-body-sm text-[#353A44]">
                 Edit Permissions
               </span>
             </button>
 
             <button 
               onClick={() => setShowAddAdminModal(true)}
-              className="flex justify-center items-center px-4 py-2 gap-1 h-8 bg-gradient-to-b from-[#5F2EFC] to-[#4E18FC] rounded-lg shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] hover:opacity-90 transition-opacity"
+              className="flex justify-center items-center px-4 py-2 gap-1 h-8 bg-gradient-to-b from-brand-primary to-brand-purple rounded-lg shadow-button-inset hover:opacity-90 transition-opacity"
             >
-              <Plus className="w-3 h-3 text-[#FFFCF8]" strokeWidth={1.5} />
-              <span className="text-[13.5px] font-medium leading-4 text-[#FFFCF8]">
+              <Plus className="w-3 h-3 text-white" strokeWidth={1.5} />
+              <span className="text-body-sm text-white">
                 Add Admin
               </span>
             </button>
@@ -280,8 +280,8 @@ export default function AdminRolesPage() {
           <div
             className={`w-full rounded-md border px-3 py-2 text-sm ${
               feedback.type === 'success'
-                ? 'border-[#B5E3D3] bg-[#E7F3EF] text-[#239B73]'
-                : 'border-[#F1C6C4] bg-[#FBECEB] text-[#CD110A]'
+                ? 'border-[#B5E3D3] bg-surface-success text-text-success'
+                : 'border-[#F1C6C4] bg-surface-danger text-text-danger'
             }`}
           >
             {feedback.text}
@@ -289,21 +289,21 @@ export default function AdminRolesPage() {
         ) : null}
 
         {/* Permissions Table */}
-        <div className="flex flex-col p-1 gap-1 w-full bg-[#F9F9FB] rounded-lg overflow-x-auto">
+        <div className="flex flex-col p-1 gap-1 w-full bg-surface-secondary rounded-lg overflow-x-auto">
           {/* Table Header */}
-          <div className="flex items-center px-6 py-2 gap-4 w-full min-w-[800px] bg-[#F9F9FB]">
-            <div className="w-[103px] text-xs font-medium leading-[14px] text-[#2B2834]">
+          <div className="flex items-center px-6 py-2 gap-4 w-full min-w-[800px] bg-surface-secondary">
+            <div className="w-[103px] text-xs font-medium leading-[14px] text-text-primary">
               Role
             </div>
-            <div className="w-[80px] text-xs font-medium leading-[14px] text-[#2B2834]">
+            <div className="w-[80px] text-xs font-medium leading-[14px] text-text-primary">
               Admins
             </div>
-            <div className="w-0 h-[14px] border-l border-[#EBEBEB]" />
+            <div className="w-0 h-[14px] border-l border-border-primary" />
             <div className="flex justify-center items-center gap-4 flex-1">
               {permissionColumns.map((col, idx) => (
                 <div
                   key={idx}
-                  className="flex-1 text-xs font-medium leading-[14px] text-center text-[#2B2834]"
+                  className="flex-1 text-xs font-medium leading-[14px] text-center text-text-primary"
                 >
                   {col}
                 </div>
@@ -312,21 +312,21 @@ export default function AdminRolesPage() {
           </div>
 
           {/* Table Body */}
-          <div className="flex flex-col w-full bg-white border border-[#EBEBEB] rounded-lg overflow-hidden min-w-[800px]">
+          <div className="flex flex-col w-full bg-white border border-border-primary rounded-lg overflow-hidden min-w-[800px]">
             {roles.map((role, roleIdx) => (
               <div
                 key={roleIdx}
                 className={`flex items-center px-6 py-3 gap-4 w-full ${
-                  roleIdx !== roles.length - 1 ? 'border-b border-[#EBEBEB]' : ''
+                  roleIdx !== roles.length - 1 ? 'border-b border-border-primary' : ''
                 }`}
               >
-                <div className="w-[103px] text-[13.5px] font-normal leading-4 text-[#2B2834]">
+                <div className="w-[103px] text-body-sm-regular text-text-primary">
                   {role.name}
                 </div>
-                <div className="w-[80px] text-[13.5px] font-normal leading-4 text-[#2B2834]">
+                <div className="w-[80px] text-body-sm-regular text-text-primary">
                   {role.admins}
                 </div>
-                <div className="w-0 h-4 border-l border-[#EBEBEB]" />
+                <div className="w-0 h-4 border-l border-border-primary" />
                 <div className="flex justify-center items-center gap-4 flex-1">
                   {permissionKeys.map((permKey, permIdx) => {
                     const hasPermission = role.permissions[permKey];

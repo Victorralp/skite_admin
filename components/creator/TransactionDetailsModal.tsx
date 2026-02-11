@@ -28,13 +28,13 @@ export default function TransactionDetailsModal({ isOpen, onClose, transaction }
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'Success':
-                return 'text-[#239B73] bg-[#E7F3EF]';
+                return 'text-text-success bg-surface-success';
             case 'Pending':
-                return 'text-[#FB6A00] bg-[#FFF3EB]';
+                return 'text-text-warning bg-surface-warning';
             case 'Failed':
                 return 'text-[#E53E3E] bg-[#FED7D7]';
             default:
-                return 'text-[#5F5971] bg-[#F7F7F9]';
+                return 'text-text-secondary bg-[#F7F7F9]';
         }
     };
 
@@ -72,7 +72,7 @@ export default function TransactionDetailsModal({ isOpen, onClose, transaction }
             <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="font-['Neue_Montreal'] font-semibold text-lg text-[#2B2834]">
+                    <h2 className="font-sans font-semibold text-lg text-text-primary">
                         Transaction Details
                     </h2>
                     <button
@@ -89,63 +89,63 @@ export default function TransactionDetailsModal({ isOpen, onClose, transaction }
                 <div className="space-y-4">
                     {/* Transaction ID */}
                     <div className="flex justify-between items-center">
-                        <span className="font-['Neue_Montreal'] font-medium text-sm text-[#5F5971]">Transaction ID</span>
-                        <span className="font-['Neue_Montreal'] font-medium text-sm text-[#2B2834]">{transaction.id}</span>
+                        <span className="font-sans font-medium text-sm text-text-secondary">Transaction ID</span>
+                        <span className="font-sans font-medium text-sm text-text-primary">{transaction.id}</span>
                     </div>
 
                     {/* Date & Time */}
                     <div className="flex justify-between items-center">
-                        <span className="font-['Neue_Montreal'] font-medium text-sm text-[#5F5971]">Date & Time</span>
-                        <span className="font-['Neue_Montreal'] font-medium text-sm text-[#2B2834]">
+                        <span className="font-sans font-medium text-sm text-text-secondary">Date & Time</span>
+                        <span className="font-sans font-medium text-sm text-text-primary">
                             {transaction.date} at {transaction.time}
                         </span>
                     </div>
 
                     {/* Creator */}
                     <div className="flex justify-between items-center">
-                        <span className="font-['Neue_Montreal'] font-medium text-sm text-[#5F5971]">Creator</span>
-                        <span className="font-['Neue_Montreal'] font-medium text-sm text-[#2B2834]">{transaction.creator}</span>
+                        <span className="font-sans font-medium text-sm text-text-secondary">Creator</span>
+                        <span className="font-sans font-medium text-sm text-text-primary">{transaction.creator}</span>
                     </div>
 
                     {/* Buyer */}
                     <div className="flex justify-between items-center">
-                        <span className="font-['Neue_Montreal'] font-medium text-sm text-[#5F5971]">Buyer</span>
-                        <span className="font-['Neue_Montreal'] font-medium text-sm text-[#2B2834]">{transaction.buyer}</span>
+                        <span className="font-sans font-medium text-sm text-text-secondary">Buyer</span>
+                        <span className="font-sans font-medium text-sm text-text-primary">{transaction.buyer}</span>
                     </div>
 
                     {/* Product */}
                     <div className="flex justify-between items-start">
-                        <span className="font-['Neue_Montreal'] font-medium text-sm text-[#5F5971]">Product</span>
+                        <span className="font-sans font-medium text-sm text-text-secondary">Product</span>
                         <div className="text-right">
-                            <div className="font-['Neue_Montreal'] font-medium text-sm text-[#2B2834]">{transaction.product}</div>
-                            <div className="font-['Neue_Montreal'] font-normal text-xs text-[#5F5971]">{transaction.productType}</div>
+                            <div className="font-sans font-medium text-sm text-text-primary">{transaction.product}</div>
+                            <div className="font-sans font-normal text-xs text-text-secondary">{transaction.productType}</div>
                         </div>
                     </div>
 
                     {/* Amount */}
                     <div className="flex justify-between items-center">
-                        <span className="font-['Neue_Montreal'] font-medium text-sm text-[#5F5971]">Amount</span>
-                        <span className="font-['Neue_Montreal'] font-semibold text-sm text-[#2B2834]">{transaction.amount}</span>
+                        <span className="font-sans font-medium text-sm text-text-secondary">Amount</span>
+                        <span className="font-sans font-semibold text-sm text-text-primary">{transaction.amount}</span>
                     </div>
 
                     {/* Fee */}
                     <div className="flex justify-between items-center">
-                        <span className="font-['Neue_Montreal'] font-medium text-sm text-[#5F5971]">Transaction Fee</span>
-                        <span className="font-['Neue_Montreal'] font-medium text-sm text-[#2B2834]">{transaction.fee}</span>
+                        <span className="font-sans font-medium text-sm text-text-secondary">Transaction Fee</span>
+                        <span className="font-sans font-medium text-sm text-text-primary">{transaction.fee}</span>
                     </div>
 
                     {/* Payment Method */}
                     <div className="flex justify-between items-center">
-                        <span className="font-['Neue_Montreal'] font-medium text-sm text-[#5F5971]">Payment Method</span>
-                        <span className="font-['Neue_Montreal'] font-medium text-sm text-[#2B2834]">{transaction.paymentMethod}</span>
+                        <span className="font-sans font-medium text-sm text-text-secondary">Payment Method</span>
+                        <span className="font-sans font-medium text-sm text-text-primary">{transaction.paymentMethod}</span>
                     </div>
 
                     {/* Status */}
                     <div className="flex justify-between items-center">
-                        <span className="font-['Neue_Montreal'] font-medium text-sm text-[#5F5971]">Status</span>
+                        <span className="font-sans font-medium text-sm text-text-secondary">Status</span>
                         <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${getStatusColor(transaction.status)}`}>
                             {getStatusIcon(transaction.status)}
-                            <span className="font-['Neue_Montreal'] font-medium text-sm">
+                            <span className="font-sans font-medium text-sm">
                                 {transaction.status}
                             </span>
                         </div>
@@ -156,11 +156,11 @@ export default function TransactionDetailsModal({ isOpen, onClose, transaction }
                 <div className="flex gap-3 mt-6">
                     <button
                         onClick={onClose}
-                        className="flex-1 px-4 py-2 border border-[#EBEBEB] rounded-lg font-['Neue_Montreal'] font-medium text-sm text-[#5F5971] hover:bg-gray-50 transition-colors"
+                        className="flex-1 px-4 py-2 border border-border-primary rounded-lg font-sans font-medium text-sm text-text-secondary hover:bg-gray-50 transition-colors"
                     >
                         Close
                     </button>
-                    <button className="flex-1 px-4 py-2 bg-[#6366F1] rounded-lg font-['Neue_Montreal'] font-medium text-sm text-white hover:bg-[#5856EB] transition-colors">
+                    <button className="flex-1 px-4 py-2 bg-[#6366F1] rounded-lg font-sans font-medium text-sm text-white hover:bg-[#5856EB] transition-colors">
                         View Receipt
                     </button>
                 </div>

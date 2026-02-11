@@ -58,10 +58,10 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       {/* Go Back Button */}
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-1.5 px-2 py-1.5 w-[88px] h-[29px] bg-[#F9F9FB] rounded-md hover:bg-gray-200 transition-colors"
+        className="flex items-center gap-1.5 px-2 py-1.5 w-[88px] h-[29px] bg-surface-secondary rounded-md hover:bg-gray-200 transition-colors"
       >
-        <ArrowLeft className="w-4 h-4 text-[#2B2834]" />
-        <span className="font-['Neue_Montreal'] font-medium text-[14px] leading-[17px] tracking-[-0.01em] text-[#2B2834]">
+        <ArrowLeft className="w-4 h-4 text-text-primary" />
+        <span className="font-sans text-body-md tracking-[-0.01em] text-text-primary">
           Go back
         </span>
       </button>
@@ -71,7 +71,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
         {/* Left Column - Main Content */}
         <div className="flex-1 flex flex-col gap-6">
           {/* Title */}
-          <h1 className="font-['Neue_Montreal'] font-bold text-[20px] leading-[24px] tracking-[-0.01em] text-[#2B2834] line-clamp-2">
+          <h1 className="font-sans text-heading-lg-bold text-text-primary line-clamp-2">
             Interior Design Course
           </h1>
 
@@ -81,10 +81,10 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
             {/* Lesson Title and Description */}
             <div className="flex flex-col gap-3.5">
-              <h2 className="font-['Neue_Montreal'] font-bold text-[16px] leading-[19px] text-[#1F1F1F] line-clamp-2">
+              <h2 className="font-sans text-body-lg text-[#1F1F1F] line-clamp-2">
                 {activeLesson.type === 'Reading' ? 'Introduction to Interior Design' : 'Approaching Interior Design'}
               </h2>
-              <p className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-[16px] text-[#4B4B4B] line-clamp-3">
+              <p className="font-sans text-body-sm-regular text-[#4B4B4B] line-clamp-3">
                 Explore the fascinating realm of interior design with our comprehensive book! You&apos;ll discover inspiring projects and gain personalized insights to ignite your creativity.
               </p>
             </div>
@@ -94,14 +94,14 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
             {/* Comments Section */}
             <div className="flex flex-col gap-3">
-              <h3 className="font-['Neue_Montreal'] font-bold text-[16px] leading-[19px] text-[#1F1F1F]">
+              <h3 className="font-sans text-body-lg text-[#1F1F1F]">
                 Comments
               </h3>
-              <div className="flex flex-col gap-4 p-4 bg-white border border-[#EBEBEB] rounded">
+              <div className="flex flex-col gap-4 p-4 bg-white border border-border-primary rounded">
                 {comments.map((comment, index) => (
                   <div
                     key={comment.id}
-                    className={`flex gap-2 pb-4 ${index !== comments.length - 1 ? 'border-b border-[#EBEBEB]' : ''}`}
+                    className={`flex gap-2 pb-4 ${index !== comments.length - 1 ? 'border-b border-border-primary' : ''}`}
                   >
                     <img
                       src={comment.avatar}
@@ -110,21 +110,21 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                     />
                     <div className="flex-1 flex flex-col gap-1.5">
                       <div className="flex items-center justify-between">
-                        <span className={`font-['Neue_Montreal'] text-[13.5px] leading-[16px] text-[#1F1F1F] truncate ${comment.isCreator ? 'font-bold' : 'font-medium'}`}>
+                        <span className={`font-sans text-[13.5px] leading-[16px] text-[#1F1F1F] truncate ${comment.isCreator ? 'font-bold' : 'font-medium'}`}>
                           {comment.author}
                         </span>
-                        <span className="font-['Neue_Montreal'] font-normal text-[10px] leading-[12px] text-[#A5A1AF]">
+                        <span className="font-sans text-caption-sm-regular text-text-tertiary">
                           {comment.time}
                         </span>
                       </div>
                       {comment.isCreator ? (
-                        <div className="px-2 py-1 bg-[#F9F9FB] rounded-br-lg rounded-bl-lg rounded-tr-lg">
-                          <p className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-[16px] text-[#1F1F1F] line-clamp-3">
+                        <div className="px-2 py-1 bg-surface-secondary rounded-br-lg rounded-bl-lg rounded-tr-lg">
+                          <p className="font-sans text-body-sm-regular text-[#1F1F1F] line-clamp-3">
                             {comment.text}
                           </p>
                         </div>
                       ) : (
-                        <p className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-[16px] text-[#5F5971] line-clamp-3">
+                        <p className="font-sans text-body-sm-regular text-text-secondary line-clamp-3">
                           {comment.text}
                         </p>
                       )}
@@ -138,26 +138,26 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
         {/* Right Column - Course Content Sidebar */}
         <div className="w-[306px] flex flex-col gap-6">
-          <h3 className="font-['Neue_Montreal'] font-medium text-[16px] leading-[19px] text-[#5F5971]">
+          <h3 className="font-sans text-heading-sm text-text-secondary">
             Course Content
           </h3>
 
-          <div className="flex flex-col gap-2 p-4 bg-white border border-[#EBEBEB] rounded-lg">
+          <div className="flex flex-col gap-2 p-4 bg-white border border-border-primary rounded-lg">
             {modules.map((module) => (
               <div key={module.id} className="flex flex-col">
                 {/* Module Header */}
                 <button
                   onClick={() => module.lessons.length > 0 ? setExpandedModule(expandedModule === module.id ? null : module.id) : undefined}
-                  className={`flex items-center justify-between py-2.5 ${module.id !== modules.length ? 'border-b border-[#EBEBEB]' : ''} ${module.lessons.length === 0 ? 'cursor-default' : ''}`}
+                  className={`flex items-center justify-between py-2.5 ${module.id !== modules.length ? 'border-b border-border-primary' : ''} ${module.lessons.length === 0 ? 'cursor-default' : ''}`}
                 >
-                  <span className="font-['Neue_Montreal'] font-medium text-[16px] leading-[19px] text-[#2B2834] truncate">
+                  <span className="font-sans text-heading-sm text-text-primary truncate">
                     {module.title}
                   </span>
                   {module.lessons.length > 0 && (
                     expandedModule === module.id ? (
-                      <ChevronDown className="w-4 h-4 text-[#5F5971]" />
+                      <ChevronDown className="w-4 h-4 text-text-secondary" />
                     ) : (
-                      <ChevronRight className="w-4 h-4 text-[#5F5971]" />
+                      <ChevronRight className="w-4 h-4 text-text-secondary" />
                     )
                   )}
                 </button>
@@ -187,10 +187,10 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                           </svg>
                         )}
                         <div className="flex-1 flex flex-col gap-0.5">
-                          <span className={`font-['Neue_Montreal'] font-medium text-[14px] leading-[17px] truncate ${lesson.active ? 'text-[#5F2EFC]' : 'text-[#2B2834]'}`}>
+                          <span className={`font-sans text-body-md truncate ${lesson.active ? 'text-text-brand' : 'text-text-primary'}`}>
                             {lesson.title}
                           </span>
-                          <span className={`font-['Neue_Montreal'] font-normal text-[11px] leading-[13px] ${lesson.active ? 'text-[#5F2EFC]' : 'text-[#A5A1AF]'}`}>
+                          <span className={`font-sans text-caption-md ${lesson.active ? 'text-text-brand' : 'text-text-tertiary'}`}>
                             {lesson.type} • {lesson.duration}
                           </span>
                         </div>

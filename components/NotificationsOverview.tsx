@@ -10,7 +10,7 @@ export default function NotificationsOverview() {
   return (
     <div className="flex flex-col items-start p-6 gap-8 w-full max-w-[1230px]">
       {/* Page Title */}
-      <h1 className="font-['Neue_Montreal'] font-bold text-[20px] leading-[24px] tracking-[-0.01em] text-[#2B2834]">
+      <h1 className="font-sans text-heading-lg-bold text-text-primary">
         Notifications
       </h1>
 

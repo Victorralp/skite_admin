@@ -13,7 +13,7 @@ export default function LogsOverview() {
   return (
     <div className="flex flex-col items-start gap-6 w-full max-w-[1230px]">
       {/* Page Title */}
-      <h1 className="font-['Neue_Montreal'] font-bold text-[20px] leading-[24px] tracking-[-0.01em] text-[#2B2834]">
+      <h1 className="font-sans text-heading-lg-bold text-text-primary">
         Logs
       </h1>
 
@@ -25,15 +25,15 @@ export default function LogsOverview() {
             onClick={() => setActiveCategory(category)}
             className={`flex flex-row justify-center items-center px-4 py-2 gap-2.5 flex-1 h-8 rounded-md transition-colors ${
               activeCategory === category
-                ? 'bg-white border border-[#5F2EFC]'
-                : 'bg-white border border-[#EBEBEB]'
+                ? 'bg-white border border-border-brand'
+                : 'bg-white border border-border-primary'
             }`}
           >
             <span
-              className={`font-['Neue_Montreal'] text-[13.5px] leading-4 ${
+              className={`font-sans text-[13.5px] leading-4 ${
                 activeCategory === category
-                  ? 'font-medium text-[#5F2EFC]'
-                  : 'font-normal text-[#5F5971]'
+                  ? 'font-medium text-text-brand'
+                  : 'font-normal text-text-secondary'
               }`}
             >
               {category}

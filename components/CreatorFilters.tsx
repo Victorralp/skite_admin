@@ -38,14 +38,14 @@ const FilterDropdown = ({ title, showCalendar, showCurrency, onApply }: FilterDr
 
     return (
         <div
-            className="absolute left-[-0.75px] top-[27px] w-[185px] h-[154px] bg-white border border-[#5F2EFC] rounded-[16px] flex flex-col justify-center items-start p-3 gap-[10px]"
+            className="absolute left-[-0.75px] top-[27px] w-[185px] h-[154px] bg-white border border-border-brand rounded-[16px] flex flex-col justify-center items-start p-3 gap-[10px]"
             style={{
                 boxShadow: '0px 116px 46px rgba(0, 0, 0, 0.01), 0px 65px 39px rgba(0, 0, 0, 0.05), 0px 29px 29px rgba(0, 0, 0, 0.09), 0px 7px 16px rgba(0, 0, 0, 0.1)',
                 zIndex: 50
             }}
         >
             {/* Title */}
-            <span className="text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
+            <span className="text-[12px] font-medium text-text-primary leading-[14px] font-sans">
                 {title}
             </span>
 
@@ -53,38 +53,38 @@ const FilterDropdown = ({ title, showCalendar, showCurrency, onApply }: FilterDr
             <div className="flex flex-col items-start gap-1 w-[161px] h-16">
                 {/* From Field */}
                 <div className="flex items-center gap-[10px] w-[161px] h-[30px]">
-                    <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal'] w-[32.91px] shrink-0">
+                    <span className="text-[12px] font-normal text-text-primary leading-[14px] font-sans w-[32.91px] shrink-0">
                         From
                     </span>
-                    <div className="w-[118px] h-[30px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-[6px] flex items-center justify-end px-2 gap-[10px] overflow-hidden">
+                    <div className="w-[118px] h-[30px] bg-surface-secondary border border-border-primary rounded-[6px] flex items-center justify-end px-2 gap-[10px] overflow-hidden">
                         <input
                             type={showCalendar ? "date" : "number"}
                             value={fromValue}
                             onChange={(e) => setFromValue(e.target.value)}
-                            className="w-full bg-transparent text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal'] outline-none border-none text-right"
+                            className="w-full bg-transparent text-[12px] font-medium text-text-primary leading-[14px] font-sans outline-none border-none text-right"
                             placeholder=""
                         />
                         {showCurrency && (
-                            <span className="text-[12px] font-medium text-[#5F5971] leading-[14px] font-['Neue_Montreal'] shrink-0">₦</span>
+                            <span className="text-[12px] font-medium text-text-secondary leading-[14px] font-sans shrink-0">₦</span>
                         )}
                     </div>
                 </div>
 
                 {/* To Field */}
                 <div className="flex items-center gap-[10px] w-[161px] h-[30px]">
-                    <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal'] w-[32.91px] shrink-0">
+                    <span className="text-[12px] font-normal text-text-primary leading-[14px] font-sans w-[32.91px] shrink-0">
                         To
                     </span>
-                    <div className="w-[118px] h-[30px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-[6px] flex items-center justify-end px-2 gap-[10px] overflow-hidden">
+                    <div className="w-[118px] h-[30px] bg-surface-secondary border border-border-primary rounded-[6px] flex items-center justify-end px-2 gap-[10px] overflow-hidden">
                         <input
                             type={showCalendar ? "date" : "number"}
                             value={toValue}
                             onChange={(e) => setToValue(e.target.value)}
-                            className="w-full bg-transparent text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal'] outline-none border-none text-right"
+                            className="w-full bg-transparent text-[12px] font-medium text-text-primary leading-[14px] font-sans outline-none border-none text-right"
                             placeholder=""
                         />
                         {showCurrency && (
-                            <span className="text-[12px] font-medium text-[#5F5971] leading-[14px] font-['Neue_Montreal'] shrink-0">₦</span>
+                            <span className="text-[12px] font-medium text-text-secondary leading-[14px] font-sans shrink-0">₦</span>
                         )}
                     </div>
                 </div>
@@ -100,7 +100,7 @@ const FilterDropdown = ({ title, showCalendar, showCurrency, onApply }: FilterDr
                 }}
             >
                 <span
-                    className="text-[13.5px] font-medium text-[#FFFCF8] leading-4 font-['Neue_Montreal']"
+                    className="text-[13.5px] font-medium text-white leading-4 font-sans"
                     style={{ textShadow: '0px -1px 6px rgba(0, 0, 0, 0.25)' }}
                 >
                     Apply
@@ -153,11 +153,11 @@ export default function CreatorFilters({
                         }}
                         className={cn(
                             "flex items-center gap-[4px] pl-[7px] pr-[9px] py-[4px] h-[22px] rounded-full border border-dashed transition-colors box-border",
-                            revenueFilterActive ? "border-[#5F2EFC]" : "border-[#EBEBEB] hover:bg-gray-50"
+                            revenueFilterActive ? "border-border-brand" : "border-border-primary hover:bg-gray-50"
                         )}
                     >
-                        <FilterPlusIcon className={cn(revenueFilterActive ? "text-[#5F2EFC]" : "text-[#5F5971]")} />
-                        <span className={cn("text-[12px] font-medium leading-[14px] font-['Neue_Montreal']", revenueFilterActive ? "text-[#5F2EFC]" : "text-[#5F5971]")}>Revenue</span>
+                        <FilterPlusIcon className={cn(revenueFilterActive ? "text-text-brand" : "text-text-secondary")} />
+                        <span className={cn("text-caption-lg font-sans", revenueFilterActive ? "text-text-brand" : "text-text-secondary")}>Revenue</span>
                     </button>
                     {revenueFilterActive && (
                         <FilterDropdown
@@ -177,11 +177,11 @@ export default function CreatorFilters({
                         }}
                         className={cn(
                             "flex items-center gap-[4px] pl-[7px] pr-[9px] py-[4px] h-[22px] rounded-full border border-dashed transition-colors box-border",
-                            dateJoinedFilterActive ? "border-[#5F2EFC]" : "border-[#EBEBEB] hover:bg-gray-50"
+                            dateJoinedFilterActive ? "border-border-brand" : "border-border-primary hover:bg-gray-50"
                         )}
                     >
-                        <FilterPlusIcon className={cn(dateJoinedFilterActive ? "text-[#5F2EFC]" : "text-[#5F5971]")} />
-                        <span className={cn("text-[12px] font-medium leading-[14px] font-['Neue_Montreal']", dateJoinedFilterActive ? "text-[#5F2EFC]" : "text-[#5F5971]")}>Date Joined</span>
+                        <FilterPlusIcon className={cn(dateJoinedFilterActive ? "text-text-brand" : "text-text-secondary")} />
+                        <span className={cn("text-caption-lg font-sans", dateJoinedFilterActive ? "text-text-brand" : "text-text-secondary")}>Date Joined</span>
                     </button>
                     {dateJoinedFilterActive && (
                         <FilterDropdown
@@ -202,11 +202,11 @@ export default function CreatorFilters({
                     )}
                     className={cn(
                         "flex items-center gap-[4px] pl-[7px] pr-[9px] py-[4px] h-[22px] rounded-full border border-dashed transition-colors box-border",
-                        statusFilter !== 'all' ? "border-[#5F2EFC]" : "border-[#EBEBEB] hover:bg-gray-50"
+                        statusFilter !== 'all' ? "border-border-brand" : "border-border-primary hover:bg-gray-50"
                     )}
                 >
-                    <FilterPlusIcon className={cn(statusFilter !== 'all' ? "text-[#5F2EFC]" : "text-[#5F5971]")} />
-                    <span className={cn("text-[12px] font-medium leading-[14px] font-['Neue_Montreal']", statusFilter !== 'all' ? "text-[#5F2EFC]" : "text-[#5F5971]")}>
+                    <FilterPlusIcon className={cn(statusFilter !== 'all' ? "text-text-brand" : "text-text-secondary")} />
+                    <span className={cn("text-caption-lg font-sans", statusFilter !== 'all' ? "text-text-brand" : "text-text-secondary")}>
                         {statusFilter === 'all' ? 'Status' :
                             statusFilter === 'active' ? 'Active' :
                                 statusFilter === 'suspended' ? 'Suspended' :
@@ -218,9 +218,9 @@ export default function CreatorFilters({
             {/* Right: Actions */}
             <div className="flex items-center gap-2">
                 {/* Sort Button */}
-                <button className="flex items-center gap-[2px] pl-[7px] pr-[10px] py-[5px] h-[24px] bg-white border border-[#EBEBEB] rounded-lg shadow-[0px_1px_4.8px_rgba(0,0,0,0.03)] hover:bg-gray-50 transition-colors box-border">
-                    <SlidersHorizontalIcon className="h-[14px] w-[14px] text-[#5F5971]" />
-                    <span className="text-[12px] font-normal text-[#5F5971] leading-[14px] font-['Neue_Montreal']">Sort</span>
+                <button className="flex items-center gap-[2px] pl-[7px] pr-[10px] py-[5px] h-[24px] bg-white border border-border-primary rounded-lg shadow-button-soft hover:bg-gray-50 transition-colors box-border">
+                    <SlidersHorizontalIcon className="h-[14px] w-[14px] text-text-secondary" />
+                    <span className="text-[12px] font-normal text-text-secondary leading-[14px] font-sans">Sort</span>
                 </button>
             </div>
         </div>

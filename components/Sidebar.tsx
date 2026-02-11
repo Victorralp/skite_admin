@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -20,9 +20,60 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import SkiteLogo from '@/components/SkiteLogo';
-import { logoutFromBackend } from '@/lib/api';
+import { getMe, logoutFromBackend } from '@/lib/api';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebaseClient';
+
+const AUTH_LOG_STORAGE_KEY = 'skite_latest_auth_log';
+const AUTH_LOG_HISTORY_STORAGE_KEY = 'skite_auth_logs';
+
+type AuthLogEntry = {
+  id: string;
+  timestamp: string;
+  user: string;
+  action: string;
+  message: string;
+  userAgent: string;
+  ipAddress: string;
+  status: 'Failed' | 'Success';
+};
+
+function formatAuthTimestamp(date: Date) {
+  const datePart = new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  }).format(date);
+  const timePart = new Intl.DateTimeFormat('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  }).format(date);
+  return `${datePart} ${timePart}`;
+}
+
+function appendAuthLog(entry: AuthLogEntry) {
+  if (typeof window === 'undefined') return;
+
+  const raw = localStorage.getItem(AUTH_LOG_HISTORY_STORAGE_KEY);
+  let logs: AuthLogEntry[] = [];
+
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        logs = parsed.filter((item) => item && typeof item === 'object') as AuthLogEntry[];
+      }
+    } catch {
+      logs = [];
+    }
+  }
+
+  logs.unshift(entry);
+  const trimmed = logs.slice(0, 100);
+  localStorage.setItem(AUTH_LOG_HISTORY_STORAGE_KEY, JSON.stringify(trimmed));
+  localStorage.setItem(AUTH_LOG_STORAGE_KEY, JSON.stringify(entry));
+}
 
 
 
@@ -52,52 +103,52 @@ const UsersIcon = ({ size = 18 }: { size?: number }) => (
 
 const PackageIcon = ({ size = 18 }: { size?: number }) => (
   <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M15 4.875L12 6.375M12 6.375L11.625 6.5625L8.25 8.25M12 6.375V9M12 6.375L4.875 2.625M8.25 8.25L1.5 4.875M8.25 8.25V15.375M10.9335 1.7865L12.4335 2.574C14.0467 3.42075 14.8537 3.84375 15.3022 4.605C15.75 5.3655 15.75 6.31275 15.75 8.2065V8.29425C15.75 10.1872 15.75 11.1345 15.3022 11.895C14.8537 12.6563 14.0467 13.08 12.4335 13.9268L10.9335 14.7135C9.6165 15.4043 8.958 15.75 8.25 15.75C7.542 15.75 6.8835 15.405 5.5665 14.7135L4.0665 13.926C2.45325 13.0793 1.64625 12.6563 1.19775 11.895C0.75 11.1345 0.75 10.1873 0.75 8.295V8.20725C0.75 6.3135 0.75 5.36625 1.19775 4.60575C1.64625 3.8445 2.45325 3.42075 4.0665 2.57475L5.5665 1.78725C6.8835 1.09575 7.542 0.75 8.25 0.75C8.958 0.75 9.6165 1.095 10.9335 1.7865Z" stroke="#5F5971" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M15 4.875L12 6.375M12 6.375L11.625 6.5625L8.25 8.25M12 6.375V9M12 6.375L4.875 2.625M8.25 8.25L1.5 4.875M8.25 8.25V15.375M10.9335 1.7865L12.4335 2.574C14.0467 3.42075 14.8537 3.84375 15.3022 4.605C15.75 5.3655 15.75 6.31275 15.75 8.2065V8.29425C15.75 10.1872 15.75 11.1345 15.3022 11.895C14.8537 12.6563 14.0467 13.08 12.4335 13.9268L10.9335 14.7135C9.6165 15.4043 8.958 15.75 8.25 15.75C7.542 15.75 6.8835 15.405 5.5665 14.7135L4.0665 13.926C2.45325 13.0793 1.64625 12.6563 1.19775 11.895C0.75 11.1345 0.75 10.1873 0.75 8.295V8.20725C0.75 6.3135 0.75 5.36625 1.19775 4.60575C1.64625 3.8445 2.45325 3.42075 4.0665 2.57475L5.5665 1.78725C6.8835 1.09575 7.542 0.75 8.25 0.75C8.958 0.75 9.6165 1.095 10.9335 1.7865Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
   </svg>
 );
 
 const VideoIcon = ({ size = 18 }: { size?: number }) => (
   <svg width="17" height="13" viewBox="0 0 17 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M10.9035 11.319C10.0733 12 8.841 12 6.375 12C3.90975 12 2.67675 12 1.8465 11.319C1.69474 11.1944 1.55557 11.0553 1.431 10.9035C0.75 10.0725 0.75 8.841 0.75 6.375C0.75 3.90975 0.75 2.67675 1.431 1.8465C1.55557 1.69474 1.69474 1.55557 1.8465 1.431C2.6775 0.75 3.909 0.75 6.375 0.75C8.84025 0.75 10.0733 0.75 10.9035 1.431C11.0553 1.55557 11.1944 1.69474 11.319 1.8465C12 2.6775 12 3.909 12 6.375C12 8.84025 12 10.0733 11.319 10.9035C11.1944 11.0553 11.0553 11.1944 10.9035 11.319ZM12 7.125V5.625L13.95 3.02475C14.0758 2.85669 14.2514 2.73251 14.4518 2.66984C14.6522 2.60716 14.8672 2.60916 15.0664 2.67555C15.2656 2.74195 15.4388 2.86937 15.5615 3.03974C15.6842 3.21011 15.7502 3.41479 15.75 3.62475V9.12525C15.7502 9.33521 15.6842 9.53989 15.5615 9.71026C15.4388 9.88063 15.2656 10.0081 15.0664 10.0744C14.8672 10.1408 14.6522 10.1428 14.4518 10.0802C14.2514 10.0175 14.0758 9.89331 13.95 9.72525L12 7.125Z" stroke="#5F5971" strokeWidth="1.5" strokeLinejoin="round" />
-    <path d="M6.375 7.5C6.67337 7.5 6.95952 7.38147 7.1705 7.1705C7.38147 6.95952 7.5 6.67337 7.5 6.375C7.5 6.07663 7.38147 5.79048 7.1705 5.5795C6.95952 5.36853 6.67337 5.25 6.375 5.25M6.375 7.5C6.07663 7.5 5.79048 7.38147 5.5795 7.1705C5.36853 6.95952 5.25 6.67337 5.25 6.375C5.25 6.07663 5.36853 5.79048 5.5795 5.5795C5.79048 5.36853 6.07663 5.25 6.375 5.25M6.375 7.5V5.25" stroke="#5F5971" strokeWidth="1.5" strokeLinejoin="round" />
+    <path d="M10.9035 11.319C10.0733 12 8.841 12 6.375 12C3.90975 12 2.67675 12 1.8465 11.319C1.69474 11.1944 1.55557 11.0553 1.431 10.9035C0.75 10.0725 0.75 8.841 0.75 6.375C0.75 3.90975 0.75 2.67675 1.431 1.8465C1.55557 1.69474 1.69474 1.55557 1.8465 1.431C2.6775 0.75 3.909 0.75 6.375 0.75C8.84025 0.75 10.0733 0.75 10.9035 1.431C11.0553 1.55557 11.1944 1.69474 11.319 1.8465C12 2.6775 12 3.909 12 6.375C12 8.84025 12 10.0733 11.319 10.9035C11.1944 11.0553 11.0553 11.1944 10.9035 11.319ZM12 7.125V5.625L13.95 3.02475C14.0758 2.85669 14.2514 2.73251 14.4518 2.66984C14.6522 2.60716 14.8672 2.60916 15.0664 2.67555C15.2656 2.74195 15.4388 2.86937 15.5615 3.03974C15.6842 3.21011 15.7502 3.41479 15.75 3.62475V9.12525C15.7502 9.33521 15.6842 9.53989 15.5615 9.71026C15.4388 9.88063 15.2656 10.0081 15.0664 10.0744C14.8672 10.1408 14.6522 10.1428 14.4518 10.0802C14.2514 10.0175 14.0758 9.89331 13.95 9.72525L12 7.125Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+    <path d="M6.375 7.5C6.67337 7.5 6.95952 7.38147 7.1705 7.1705C7.38147 6.95952 7.5 6.67337 7.5 6.375C7.5 6.07663 7.38147 5.79048 7.1705 5.5795C6.95952 5.36853 6.67337 5.25 6.375 5.25M6.375 7.5C6.07663 7.5 5.79048 7.38147 5.5795 7.1705C5.36853 6.95952 5.25 6.67337 5.25 6.375C5.25 6.07663 5.36853 5.79048 5.5795 5.5795C5.79048 5.36853 6.07663 5.25 6.375 5.25M6.375 7.5V5.25" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
   </svg>
 );
 
 const TrendingUpIcon = ({ size = 18 }: { size?: number }) => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M1.5 5.25C1.5 4.85218 1.65804 4.47064 1.93934 4.18934C2.22064 3.90804 2.60218 3.75 3 3.75H15C15.3978 3.75 15.7794 3.90804 16.0607 4.18934C16.342 4.47064 16.5 4.85218 16.5 5.25V12.75C16.5 13.1478 16.342 13.5294 16.0607 13.8107C15.7794 14.092 15.3978 14.25 15 14.25H3C2.60218 14.25 2.22064 14.092 1.93934 13.8107C1.65804 13.5294 1.5 13.1478 1.5 12.75V5.25Z" stroke="#5F5971" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M9 11.25C10.2426 11.25 11.25 10.2426 11.25 9C11.25 7.75736 10.2426 6.75 9 6.75C7.75736 6.75 6.75 7.75736 6.75 9C6.75 10.2426 7.75736 11.25 9 11.25Z" stroke="#5F5971" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M1.5 6.75C2.29565 6.75 3.05871 6.43393 3.62132 5.87132C4.18393 5.30871 4.5 4.54565 4.5 3.75M13.5 14.25C13.5 13.4544 13.8161 12.6913 14.3787 12.1287C14.9413 11.5661 15.7044 11.25 16.5 11.25" stroke="#5F5971" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M1.5 5.25C1.5 4.85218 1.65804 4.47064 1.93934 4.18934C2.22064 3.90804 2.60218 3.75 3 3.75H15C15.3978 3.75 15.7794 3.90804 16.0607 4.18934C16.342 4.47064 16.5 4.85218 16.5 5.25V12.75C16.5 13.1478 16.342 13.5294 16.0607 13.8107C15.7794 14.092 15.3978 14.25 15 14.25H3C2.60218 14.25 2.22064 14.092 1.93934 13.8107C1.65804 13.5294 1.5 13.1478 1.5 12.75V5.25Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M9 11.25C10.2426 11.25 11.25 10.2426 11.25 9C11.25 7.75736 10.2426 6.75 9 6.75C7.75736 6.75 6.75 7.75736 6.75 9C6.75 10.2426 7.75736 11.25 9 11.25Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M1.5 6.75C2.29565 6.75 3.05871 6.43393 3.62132 5.87132C4.18393 5.30871 4.5 4.54565 4.5 3.75M13.5 14.25C13.5 13.4544 13.8161 12.6913 14.3787 12.1287C14.9413 11.5661 15.7044 11.25 16.5 11.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
 const HeadphonesIcon = ({ size = 18 }: { size?: number }) => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M12.75 8.10375C12.75 7.84425 12.75 7.7145 12.789 7.599C12.9023 7.263 13.2015 7.13325 13.5015 6.99675C13.8375 6.843 14.0055 6.7665 14.1728 6.753C14.3618 6.738 14.5515 6.7785 14.7135 6.86925C14.928 6.98925 15.078 7.21875 15.231 7.40475C15.9383 8.26425 16.2923 8.694 16.4213 9.16725C16.5263 9.54975 16.5263 9.95025 16.4213 10.332C16.233 11.0235 15.6368 11.6025 15.195 12.1395C14.9693 12.4132 14.856 12.5505 14.7135 12.6307C14.5487 12.7221 14.3605 12.7626 14.1728 12.747C14.0055 12.7335 13.8375 12.657 13.5008 12.5032C13.2008 12.3667 12.9023 12.237 12.789 11.901C12.75 11.7855 12.75 11.6557 12.75 11.3962V8.10375ZM5.25001 8.10375C5.25001 7.77675 5.24101 7.4835 4.97701 7.254C4.88101 7.17075 4.75351 7.113 4.49926 6.99675C4.16251 6.84375 3.99451 6.7665 3.82726 6.753C3.32701 6.7125 3.05776 7.0545 2.76976 7.4055C2.06176 8.26425 1.70776 8.694 1.57801 9.168C1.47361 9.54923 1.47361 9.95152 1.57801 10.3327C1.76701 11.0235 2.36401 11.6032 2.80501 12.1395C3.08326 12.477 3.34951 12.7852 3.82726 12.747C3.99451 12.7335 4.16251 12.657 4.49926 12.5032C4.75426 12.3877 4.88101 12.3292 4.97701 12.246C5.24101 12.0165 5.25001 11.7232 5.25001 11.397V8.10375Z" stroke="#5F5971" strokeWidth="1.5" />
-    <path d="M3.75 6.75C3.75 4.2645 6.1005 2.25 9 2.25C11.8995 2.25 14.25 4.2645 14.25 6.75" stroke="#5F5971" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round" />
-    <path d="M14.25 12.75V13.35C14.25 14.6752 12.9075 15.75 11.25 15.75H9.75" stroke="#5F5971" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M12.75 8.10375C12.75 7.84425 12.75 7.7145 12.789 7.599C12.9023 7.263 13.2015 7.13325 13.5015 6.99675C13.8375 6.843 14.0055 6.7665 14.1728 6.753C14.3618 6.738 14.5515 6.7785 14.7135 6.86925C14.928 6.98925 15.078 7.21875 15.231 7.40475C15.9383 8.26425 16.2923 8.694 16.4213 9.16725C16.5263 9.54975 16.5263 9.95025 16.4213 10.332C16.233 11.0235 15.6368 11.6025 15.195 12.1395C14.9693 12.4132 14.856 12.5505 14.7135 12.6307C14.5487 12.7221 14.3605 12.7626 14.1728 12.747C14.0055 12.7335 13.8375 12.657 13.5008 12.5032C13.2008 12.3667 12.9023 12.237 12.789 11.901C12.75 11.7855 12.75 11.6557 12.75 11.3962V8.10375ZM5.25001 8.10375C5.25001 7.77675 5.24101 7.4835 4.97701 7.254C4.88101 7.17075 4.75351 7.113 4.49926 6.99675C4.16251 6.84375 3.99451 6.7665 3.82726 6.753C3.32701 6.7125 3.05776 7.0545 2.76976 7.4055C2.06176 8.26425 1.70776 8.694 1.57801 9.168C1.47361 9.54923 1.47361 9.95152 1.57801 10.3327C1.76701 11.0235 2.36401 11.6032 2.80501 12.1395C3.08326 12.477 3.34951 12.7852 3.82726 12.747C3.99451 12.7335 4.16251 12.657 4.49926 12.5032C4.75426 12.3877 4.88101 12.3292 4.97701 12.246C5.24101 12.0165 5.25001 11.7232 5.25001 11.397V8.10375Z" stroke="currentColor" strokeWidth="1.5" />
+    <path d="M3.75 6.75C3.75 4.2645 6.1005 2.25 9 2.25C11.8995 2.25 14.25 4.2645 14.25 6.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round" />
+    <path d="M14.25 12.75V13.35C14.25 14.6752 12.9075 15.75 11.25 15.75H9.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 
 );
 
 const DiscIcon = ({ size = 18 }: { size?: number }) => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M9 15.9375C12.8315 15.9375 15.9375 12.8315 15.9375 9C15.9375 5.16852 12.8315 2.0625 9 2.0625C5.16852 2.0625 2.0625 5.16852 2.0625 9C2.0625 12.8315 5.16852 15.9375 9 15.9375Z" stroke="#5F5971" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M9 12.75C11.0711 12.75 12.75 11.0711 12.75 9C12.75 6.92893 11.0711 5.25 9 5.25C6.92893 5.25 5.25 6.92893 5.25 9C5.25 11.0711 6.92893 12.75 9 12.75Z" fill="#5F5971" />
+    <path d="M9 15.9375C12.8315 15.9375 15.9375 12.8315 15.9375 9C15.9375 5.16852 12.8315 2.0625 9 2.0625C5.16852 2.0625 2.0625 5.16852 2.0625 9C2.0625 12.8315 5.16852 15.9375 9 15.9375Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M9 12.75C11.0711 12.75 12.75 11.0711 12.75 9C12.75 6.92893 11.0711 5.25 9 5.25C6.92893 5.25 5.25 6.92893 5.25 9C5.25 11.0711 6.92893 12.75 9 12.75Z" fill="currentColor" />
   </svg>
 
 );
 
 const BellIcon = ({ size = 18 }: { size?: number }) => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M11.25 14.25C11.25 14.8467 11.013 15.419 10.591 15.841C10.169 16.263 9.59674 16.5 9.00001 16.5C8.40327 16.5 7.83097 16.263 7.40902 15.841C6.98706 15.419 6.75001 14.8467 6.75001 14.25M9.54076 3.75226L8.44126 3.75001C5.93326 3.74401 3.75601 5.78176 3.73876 8.25001V11.0925C3.73876 11.685 3.66376 12.2633 3.34051 12.756L3.12526 13.0845C2.79751 13.5825 3.15001 14.25 3.73876 14.25H14.2613C14.85 14.25 15.2018 13.5825 14.8748 13.0845L14.6595 12.756C14.337 12.2633 14.2613 11.6843 14.2613 11.0918V8.25076C14.2313 5.78176 12.0488 3.75826 9.54076 3.75226Z" stroke="#5F5971" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M9 1.5C9.39782 1.5 9.77936 1.65804 10.0607 1.93934C10.342 2.22064 10.5 2.60218 10.5 3V3.75H7.5V3C7.5 2.60218 7.65804 2.22064 7.93934 1.93934C8.22064 1.65804 8.60218 1.5 9 1.5Z" stroke="#5F5971" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M11.25 14.25C11.25 14.8467 11.013 15.419 10.591 15.841C10.169 16.263 9.59674 16.5 9.00001 16.5C8.40327 16.5 7.83097 16.263 7.40902 15.841C6.98706 15.419 6.75001 14.8467 6.75001 14.25M9.54076 3.75226L8.44126 3.75001C5.93326 3.74401 3.75601 5.78176 3.73876 8.25001V11.0925C3.73876 11.685 3.66376 12.2633 3.34051 12.756L3.12526 13.0845C2.79751 13.5825 3.15001 14.25 3.73876 14.25H14.2613C14.85 14.25 15.2018 13.5825 14.8748 13.0845L14.6595 12.756C14.337 12.2633 14.2613 11.6843 14.2613 11.0918V8.25076C14.2313 5.78176 12.0488 3.75826 9.54076 3.75226Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M9 1.5C9.39782 1.5 9.77936 1.65804 10.0607 1.93934C10.342 2.22064 10.5 2.60218 10.5 3V3.75H7.5V3C7.5 2.60218 7.65804 2.22064 7.93934 1.93934C8.22064 1.65804 8.60218 1.5 9 1.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
 const FileTextIcon = ({ size = 18 }: { size?: number }) => (
   <svg width="15" height="12" viewBox="0 0 15 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M0.75 0.75H1.5M0.75 6H1.5M0.75 11.25H1.5M4.5 0.75H5.25M4.5 6H5.25M4.5 11.25H5.25M8.25 0.75H14.25M8.25 6H14.25M8.25 11.25H14.25" stroke="#5F5971" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M0.75 0.75H1.5M0.75 6H1.5M0.75 11.25H1.5M4.5 0.75H5.25M4.5 6H5.25M4.5 11.25H5.25M8.25 0.75H14.25M8.25 6H14.25M8.25 11.25H14.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 
 );
@@ -114,11 +165,52 @@ type SidebarProps = {
   className?: string;
 };
 
+function getInitials(name?: string | null) {
+  const safeName = (name ?? '').trim();
+  if (!safeName) return 'SK';
+  const parts = safeName.split(/\s+/).filter(Boolean);
+  const first = parts[0]?.[0] ?? '';
+  const last = parts.length > 1 ? parts[parts.length - 1]?.[0] ?? '' : '';
+  return `${first}${last}`.toUpperCase() || 'SK';
+}
+
 export default function Sidebar({ className }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{
+    name: string;
+    role?: string;
+    avatar?: string | null;
+  } | null>(null);
   const pathname = usePathname() ?? '';
   const router = useRouter();
+
+  // Load signed-in admin info for footer
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const me = await getMe();
+        if (!mounted) return;
+        const name =
+          me?.name ??
+          ([me?.first_name, me?.last_name].filter(Boolean).join(' ').trim() ||
+            'User');
+        setCurrentUser({
+          name,
+          role: me?.role ?? (me?.permissions ? 'Admin' : 'User'),
+          avatar: me?.avatar ?? me?.picture ?? null
+        });
+      } catch {
+        if (mounted) setCurrentUser(null);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const avatarSeed = encodeURIComponent(getInitials(currentUser?.name));
 
   return (
     <aside
@@ -207,12 +299,22 @@ export default function Sidebar({ className }: SidebarProps) {
             )}
           >
             <div className="w-7 h-7 rounded-full bg-[#eee] overflow-hidden shrink-0">
-              <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face" alt="User" />
+              <img
+                src={
+                  currentUser?.avatar ||
+                  `https://api.dicebear.com/7.x/initials/svg?seed=${avatarSeed}`
+                }
+                alt={currentUser?.name ?? 'User'}
+              />
             </div>
             {!isCollapsed && (
               <div className="flex flex-col gap-0 overflow-hidden whitespace-nowrap">
-                <span className="text-body-sm text-text-primary">User Name</span>
-                <span className="text-caption-sm text-text-secondary">Super Admin (HQ)</span>
+                <span className="text-body-sm text-text-primary">
+                  {currentUser?.name ?? 'User'}
+                </span>
+                <span className="text-caption-sm text-text-secondary">
+                  {currentUser?.role ?? 'Admin'}
+                </span>
               </div>
             )}
           </Link>
@@ -223,9 +325,31 @@ export default function Sidebar({ className }: SidebarProps) {
             onClick={async () => {
               if (isLoggingOut) return;
               setIsLoggingOut(true);
+              const actingUser = currentUser?.name ?? 'User';
               try {
                 await logoutFromBackend();
                 await signOut(auth).catch(() => null);
+                appendAuthLog({
+                  id: `current-logout-${Date.now()}`,
+                  timestamp: formatAuthTimestamp(new Date()),
+                  user: actingUser,
+                  action: 'Logout',
+                  message: 'Logout successful',
+                  userAgent: navigator.userAgent,
+                  ipAddress: 'Current session',
+                  status: 'Success'
+                });
+              } catch {
+                appendAuthLog({
+                  id: `current-logout-failed-${Date.now()}`,
+                  timestamp: formatAuthTimestamp(new Date()),
+                  user: actingUser,
+                  action: 'Logout',
+                  message: 'Logout failed',
+                  userAgent: navigator.userAgent,
+                  ipAddress: 'Current session',
+                  status: 'Failed'
+                });
               } finally {
                 router.replace('/login');
                 router.refresh();
@@ -250,7 +374,7 @@ export default function Sidebar({ className }: SidebarProps) {
 function NavItem({ icon, label, isActive, isCollapsed, href }: { icon: ReactNode; label: string; isActive: boolean; isCollapsed: boolean; href: string }) {
   return (
     <Link href={href} className={cn(
-      "flex items-center gap-2.5 p-2 h-9 cursor-pointer w-full transition-colors duration-200 no-underline",
+      "flex items-center gap-2.5 p-2 h-9 cursor-pointer w-full transition-colors duration-200 no-underline hover:text-brand-primary",
       isCollapsed ? "justify-center" : "justify-start",
       isActive ? "text-brand-primary" : "text-text-secondary"
     )}>

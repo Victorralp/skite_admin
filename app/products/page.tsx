@@ -90,7 +90,7 @@ export default function ProductsPage() {
       <PageContainer>
         {/* Stats Section */}
         <div className="flex flex-col gap-2">
-          <h1 className="text-[20px] font-bold text-[#2B2834] leading-[100%] tracking-[-0.01em] font-['Neue_Montreal']">Products</h1>
+          <h1 className="text-[20px] font-bold text-text-primary leading-[100%] tracking-[-0.01em] font-sans">Products</h1>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 w-full">
             {stats.map((stat, index) => (
               <StatsCard key={index} {...stat} />
@@ -133,11 +133,11 @@ export default function ProductsPage() {
                 )}
                 className={cn(
                   "flex items-center gap-[4px] pl-[7px] pr-[9px] py-[4px] h-[22px] rounded-full border border-dashed transition-colors box-border",
-                  statusFilter !== 'all' ? "border-[#5F2EFC]" : "border-[#EBEBEB] hover:bg-gray-50"
+                  statusFilter !== 'all' ? "border-border-brand" : "border-border-primary hover:bg-gray-50"
                 )}
               >
-                <FilterPlusIcon className={cn(statusFilter !== 'all' ? "text-[#5F2EFC]" : "text-[#5F5971]")} />
-                <span className={cn("text-[12px] font-medium leading-[14px] font-['Neue_Montreal']", statusFilter !== 'all' ? "text-[#5F2EFC]" : "text-[#5F5971]")}>
+                <FilterPlusIcon className={cn(statusFilter !== 'all' ? "text-text-brand" : "text-text-secondary")} />
+                <span className={cn("text-caption-lg font-sans", statusFilter !== 'all' ? "text-text-brand" : "text-text-secondary")}>
                   {statusFilter === 'all' ? 'Status' :
                     statusFilter === 'active' ? 'Active' :
                       statusFilter === 'rejected' ? 'Rejected' :
@@ -205,28 +205,28 @@ export default function ProductsPage() {
                 )}
               </div>
             </div>
-            <button className="flex items-center gap-[2px] pl-[7px] pr-[10px] py-[5px] h-[24px] bg-white border border-[#EBEBEB] rounded-lg shadow-[0px_1px_4.8px_rgba(0,0,0,0.03)] hover:bg-gray-50 transition-colors box-border">
-              <SlidersHorizontalIcon className="h-[14px] w-[14px] text-[#5F5971]" />
-              <span className="text-[12px] font-normal text-[#5F5971] leading-[14px] font-['Neue_Montreal']">Sort</span>
+            <button className="flex items-center gap-[2px] pl-[7px] pr-[10px] py-[5px] h-[24px] bg-white border border-border-primary rounded-lg shadow-button-soft hover:bg-gray-50 transition-colors box-border">
+              <SlidersHorizontalIcon className="h-[14px] w-[14px] text-text-secondary" />
+              <span className="text-[12px] font-normal text-text-secondary leading-[14px] font-sans">Sort</span>
             </button>
           </div>
 
           {/* Table */}
-          <div className="rounded-lg border border-[#EBEBEB] flex flex-col w-full shadow-none p-1 gap-1" style={{ backgroundColor: '#F9F9FB' }}>
+          <div className="rounded-lg border border-border-primary flex flex-col w-full shadow-none p-1 gap-1" style={{ backgroundColor: '#F9F9FB' }}>
             {/* Table Header */}
             <div className="flex items-center h-[30px] shrink-0" style={{ padding: '8px 24px', gap: '16px' }}>
-              <div className="w-[240px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Product</div>
-              <div className="w-[180px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Creator</div>
-              <div className="w-[120px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Type</div>
-              <div className="w-[120px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Date Created</div>
-              <div className="w-[100px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Price</div>
-              <div className="w-[80px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Sales</div>
-              <div className="w-[120px] text-xs font-medium text-[#2B2834] font-['Neue_Montreal'] leading-[14px]">Revenue</div>
-              <div className="flex-1 min-w-[18px] flex justify-end opacity-0">•</div>
+              <div className="w-[240px] text-xs font-medium text-text-primary font-sans leading-[14px]">Product</div>
+              <div className="w-[180px] text-xs font-medium text-text-primary font-sans leading-[14px]">Creator</div>
+              <div className="w-[120px] text-xs font-medium text-text-primary font-sans leading-[14px]">Type</div>
+              <div className="w-[120px] text-xs font-medium text-text-primary font-sans leading-[14px]">Date Created</div>
+              <div className="w-[100px] text-xs font-medium text-text-primary font-sans leading-[14px]">Price</div>
+              <div className="w-[80px] text-xs font-medium text-text-primary font-sans leading-[14px]">Sales</div>
+              <div className="w-[120px] text-xs font-medium text-text-primary font-sans leading-[14px]">Revenue</div>
+              <div className="w-[18px] ml-auto opacity-0">•</div>
             </div>
 
             {/* Table Body */}
-            <div className="bg-white border border-[#EBEBEB] rounded-lg overflow-hidden">
+            <div className="bg-white border border-border-primary rounded-lg overflow-hidden">
               {filteredProducts.map((product) => (
                 <ProductRow
                   key={product.id}
@@ -243,14 +243,14 @@ export default function ProductsPage() {
             <div className="flex justify-between items-center pl-6 h-[30px]">
               <span className="text-xs text-black/50">Showing 1 to 12 of 200 results</span>
               <div className="flex gap-2">
-                <button className="p-[1px] bg-[#F9F9FB] rounded-md opacity-30 shadow-[0px_2px_5.4px_rgba(0,0,0,0.05)] h-[30px] w-[87.5px]">
-                  <div className="flex items-center justify-center bg-white rounded-[5px] h-[28px] shadow-[0px_4px_27px_rgba(0,0,0,0.18)]">
-                    <span className="text-[13px] font-medium text-[#5F5971] leading-4">Previous</span>
+                <button className="p-[1px] bg-surface-secondary rounded-md opacity-30 shadow-segmented-outer h-[30px] w-[87.5px]">
+                  <div className="flex items-center justify-center bg-white rounded-[5px] h-[28px] shadow-segmented-inner">
+                    <span className="text-[13px] font-medium text-text-secondary leading-4">Previous</span>
                   </div>
                 </button>
-                <button className="p-[1px] bg-[#F9F9FB] rounded-md shadow-[0px_2px_5.4px_rgba(0,0,0,0.05)] h-[30px] w-[87.5px]">
-                  <div className="flex items-center justify-center bg-white rounded-[5px] h-[28px] shadow-[0px_4px_27px_rgba(0,0,0,0.18)]">
-                    <span className="text-[13px] font-medium text-[#5F5971] leading-4">Next</span>
+                <button className="p-[1px] bg-surface-secondary rounded-md shadow-segmented-outer h-[30px] w-[87.5px]">
+                  <div className="flex items-center justify-center bg-white rounded-[5px] h-[28px] shadow-segmented-inner">
+                    <span className="text-[13px] font-medium text-text-secondary leading-4">Next</span>
                   </div>
                 </button>
               </div>
@@ -277,11 +277,11 @@ function FilterPill({ label, active, onClick }: { label: string; active: boolean
       onClick={onClick}
       className={cn(
         "flex items-center gap-[4px] pl-[7px] pr-[9px] py-[4px] h-[22px] rounded-full border border-dashed transition-colors box-border",
-        active ? "border-[#5F2EFC]" : "border-[#EBEBEB] hover:bg-gray-50"
+        active ? "border-border-brand" : "border-border-primary hover:bg-gray-50"
       )}
     >
-      <FilterPlusIcon className={cn(active ? "text-[#5F2EFC]" : "text-[#5F5971]")} />
-      <span className={cn("text-[12px] font-medium leading-[14px] font-['Neue_Montreal']", active ? "text-[#5F2EFC]" : "text-[#5F5971]")}>{label}</span>
+      <FilterPlusIcon className={cn(active ? "text-text-brand" : "text-text-secondary")} />
+      <span className={cn("text-caption-lg font-sans", active ? "text-text-brand" : "text-text-secondary")}>{label}</span>
     </button>
   );
 }
@@ -292,14 +292,14 @@ function FilterDropdown({ title, showCalendar, showCurrency, onApply }: { title:
 
   return (
     <div
-      className="absolute left-[-0.75px] top-[27px] w-[185px] h-[154px] bg-white border border-[#5F2EFC] rounded-[16px] flex flex-col justify-center items-start p-3 gap-[10px]"
+      className="absolute left-[-0.75px] top-[27px] w-[185px] h-[154px] bg-white border border-border-brand rounded-[16px] flex flex-col justify-center items-start p-3 gap-[10px]"
       style={{
         boxShadow: '0px 116px 46px rgba(0, 0, 0, 0.01), 0px 65px 39px rgba(0, 0, 0, 0.05), 0px 29px 29px rgba(0, 0, 0, 0.09), 0px 7px 16px rgba(0, 0, 0, 0.1)',
         zIndex: 50
       }}
     >
       {/* Title */}
-      <span className="text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
+      <span className="text-[12px] font-medium text-text-primary leading-[14px] font-sans">
         {title}
       </span>
 
@@ -307,38 +307,38 @@ function FilterDropdown({ title, showCalendar, showCurrency, onApply }: { title:
       <div className="flex flex-col items-start gap-1 w-[161px] h-16">
         {/* From Field */}
         <div className="flex items-center gap-[10px] w-[161px] h-[30px]">
-          <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal'] w-[32.91px] shrink-0">
+          <span className="text-[12px] font-normal text-text-primary leading-[14px] font-sans w-[32.91px] shrink-0">
             From
           </span>
-          <div className="w-[118px] h-[30px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-[6px] flex items-center justify-end px-2 gap-[10px] overflow-hidden">
+          <div className="w-[118px] h-[30px] bg-surface-secondary border border-border-primary rounded-[6px] flex items-center justify-end px-2 gap-[10px] overflow-hidden">
             <input
               type={showCalendar ? "date" : "number"}
               value={fromValue}
               onChange={(e) => setFromValue(e.target.value)}
-              className="w-full bg-transparent text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal'] outline-none border-none text-right"
+              className="w-full bg-transparent text-[12px] font-medium text-text-primary leading-[14px] font-sans outline-none border-none text-right"
               placeholder=""
             />
             {showCurrency && (
-              <span className="text-[12px] font-medium text-[#5F5971] leading-[14px] font-['Neue_Montreal'] shrink-0">₦</span>
+              <span className="text-[12px] font-medium text-text-secondary leading-[14px] font-sans shrink-0">₦</span>
             )}
           </div>
         </div>
 
         {/* To Field */}
         <div className="flex items-center gap-[10px] w-[161px] h-[30px]">
-          <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal'] w-[32.91px] shrink-0">
+          <span className="text-[12px] font-normal text-text-primary leading-[14px] font-sans w-[32.91px] shrink-0">
             To
           </span>
-          <div className="w-[118px] h-[30px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-[6px] flex items-center justify-end px-2 gap-[10px] overflow-hidden">
+          <div className="w-[118px] h-[30px] bg-surface-secondary border border-border-primary rounded-[6px] flex items-center justify-end px-2 gap-[10px] overflow-hidden">
             <input
               type={showCalendar ? "date" : "number"}
               value={toValue}
               onChange={(e) => setToValue(e.target.value)}
-              className="w-full bg-transparent text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal'] outline-none border-none text-right"
+              className="w-full bg-transparent text-[12px] font-medium text-text-primary leading-[14px] font-sans outline-none border-none text-right"
               placeholder=""
             />
             {showCurrency && (
-              <span className="text-[12px] font-medium text-[#5F5971] leading-[14px] font-['Neue_Montreal'] shrink-0">₦</span>
+              <span className="text-[12px] font-medium text-text-secondary leading-[14px] font-sans shrink-0">₦</span>
             )}
           </div>
         </div>
@@ -354,7 +354,7 @@ function FilterDropdown({ title, showCalendar, showCurrency, onApply }: { title:
         }}
       >
         <span
-          className="text-[13.5px] font-medium text-[#FFFCF8] leading-4 font-['Neue_Montreal']"
+          className="text-[13.5px] font-medium text-white leading-4 font-sans"
           style={{ textShadow: '0px -1px 6px rgba(0, 0, 0, 0.25)' }}
         >
           Apply
@@ -373,11 +373,11 @@ function ProductRow({ product, isMenuOpen, onMenuToggle, onViewDetails, menuRef 
 
   const statusColor = statusConfig[product.status as keyof typeof statusConfig] || '#5F5971';
   return (
-    <div className="flex items-center h-[50px] bg-white border-b border-[#EBEBEB] last:border-0" style={{ padding: '10px 24px', gap: '16px' }}>
+    <div className="flex items-center h-[50px] bg-white border-b border-border-primary last:border-0" style={{ padding: '10px 24px', gap: '16px' }}>
       {/* Product */}
       <div className="flex items-center gap-1.5 w-[240px] relative">
         <div className="w-[30px] h-[30px] rounded bg-gray-200 flex-shrink-0" />
-        <span className="text-[13.5px] font-medium text-[#2B2834] leading-4 truncate">{product.name}</span>
+        <span className="text-[13.5px] font-medium text-text-primary leading-4 truncate">{product.name}</span>
         <div
           className="absolute left-[22.6px] top-[-1.38px] w-2.5 h-2.5 rounded-full border border-white"
           style={{ backgroundColor: statusColor }}
@@ -386,33 +386,33 @@ function ProductRow({ product, isMenuOpen, onMenuToggle, onViewDetails, menuRef 
 
       {/* Creator */}
       <div className="flex flex-col w-[180px]">
-        <span className="text-[13.5px] font-medium text-[#2B2834] leading-4 truncate">{product.creator?.name ?? '—'}</span>
-        <span className="text-xs text-[#5F5971] leading-[14px] truncate">{product.creator?.username ?? ''}</span>
+        <span className="text-[13.5px] font-medium text-text-primary leading-4 truncate">{product.creator?.name ?? '—'}</span>
+        <span className="text-xs text-text-secondary leading-[14px] truncate">{product.creator?.username ?? ''}</span>
       </div>
 
       {/* Type */}
-      <div className="w-[120px] text-[13.5px] text-[#2B2834] leading-4 truncate">{product.type}</div>
+      <div className="w-[120px] text-[13.5px] text-text-primary leading-4 truncate">{product.type}</div>
 
       {/* Date Created */}
-      <div className="w-[120px] text-[13.5px] text-[#2B2834] leading-4">{product.dateCreated}</div>
+      <div className="w-[120px] text-[13.5px] text-text-primary leading-4">{product.dateCreated}</div>
 
       {/* Price */}
-      <div className="w-[100px] text-[13.5px] text-[#2B2834] leading-4">₦{product.price.toLocaleString()}</div>
+      <div className="w-[100px] text-[13.5px] text-text-primary leading-4">₦{product.price.toLocaleString()}</div>
 
       {/* Sales */}
-      <div className="w-[80px] text-[13.5px] text-[#2B2834] leading-4">{product.sales}</div>
+      <div className="w-[80px] text-[13.5px] text-text-primary leading-4">{product.sales}</div>
 
       {/* Revenue */}
-      <div className="w-[120px] text-[13.5px] text-[#2B2834] leading-4">₦{product.revenue.toLocaleString()}</div>
+      <div className="w-[120px] text-[13.5px] text-text-primary leading-4">₦{product.revenue.toLocaleString()}</div>
 
       {/* Actions */}
-      <div className="flex-1 min-w-[18px] flex justify-end items-center" ref={isMenuOpen ? menuRef : null}>
+      <div className="relative w-[18px] h-[18px] flex-shrink-0 ml-auto" ref={isMenuOpen ? menuRef : null}>
         <button
           onClick={onMenuToggle}
           aria-label={`Open actions for ${product.name}`}
           className="w-[18px] h-[18px] flex items-center justify-center"
         >
-          <MoreVertical className="h-[18px] w-[18px] text-[#5F5971]" />
+          <MoreVertical className="h-[18px] w-[18px] text-text-secondary" />
         </button>
 
         {isMenuOpen && (

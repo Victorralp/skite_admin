@@ -1,4 +1,5 @@
 import { FRONTEND_SESSION_COOKIE_NAME } from '@/lib/backendSession';
+import { clearDashboardUiState } from '@/lib/dashboardUiState';
 import { auth } from '@/lib/firebaseClient';
 
 type LoginResponse = {
@@ -57,6 +58,76 @@ export type AdminDashboardMetricsResponse = {
   total_products: DashboardMetricValue;
 };
 
+export type RevenueTrendFilter =
+  | 'today'
+  | 'yesterday'
+  | 'week'
+  | 'month'
+  | 'six_months';
+
+export type AdminDashboardRevenueTrendPoint = {
+  _id: string;
+  revenue: number;
+};
+
+export type AdminDashboardTransactionVolumePoint = {
+  _id: {
+    day: string;
+    hour: number;
+  };
+  totalValue: number;
+};
+
+export type AdminDashboardRevenueBreakdownPoint = {
+  item_type: string;
+  revenue: number;
+  percentage: number;
+};
+
+const adminDashboardSessionCache = new Map<string, unknown>();
+const adminDashboardInFlightRequests = new Map<string, Promise<unknown>>();
+
+function getSessionUserKey() {
+  return auth.currentUser?.uid ?? 'anonymous';
+}
+
+function getDashboardCacheKey(scope: string) {
+  return `${getSessionUserKey()}:${scope}`;
+}
+
+async function withAdminDashboardSessionCache<T>(
+  cacheKey: string,
+  fetcher: () => Promise<T>
+): Promise<T> {
+  if (adminDashboardSessionCache.has(cacheKey)) {
+    return adminDashboardSessionCache.get(cacheKey) as T;
+  }
+
+  const inFlight = adminDashboardInFlightRequests.get(cacheKey) as Promise<T> | undefined;
+  if (inFlight) {
+    return inFlight;
+  }
+
+  const request = fetcher()
+    .then((result) => {
+      adminDashboardSessionCache.set(cacheKey, result);
+      adminDashboardInFlightRequests.delete(cacheKey);
+      return result;
+    })
+    .catch((error) => {
+      adminDashboardInFlightRequests.delete(cacheKey);
+      throw error;
+    });
+
+  adminDashboardInFlightRequests.set(cacheKey, request as Promise<unknown>);
+  return request;
+}
+
+export function clearAdminDashboardSessionCache() {
+  adminDashboardSessionCache.clear();
+  adminDashboardInFlightRequests.clear();
+}
+
 function baseUrl() {
   // In client bundles, Next.js only inlines statically referenced NEXT_PUBLIC_* env vars.
   const value = process.env.NEXT_PUBLIC_BASE_URL;
@@ -106,6 +177,8 @@ export async function loginWithBackend(params: {
     throw new Error(message);
   }
 
+  clearAdminDashboardSessionCache();
+  clearDashboardUiState();
   setFrontendSessionMarker();
   return json;
 }
@@ -121,7 +194,27 @@ export async function getMe() {
     const message = json?.message ?? json?.error ?? 'UNAUTHENTICATED';
     throw new Error(message);
   }
-  return json;
+
+  const root = json && typeof json === 'object' ? json : {};
+  const nestedData = root.data && typeof root.data === 'object' ? root.data : {};
+  const nestedUser = root.user && typeof root.user === 'object' ? root.user : {};
+
+  const merged = { ...root, ...nestedData, ...nestedUser } as any;
+  const firstName = merged.first_name ?? merged.firstName ?? '';
+  const lastName = merged.last_name ?? merged.lastName ?? '';
+  const fullName =
+    merged.name ??
+    [firstName, lastName].filter((part: string) => Boolean(part && String(part).trim())).join(' ').trim();
+
+  return {
+    ...merged,
+    id: merged.id ?? merged._id ?? merged.user_id ?? merged.uid ?? null,
+    name: fullName || null,
+    email: merged.email ?? null,
+    username: merged.username ?? null,
+    phone: merged.phone ?? merged.phone_number ?? null,
+    avatar: merged.avatar ?? merged.picture ?? merged.photoUrl ?? merged.photo_url ?? null
+  };
 }
 
 export async function logoutFromBackend() {
@@ -138,6 +231,8 @@ export async function logoutFromBackend() {
     }
     return json;
   } finally {
+    clearAdminDashboardSessionCache();
+    clearDashboardUiState();
     clearFrontendSessionMarker();
   }
 }
@@ -175,38 +270,188 @@ export async function createAdmin(payload: CreateAdminPayload) {
 }
 
 export async function getAdminDashboardMetrics() {
-  let idToken: string | null = null;
-  try {
-    idToken = (await auth.currentUser?.getIdToken()) ?? null;
-  } catch {
-    idToken = null;
-  }
+  const cacheKey = getDashboardCacheKey('metrics');
+  return withAdminDashboardSessionCache(cacheKey, async () => {
+    let idToken: string | null = null;
+    try {
+      idToken = (await auth.currentUser?.getIdToken()) ?? null;
+    } catch {
+      idToken = null;
+    }
 
-  const headers: HeadersInit = {};
-  if (idToken) {
-    headers.authorization = `Bearer ${idToken}`;
-  }
+    const headers: HeadersInit = {};
+    if (idToken) {
+      headers.authorization = `Bearer ${idToken}`;
+    }
 
-  const response = await fetch(`${baseUrl()}/admin-dashboard/metric`, {
-    method: 'GET',
-    credentials: 'include',
-    cache: 'no-store',
-    headers
+    const response = await fetch(`${baseUrl()}/admin-dashboard/metric`, {
+      method: 'GET',
+      credentials: 'include',
+      cache: 'no-store',
+      headers
+    });
+
+    const json = (await response
+      .json()
+      .catch(() => null)) as AdminDashboardMetricsResponse | { message?: string; error?: string } | null;
+
+    if (!response.ok) {
+      const errorPayload = json as { message?: string; error?: string } | null;
+      const message = errorPayload?.message ?? errorPayload?.error ?? 'DASHBOARD_METRICS_FAILED';
+      throw new Error(message);
+    }
+
+    if (!json) {
+      throw new Error('DASHBOARD_METRICS_EMPTY_RESPONSE');
+    }
+
+    return json as AdminDashboardMetricsResponse;
   });
+}
 
-  const json = (await response
-    .json()
-    .catch(() => null)) as AdminDashboardMetricsResponse | { message?: string; error?: string } | null;
+export async function getAdminDashboardRevenueTrend(
+  filter: RevenueTrendFilter = 'today'
+) {
+  const cacheKey = getDashboardCacheKey(`revenue-trend:${filter}`);
+  return withAdminDashboardSessionCache(cacheKey, async () => {
+    let idToken: string | null = null;
+    try {
+      idToken = (await auth.currentUser?.getIdToken()) ?? null;
+    } catch {
+      idToken = null;
+    }
 
-  if (!response.ok) {
-    const errorPayload = json as { message?: string; error?: string } | null;
-    const message = errorPayload?.message ?? errorPayload?.error ?? 'DASHBOARD_METRICS_FAILED';
-    throw new Error(message);
-  }
+    const headers: HeadersInit = {};
+    if (idToken) {
+      headers.authorization = `Bearer ${idToken}`;
+    }
 
-  if (!json) {
-    throw new Error('DASHBOARD_METRICS_EMPTY_RESPONSE');
-  }
+    const params = new URLSearchParams({ filter });
+    const response = await fetch(
+      `${baseUrl()}/admin-dashboard/revenue-trend?${params.toString()}`,
+      {
+        method: 'GET',
+        credentials: 'include',
+        cache: 'no-store',
+        headers
+      }
+    );
 
-  return json as AdminDashboardMetricsResponse;
+    const json = (await response
+      .json()
+      .catch(() => null)) as
+      | AdminDashboardRevenueTrendPoint[]
+      | { message?: string; error?: string }
+      | null;
+
+    if (!response.ok) {
+      const errorPayload = json as { message?: string; error?: string } | null;
+      const message = errorPayload?.message ?? errorPayload?.error ?? 'REVENUE_TREND_FAILED';
+      throw new Error(message);
+    }
+
+    if (!Array.isArray(json)) {
+      throw new Error('REVENUE_TREND_INVALID_RESPONSE');
+    }
+
+    return json as AdminDashboardRevenueTrendPoint[];
+  });
+}
+
+export async function getAdminDashboardTransactionVolume(
+  filter: RevenueTrendFilter = 'today'
+) {
+  const cacheKey = getDashboardCacheKey(`transaction-volume:${filter}`);
+  return withAdminDashboardSessionCache(cacheKey, async () => {
+    let idToken: string | null = null;
+    try {
+      idToken = (await auth.currentUser?.getIdToken()) ?? null;
+    } catch {
+      idToken = null;
+    }
+
+    const headers: HeadersInit = {};
+    if (idToken) {
+      headers.authorization = `Bearer ${idToken}`;
+    }
+
+    const params = new URLSearchParams({ filter });
+    const response = await fetch(
+      `${baseUrl()}/admin-dashboard/transaction-volume?${params.toString()}`,
+      {
+        method: 'GET',
+        credentials: 'include',
+        cache: 'no-store',
+        headers
+      }
+    );
+
+    const json = (await response
+      .json()
+      .catch(() => null)) as
+      | AdminDashboardTransactionVolumePoint[]
+      | { message?: string; error?: string }
+      | null;
+
+    if (!response.ok) {
+      const errorPayload = json as { message?: string; error?: string } | null;
+      const message = errorPayload?.message ?? errorPayload?.error ?? 'TRANSACTION_VOLUME_FAILED';
+      throw new Error(message);
+    }
+
+    if (!Array.isArray(json)) {
+      throw new Error('TRANSACTION_VOLUME_INVALID_RESPONSE');
+    }
+
+    return json as AdminDashboardTransactionVolumePoint[];
+  });
+}
+
+export async function getAdminDashboardRevenueBreakdown(
+  filter: RevenueTrendFilter = 'today'
+) {
+  const cacheKey = getDashboardCacheKey(`revenue-breakdown:${filter}`);
+  return withAdminDashboardSessionCache(cacheKey, async () => {
+    let idToken: string | null = null;
+    try {
+      idToken = (await auth.currentUser?.getIdToken()) ?? null;
+    } catch {
+      idToken = null;
+    }
+
+    const headers: HeadersInit = {};
+    if (idToken) {
+      headers.authorization = `Bearer ${idToken}`;
+    }
+
+    const params = new URLSearchParams({ filter });
+    const response = await fetch(
+      `${baseUrl()}/admin-dashboard/revenue-breakdown?${params.toString()}`,
+      {
+        method: 'GET',
+        credentials: 'include',
+        cache: 'no-store',
+        headers
+      }
+    );
+
+    const json = (await response
+      .json()
+      .catch(() => null)) as
+      | AdminDashboardRevenueBreakdownPoint[]
+      | { message?: string; error?: string }
+      | null;
+
+    if (!response.ok) {
+      const errorPayload = json as { message?: string; error?: string } | null;
+      const message = errorPayload?.message ?? errorPayload?.error ?? 'REVENUE_BREAKDOWN_FAILED';
+      throw new Error(message);
+    }
+
+    if (!Array.isArray(json)) {
+      throw new Error('REVENUE_BREAKDOWN_INVALID_RESPONSE');
+    }
+
+    return json as AdminDashboardRevenueBreakdownPoint[];
+  });
 }

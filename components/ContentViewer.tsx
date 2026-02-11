@@ -70,7 +70,7 @@ export default function ContentViewer({ type }: ContentViewerProps) {
   return (
     <div className="flex flex-col bg-[#525659] rounded-lg overflow-hidden">
       {/* PDF Header */}
-      <div className="flex items-center justify-between px-4 py-4 bg-[#323639] shadow-[0px_4px_4px_rgba(0,0,0,0.25)]">
+      <div className="flex items-center justify-between px-4 py-4 bg-[#323639] shadow-viewer-header">
         {/* Page Controls */}
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 px-6">
@@ -79,8 +79,8 @@ export default function ContentViewer({ type }: ContentViewerProps) {
                 {currentPage}
               </span>
             </div>
-            <span className="font-['Inter'] font-medium text-[14px] leading-[17px] text-white">/</span>
-            <span className="font-['Inter'] font-medium text-[14px] leading-[17px] text-white">2</span>
+            <span className="font-['Inter'] text-body-md text-white">/</span>
+            <span className="font-['Inter'] text-body-md text-white">2</span>
           </div>
 
           <div className="w-px h-6 bg-[#BDBDC7]" />

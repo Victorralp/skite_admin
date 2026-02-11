@@ -41,15 +41,15 @@ export default function SessionDetailsModal({ isOpen, onClose, session }: Sessio
       >
         {/* Header */}
         <div className="flex justify-between items-center px-6 py-4 h-[60px]">
-          <span className="text-base font-medium leading-[19px] tracking-[-0.01em] text-[#2B2834]">
+          <span className="text-base font-medium leading-[19px] tracking-[-0.01em] text-text-primary">
             Session Details
           </span>
           <button
             onClick={onClose}
-            className="flex items-center gap-1.5 px-2 py-1.5 bg-[#F9F9FB] rounded-md h-7"
+            className="flex items-center gap-1.5 px-2 py-1.5 bg-surface-secondary rounded-md h-7"
           >
-            <X className="w-4 h-4 text-[#5F2EFC]" strokeWidth={1.5} />
-            <span className="text-xs font-medium leading-[14px] text-[#5F2EFC]">Close</span>
+            <X className="w-4 h-4 text-text-brand" strokeWidth={1.5} />
+            <span className="text-xs font-medium leading-[14px] text-text-brand">Close</span>
           </button>
         </div>
 
@@ -61,12 +61,12 @@ export default function SessionDetailsModal({ isOpen, onClose, session }: Sessio
           <div className="flex flex-col items-start p-6 gap-6">
             {/* Session Info */}
             <div className="flex flex-col items-start gap-2 w-[552px]">
-              <h2 className="text-lg font-bold leading-[22px] text-[#2B2834] w-full">
+              <h2 className="text-lg font-bold leading-[22px] text-text-primary w-full">
                 {session.title}
               </h2>
               <div className="flex flex-row items-center gap-2 w-full h-6">
                 <div className="w-6 h-6 rounded-full bg-gray-200" />
-                <span className="text-base font-medium leading-[19px] text-[#5F5971] flex-1">
+                <span className="text-base font-medium leading-[19px] text-text-secondary flex-1">
                   {session.host}
                 </span>
               </div>
@@ -135,27 +135,27 @@ export default function SessionDetailsModal({ isOpen, onClose, session }: Sessio
             <div className="flex flex-col items-start gap-2 w-[552px]">
               {/* Tabs */}
               <div className="flex flex-row items-center gap-2 w-full h-8">
-                <button className="flex flex-row justify-center items-center px-4 py-2 gap-2.5 flex-1 h-8 bg-white border border-[#EBEBEB] rounded-md">
-                  <span className="text-[13.5px] leading-4 text-[#5F5971]">Participants</span>
+                <button className="flex flex-row justify-center items-center px-4 py-2 gap-2.5 flex-1 h-8 bg-white border border-border-primary rounded-md">
+                  <span className="text-[13.5px] leading-4 text-text-secondary">Participants</span>
                 </button>
-                <button className="flex flex-row justify-center items-center px-4 py-2 gap-2.5 flex-1 h-8 bg-white border border-[#5F2EFC] rounded-md">
-                  <span className="text-[13.5px] font-medium leading-4 text-[#5F2EFC]">Chat</span>
+                <button className="flex flex-row justify-center items-center px-4 py-2 gap-2.5 flex-1 h-8 bg-white border border-border-brand rounded-md">
+                  <span className="text-body-sm text-text-brand">Chat</span>
                 </button>
               </div>
 
               {/* Chat Messages */}
-              <div className="flex flex-col items-center p-6 gap-4 w-[552px] h-[252px] bg-white border border-[#EBEBEB] rounded-lg">
+              <div className="flex flex-col items-center p-6 gap-4 w-[552px] h-[252px] bg-white border border-border-primary rounded-lg">
                 {/* Message 1 */}
                 <div className="flex flex-row items-start gap-3 w-[504px] h-[105px]">
                   <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0" />
                   <div className="flex flex-col items-start gap-1.5 w-[460px] h-[105px] flex-1">
                     <div className="flex flex-row items-center gap-2 w-[460px] h-[19px] self-stretch">
-                      <span className="font-['Neue_Montreal'] font-bold text-base leading-[19px] text-[#2B2834] flex-1 w-[408px] h-[19px]">John Doe (Host)</span>
-                      <span className="font-['Satoshi'] font-medium text-xs leading-[18px] text-[#A5A1AF] w-11 h-[18px]">2:20pm</span>
+                      <span className="font-sans font-bold text-base leading-[19px] text-text-primary flex-1 w-[408px] h-[19px]">John Doe (Host)</span>
+                      <span className="font-['Satoshi'] font-medium text-xs leading-[18px] text-text-tertiary w-11 h-[18px]">2:20pm</span>
                     </div>
                     <div className="flex flex-row items-center p-[10px_14px] gap-2 w-[460px] h-20 bg-[#F2F4F7] rounded-tr-lg rounded-br-lg rounded-bl-lg self-stretch">
                       <div className="flex flex-col items-start gap-1 w-[432px] h-[60px] flex-1">
-                        <p className="font-['Neue_Montreal'] font-normal text-base leading-[19px] text-[#101828] w-[432px] h-[38px] self-stretch">
+                        <p className="font-sans font-normal text-base leading-[19px] text-[#101828] w-[432px] h-[38px] self-stretch">
                           Hey Olivia, can you please review the latest design when you can?
                         </p>
                         <div className="flex flex-row justify-center items-center gap-0.5 w-[53px] h-[18px]">
@@ -174,11 +174,11 @@ export default function SessionDetailsModal({ isOpen, onClose, session }: Sessio
                   <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0" style={{ order: 0 }} />
                   <div className="flex flex-col items-start gap-1.5 w-[460px] h-[83px] flex-1" style={{ order: 1 }}>
                     <div className="flex flex-row items-center gap-2 w-[460px] h-[19px] self-stretch">
-                      <span className="font-['Neue_Montreal'] font-bold text-base leading-[19px] text-[#2B2834] flex-1 w-[408px] h-[19px]">Esther Howard</span>
-                      <span className="font-['Inter'] font-normal text-xs leading-[18px] text-[#A5A1AF] w-11 h-[18px]">2:20pm</span>
+                      <span className="font-sans font-bold text-base leading-[19px] text-text-primary flex-1 w-[408px] h-[19px]">Esther Howard</span>
+                      <span className="font-['Inter'] font-normal text-xs leading-[18px] text-text-tertiary w-11 h-[18px]">2:20pm</span>
                     </div>
                     <div className="flex flex-row items-center p-[10px_14px] gap-2 w-[460px] h-[58px] bg-[#F2F4F7] rounded-tr-lg rounded-br-lg rounded-bl-lg self-stretch">
-                      <p className="font-['Neue_Montreal'] font-normal text-base leading-[19px] text-[#101828] w-[432px] h-[38px] flex-1">
+                      <p className="font-sans font-normal text-base leading-[19px] text-[#101828] w-[432px] h-[38px] flex-1">
                         Absolutely! I&apos;m excited to hear that the course covers amazing strategies for growing our audience. Let&apos;s explore it together!
                       </p>
                     </div>

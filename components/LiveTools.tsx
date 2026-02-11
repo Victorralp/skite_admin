@@ -181,31 +181,31 @@ export default function LiveTools() {
     <PageContainer>
       {/* Header and Stats */}
       <div className="flex flex-col gap-2">
-        <h1 className="text-[20px] font-bold text-[#2B2834] leading-[100%] tracking-[-0.01em] font-['Neue_Montreal']">Live Tools</h1>
+        <h1 className="text-[20px] font-bold text-text-primary leading-[100%] tracking-[-0.01em] font-sans">Live Tools</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 w-full">
-          <div className="min-w-[214px] h-24 bg-white border border-[#EBEBEB] rounded-lg box-border flex flex-col p-4 gap-3 grow">
+          <div className="min-w-[214px] h-24 bg-white border border-border-primary rounded-lg box-border flex flex-col p-4 gap-3 grow">
             <div className="flex flex-col gap-1 w-full h-10">
-              <span className="font-sans font-normal text-xs leading-[14px] text-[#5F5971]">Live Sessions</span>
-              <span className="font-sans font-medium text-lg leading-[22px] text-[#2B2834]">1,393</span>
+              <span className="font-sans font-normal text-xs leading-[14px] text-text-secondary">Live Sessions</span>
+              <span className="font-sans font-medium text-lg leading-[22px] text-text-primary">1,393</span>
             </div>
           </div>
-          <div className="min-w-[214px] h-24 bg-white border border-[#EBEBEB] rounded-lg box-border flex flex-col p-4 gap-3 grow">
+          <div className="min-w-[214px] h-24 bg-white border border-border-primary rounded-lg box-border flex flex-col p-4 gap-3 grow">
             <div className="flex flex-col gap-1 w-full h-10">
-              <span className="font-sans font-normal text-xs leading-[14px] text-[#5F5971]">1-1 Calls</span>
-              <span className="font-sans font-medium text-lg leading-[22px] text-[#2B2834]">6</span>
+              <span className="font-sans font-normal text-xs leading-[14px] text-text-secondary">1-1 Calls</span>
+              <span className="font-sans font-medium text-lg leading-[22px] text-text-primary">6</span>
             </div>
           </div>
-          <div className="min-w-[214px] h-24 bg-white border border-[#EBEBEB] rounded-lg box-border flex flex-col p-4 gap-3 grow">
+          <div className="min-w-[214px] h-24 bg-white border border-border-primary rounded-lg box-border flex flex-col p-4 gap-3 grow">
             <div className="flex flex-col gap-1 w-full h-10">
-              <span className="font-sans font-normal text-xs leading-[14px] text-[#5F5971]">Critical Alerts</span>
-              <span className="font-sans font-medium text-lg leading-[22px] text-[#2B2834]">156</span>
+              <span className="font-sans font-normal text-xs leading-[14px] text-text-secondary">Critical Alerts</span>
+              <span className="font-sans font-medium text-lg leading-[22px] text-text-primary">156</span>
             </div>
           </div>
-          <div className="min-w-[214px] h-24 bg-white border border-[#EBEBEB] rounded-lg box-border flex flex-col p-4 gap-3 grow">
+          <div className="min-w-[214px] h-24 bg-white border border-border-primary rounded-lg box-border flex flex-col p-4 gap-3 grow">
             <div className="flex flex-col gap-1 w-full h-10">
-              <span className="font-sans font-normal text-xs leading-[14px] text-[#5F5971]">Warning Alerts</span>
-              <span className="font-sans font-medium text-lg leading-[22px] text-[#2B2834]">11</span>
+              <span className="font-sans font-normal text-xs leading-[14px] text-text-secondary">Warning Alerts</span>
+              <span className="font-sans font-medium text-lg leading-[22px] text-text-primary">11</span>
             </div>
           </div>
         </div>
@@ -217,30 +217,30 @@ export default function LiveTools() {
         <div className="flex gap-2 w-full">
           <button
             onClick={() => setActiveFilter('all')}
-            className={`flex justify-center items-center px-4 py-2 gap-2.5 h-8 text-[13.5px] font-medium leading-4 rounded-md border transition-all flex-1 ${
+            className={`flex justify-center items-center px-4 py-2 gap-2.5 h-8 text-body-sm rounded-md border transition-all flex-1 ${
               activeFilter === 'all'
-                ? 'bg-white border-[#5F2EFC] text-[#5F2EFC]'
-                : 'bg-white border-[#EBEBEB] text-[#5F5971]'
+                ? 'bg-white border-border-brand text-text-brand'
+                : 'bg-white border-border-primary text-text-secondary'
             }`}
           >
             All
           </button>
           <button
             onClick={() => setActiveFilter('warning')}
-            className={`flex justify-center items-center px-4 py-2 gap-2.5 h-8 text-[13.5px] font-medium leading-4 rounded-md border transition-all flex-1 ${
+            className={`flex justify-center items-center px-4 py-2 gap-2.5 h-8 text-body-sm rounded-md border transition-all flex-1 ${
               activeFilter === 'warning'
-                ? 'bg-white border-[#5F2EFC] text-[#5F2EFC]'
-                : 'bg-white border-[#EBEBEB] text-[#5F5971]'
+                ? 'bg-white border-border-brand text-text-brand'
+                : 'bg-white border-border-primary text-text-secondary'
             }`}
           >
             Warning
           </button>
           <button
             onClick={() => setActiveFilter('critical')}
-            className={`flex justify-center items-center px-4 py-2 gap-2.5 h-8 text-[13.5px] font-medium leading-4 rounded-md border transition-all flex-1 ${
+            className={`flex justify-center items-center px-4 py-2 gap-2.5 h-8 text-body-sm rounded-md border transition-all flex-1 ${
               activeFilter === 'critical'
-                ? 'bg-white border-[#5F2EFC] text-[#5F2EFC]'
-                : 'bg-white border-[#EBEBEB] text-[#5F5971]'
+                ? 'bg-white border-border-brand text-text-brand'
+                : 'bg-white border-border-primary text-text-secondary'
             }`}
           >
             Critical
@@ -248,12 +248,12 @@ export default function LiveTools() {
         </div>
 
         {/* Live Sessions Grid */}
-        <div className="flex flex-col p-1 gap-1 w-full bg-[#F9F9FB] rounded-lg">
+        <div className="flex flex-col p-1 gap-1 w-full bg-surface-secondary rounded-lg">
           {/* Header */}
           <div className="flex items-center px-2 py-1 gap-4 w-full h-8">
-            <span className="text-base font-medium leading-[19px] text-[#2B2834] flex-1">Live</span>
-            <div className="flex items-center gap-1 px-2 py-1 bg-white border border-[#EBEBEB] rounded-lg opacity-0 w-[63px] h-6">
-              <span className="text-xs leading-[14px] text-[#5F5971]">Today</span>
+            <span className="text-base font-medium leading-[19px] text-text-primary flex-1">Live</span>
+            <div className="flex items-center gap-1 px-2 py-1 bg-white border border-border-primary rounded-lg opacity-0 w-[63px] h-6">
+              <span className="text-xs leading-[14px] text-text-secondary">Today</span>
               <div className="w-2.5 h-1.5 bg-[#D3D3D3]" />
             </div>
           </div>
@@ -265,7 +265,7 @@ export default function LiveTools() {
               return (
                 <div
                   key={session.id}
-                  className="flex flex-col justify-center items-start p-4 gap-4 bg-white border border-[#EBEBEB] rounded-[4px] relative w-full max-w-[362px]"
+                  className="flex flex-col justify-center items-start p-4 gap-4 bg-white border border-border-primary rounded-[4px] relative w-full max-w-[362px]"
                   style={{ height: '207px' }}
                 >
                   {/* Header with Status and Actions */}
@@ -300,14 +300,14 @@ export default function LiveTools() {
 
                       {/* Type Badge */}
                       <div 
-                        className="flex items-center justify-center bg-[#F9F9FB] rounded-full"
+                        className="flex items-center justify-center bg-surface-secondary rounded-full"
                         style={{ 
                           padding: '4px 13px',
                           width: session.type === '1-1' ? '40px' : '57px',
                           height: '28px'
                         }}
                       >
-                        <span className="text-xs font-bold leading-[14px] text-[#2B2834] whitespace-nowrap">
+                        <span className="text-xs font-bold leading-[14px] text-text-primary whitespace-nowrap">
                           {session.type === '1-1' ? '1-1' : 'Class'}
                         </span>
                       </div>
@@ -319,22 +319,22 @@ export default function LiveTools() {
                         onClick={() => handleDropdownToggle(session.id)}
                         className="flex items-center justify-center w-[18px] h-[18px]"
                       >
-                        <MoreVertical className="w-[18px] h-[18px] text-[#5F5971]" strokeWidth={2.25} />
+                        <MoreVertical className="w-[18px] h-[18px] text-text-secondary" strokeWidth={2.25} />
                       </button>
 
                       {/* Dropdown Menu */}
                       {showDropdown === session.id && (
-                        <div className="absolute right-0 top-8 w-[134px] h-[148px] bg-white border border-[#EBEBEB] rounded-xl shadow-[0px_116px_46px_rgba(0,0,0,0.01),0px_65px_39px_rgba(0,0,0,0.05),0px_29px_29px_rgba(0,0,0,0.09),0px_7px_16px_rgba(0,0,0,0.1)] z-10">
-                          <button className="flex items-center px-4 py-2.5 w-full h-[37px] text-left text-[13.5px] font-medium leading-4 text-[#2B2834] border-b border-[#EBEBEB] hover:bg-gray-50">
+                        <div className="absolute right-0 top-8 w-[134px] h-[148px] bg-white border border-border-primary rounded-xl shadow-dropdown z-10">
+                          <button className="flex items-center px-4 py-2.5 w-full h-[37px] text-left text-body-sm text-text-primary border-b border-border-primary hover:bg-gray-50">
                             Mute Chat
                           </button>
-                          <button className="flex items-center px-4 py-2.5 w-full h-[37px] text-left text-[13.5px] font-medium leading-4 text-[#2B2834] border-b border-[#EBEBEB] hover:bg-gray-50">
+                          <button className="flex items-center px-4 py-2.5 w-full h-[37px] text-left text-body-sm text-text-primary border-b border-border-primary hover:bg-gray-50">
                             Alert Creator
                           </button>
-                          <button className="flex items-center px-4 py-2.5 w-full h-[37px] text-left text-[13.5px] font-medium leading-4 text-[#2B2834] border-b border-[#EBEBEB] hover:bg-gray-50">
+                          <button className="flex items-center px-4 py-2.5 w-full h-[37px] text-left text-body-sm text-text-primary border-b border-border-primary hover:bg-gray-50">
                             Review Profile
                           </button>
-                          <button className="flex items-center px-4 py-2.5 w-full h-[37px] text-left text-[13.5px] font-medium leading-4 text-[#CD110A] hover:bg-gray-50">
+                          <button className="flex items-center px-4 py-2.5 w-full h-[37px] text-left text-body-sm text-text-danger hover:bg-gray-50">
                             Disable Session
                           </button>
                         </div>
@@ -344,14 +344,14 @@ export default function LiveTools() {
 
                   {/* Session Info */}
                   <div className="flex flex-col gap-3 w-full h-[83px]">
-                    <h3 className="text-base font-bold leading-[19px] text-[#2B2834] w-full h-[19px]">
+                    <h3 className="text-base font-bold leading-[19px] text-text-primary w-full h-[19px]">
                       {session.title}
                     </h3>
 
                     {/* Host Info */}
                     <div className="flex items-center gap-2 w-full h-6">
                       <div className="w-6 h-6 rounded-full bg-gray-200 flex-shrink-0" />
-                      <span className="text-base font-medium leading-[19px] text-[#5F5971] flex-1">
+                      <span className="text-base font-medium leading-[19px] text-text-secondary flex-1">
                         {session.host}
                       </span>
                     </div>
@@ -359,8 +359,8 @@ export default function LiveTools() {
                     {/* Session Details */}
                     <div className="flex items-center gap-6 w-full h-4">
                       <div className="flex items-center gap-1">
-                        <Clock className="w-4 h-4 text-[#2B2834]" strokeWidth={1.3} />
-                        <span className="text-xs leading-[14px] text-[#5F5971]">{session.time}</span>
+                        <Clock className="w-4 h-4 text-text-primary" strokeWidth={1.3} />
+                        <span className="text-xs leading-[14px] text-text-secondary">{session.time}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -373,7 +373,7 @@ export default function LiveTools() {
                             </clipPath>
                           </defs>
                         </svg>
-                        <span className="text-xs leading-[14px] text-[#5F5971]">{session.duration}</span>
+                        <span className="text-xs leading-[14px] text-text-secondary">{session.duration}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -382,7 +382,7 @@ export default function LiveTools() {
                           <path d="M6.00001 14.0013C8.57734 14.0013 10.6667 12.8074 10.6667 11.3346C10.6667 9.86188 8.57734 8.66797 6.00001 8.66797C3.42268 8.66797 1.33334 9.86188 1.33334 11.3346C1.33334 12.8074 3.42268 14.0013 6.00001 14.0013Z" stroke="#2B2834" strokeWidth="1.3"/>
                           <path d="M12 9.33398C13.1693 9.59065 14 10.24 14 11.0007C14 11.6873 13.324 12.2827 12.3333 12.5807" stroke="#2B2834" strokeWidth="1.3" strokeLinecap="round"/>
                         </svg>
-                        <span className="text-xs leading-[14px] text-[#5F5971]">{session.participants}</span>
+                        <span className="text-xs leading-[14px] text-text-secondary">{session.participants}</span>
                       </div>
                     </div>
                   </div>
@@ -391,14 +391,14 @@ export default function LiveTools() {
                   <div className="flex items-center gap-1 w-full h-8">
                     <button 
                       onClick={() => handleMonitorClick(session)}
-                      className="flex items-center justify-center gap-1 px-6 py-3.5 bg-white border border-[#EBEBEB] rounded-[9px] shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] flex-1 h-8 hover:bg-gray-50 transition-colors"
+                      className="flex items-center justify-center gap-1 px-6 py-3.5 bg-white border border-border-primary rounded-[9px] shadow-button-inset flex-1 h-8 hover:bg-gray-50 transition-colors"
                     >
                       <Eye className="w-3 h-3 text-[#17181C]" strokeWidth={1.5} />
-                      <span className="text-[13.5px] font-medium leading-4 text-[#353A44]">Monitor</span>
+                      <span className="text-body-sm text-[#353A44]">Monitor</span>
                     </button>
-                    <button className="flex items-center justify-center gap-1 px-6 py-3.5 bg-white border border-[#EBEBEB] rounded-[9px] shadow-[inset_0px_1.5px_1px_rgba(255,255,255,0.11)] flex-1 h-8 hover:bg-gray-50 transition-colors">
+                    <button className="flex items-center justify-center gap-1 px-6 py-3.5 bg-white border border-border-primary rounded-[9px] shadow-button-inset flex-1 h-8 hover:bg-gray-50 transition-colors">
                       <X className="w-3 h-3 text-[#17181C]" strokeWidth={1.5} />
-                      <span className="text-[13.5px] font-medium leading-4 text-[#353A44]">End Session</span>
+                      <span className="text-body-sm text-[#353A44]">End Session</span>
                     </button>
                   </div>
                 </div>

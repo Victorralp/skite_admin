@@ -116,7 +116,7 @@ const StatusBadge = ({ status }: { status: Refund['status'] }) => {
         <AlertTriangle size={10} style={{ color }} />
       )}
       <span
-        className="font-['Neue_Montreal'] font-medium text-[10px] leading-3"
+        className="font-sans font-medium text-[10px] leading-3"
         style={{ color }}
       >
         {label}
@@ -129,50 +129,50 @@ const FilterPill = ({ label, active, onClick }: { label: string; active: boolean
   <button 
     onClick={onClick}
     className={`flex items-center justify-center gap-1 px-[9px] py-1 border border-dashed rounded-full h-[22px] transition-colors ${
-      active ? 'border-[#5F2EFC]' : 'border-[#EBEBEB] hover:bg-gray-50'
+      active ? 'border-border-brand' : 'border-border-primary hover:bg-gray-50'
     }`}
   >
     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-      <circle cx="6" cy="6" r="5.25" stroke="currentColor" strokeWidth="1.2" fill="none" className={active ? 'text-[#5F2EFC]' : 'text-[#5F5971]'} />
-      <path d="M6 3V9M3 6H9" stroke="currentColor" strokeWidth="1.2" className={active ? 'text-[#5F2EFC]' : 'text-[#5F5971]'} />
+      <circle cx="6" cy="6" r="5.25" stroke="currentColor" strokeWidth="1.2" fill="none" className={active ? 'text-text-brand' : 'text-text-secondary'} />
+      <path d="M6 3V9M3 6H9" stroke="currentColor" strokeWidth="1.2" className={active ? 'text-text-brand' : 'text-text-secondary'} />
     </svg>
-    <span className={`text-xs font-medium leading-[14px] ${active ? 'text-[#5F2EFC]' : 'text-[#5F5971]'}`}>{label}</span>
+    <span className={`text-xs font-medium leading-[14px] ${active ? 'text-text-brand' : 'text-text-secondary'}`}>{label}</span>
   </button>
 );
 
 const FilterDropdown = ({ title, onApply }: { title: string; onApply: () => void }) => (
   <div
-    className="absolute left-[-0.75px] top-[27px] w-[185px] bg-white border border-[#5F2EFC] rounded-2xl flex flex-col justify-center items-start p-3 gap-[10px]"
+    className="absolute left-[-0.75px] top-[27px] w-[185px] bg-white border border-border-brand rounded-2xl flex flex-col justify-center items-start p-3 gap-[10px]"
     style={{
       boxShadow: '0px 116px 46px rgba(0, 0, 0, 0.01), 0px 65px 39px rgba(0, 0, 0, 0.05), 0px 29px 29px rgba(0, 0, 0, 0.09), 0px 7px 16px rgba(0, 0, 0, 0.1)',
       zIndex: 50
     }}
   >
-    <span className="text-[12px] font-medium text-[#2B2834] leading-[14px] font-['Neue_Montreal']">
+    <span className="text-[12px] font-medium text-text-primary leading-[14px] font-sans">
       {title}
     </span>
     {title === 'Filter by: Status' ? (
       <div className="flex flex-col items-start gap-2 w-[161px]">
         <label className="flex items-center gap-2 cursor-pointer">
           <input type="checkbox" className="w-4 h-4" />
-          <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal']">Success</span>
+          <span className="text-[12px] font-normal text-text-primary leading-[14px] font-sans">Success</span>
         </label>
         <label className="flex items-center gap-2 cursor-pointer">
           <input type="checkbox" className="w-4 h-4" />
-          <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal']">Pending</span>
+          <span className="text-[12px] font-normal text-text-primary leading-[14px] font-sans">Pending</span>
         </label>
         <label className="flex items-center gap-2 cursor-pointer">
           <input type="checkbox" className="w-4 h-4" />
-          <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal']">Declined</span>
+          <span className="text-[12px] font-normal text-text-primary leading-[14px] font-sans">Declined</span>
         </label>
       </div>
     ) : (
       <div className="flex flex-col items-start gap-1 w-[161px] h-16">
         <div className="flex items-center gap-[10px] w-[161px] h-[30px]">
-          <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal'] w-[32.91px]">
+          <span className="text-[12px] font-normal text-text-primary leading-[14px] font-sans w-[32.91px]">
             From
           </span>
-          <div className="flex-1 h-[30px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-md flex items-center justify-end px-2">
+          <div className="flex-1 h-[30px] bg-surface-secondary border border-border-primary rounded-md flex items-center justify-end px-2">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M9.5 1.5H2.5C1.94772 1.5 1.5 1.94772 1.5 2.5V9.5C1.5 10.0523 1.94772 10.5 2.5 10.5H9.5C10.0523 10.5 10.5 10.0523 10.5 9.5V2.5C10.5 1.94772 10.0523 1.5 9.5 1.5Z" stroke="#5F5971" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M8 0.5V2.5M4 0.5V2.5M1.5 4.5H10.5" stroke="#5F5971" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
@@ -180,10 +180,10 @@ const FilterDropdown = ({ title, onApply }: { title: string; onApply: () => void
           </div>
         </div>
         <div className="flex items-center gap-[10px] w-[161px] h-[30px]">
-          <span className="text-[12px] font-normal text-[#2B2834] leading-[14px] font-['Neue_Montreal'] w-[32.91px]">
+          <span className="text-[12px] font-normal text-text-primary leading-[14px] font-sans w-[32.91px]">
             To
           </span>
-          <div className="flex-1 h-[30px] bg-[#F9F9FB] border border-[#EBEBEB] rounded-md flex items-center justify-end px-2">
+          <div className="flex-1 h-[30px] bg-surface-secondary border border-border-primary rounded-md flex items-center justify-end px-2">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M9.5 1.5H2.5C1.94772 1.5 1.5 1.94772 1.5 2.5V9.5C1.5 10.0523 1.94772 10.5 2.5 10.5H9.5C10.0523 10.5 10.5 10.0523 10.5 9.5V2.5C10.5 1.94772 10.0523 1.5 9.5 1.5Z" stroke="#5F5971" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M8 0.5V2.5M4 0.5V2.5M1.5 4.5H10.5" stroke="#5F5971" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
@@ -201,7 +201,7 @@ const FilterDropdown = ({ title, onApply }: { title: string; onApply: () => void
       }}
     >
       <span
-        className="text-[13.5px] font-medium text-[#FFFCF8] leading-4 font-['Neue_Montreal']"
+        className="text-[13.5px] font-medium text-white leading-4 font-sans"
         style={{ textShadow: '0px -1px 6px rgba(0, 0, 0, 0.25)' }}
       >
         Apply
@@ -256,76 +256,76 @@ export default function RefundsTable() {
             }}
           />
         </div>
-        <button className="flex items-center gap-0.5 px-2 py-1 bg-white border border-[#EBEBEB] rounded-lg shadow-[0px_1px_4.8px_rgba(0,0,0,0.03)]">
+        <button className="flex items-center gap-0.5 px-2 py-1 bg-white border border-border-primary rounded-lg shadow-button-soft">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M9.33337 10.5V3.5M9.33337 3.5L11.6667 5.90625M9.33337 3.5L7.00004 5.90625M4.66671 3.5V10.5M4.66671 10.5L7.00004 8.09375M4.66671 10.5L2.33337 8.09375" stroke="#5F5971" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          <span className="font-['Neue_Montreal'] font-normal text-xs leading-none text-[#5F5971]">
+          <span className="font-sans font-normal text-xs leading-none text-text-secondary">
             Sort
           </span>
         </button>
       </div>
 
       {/* Table Container */}
-      <div className="flex flex-col items-start p-1 gap-1 w-full bg-[#F9F9FB] rounded-lg">
+      <div className="flex flex-col items-start p-1 gap-1 w-full bg-surface-secondary rounded-lg">
         {/* Table Header */}
         <div className="flex items-center px-6 py-2 gap-4 w-full h-[30px]">
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[10%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[10%]">
             TXN ID
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[12%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[12%]">
             Date
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[18%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[18%]">
             Product
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[10%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[10%]">
             Product type
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[15%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[15%]">
             Creator
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[15%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[15%]">
             Buyer
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[12%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[12%]">
             Amount
           </span>
-          <span className="font-['Neue_Montreal'] font-medium text-xs leading-none text-[#2B2834] w-[8%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[8%]">
             Status
           </span>
           <div className="w-[4%]" />
         </div>
 
         {/* Table Body */}
-        <div className="flex flex-col items-start w-full bg-white border border-[#EBEBEB] rounded-lg">
+        <div className="flex flex-col items-start w-full bg-white border border-border-primary rounded-lg">
           {filteredRefunds.map((refund, index) => (
             <div
               key={`${refund.id}-${index}`}
               className={cn(
                 'flex items-center px-6 py-3.5 gap-4 w-full h-[46px] bg-white',
-                index < filteredRefunds.length - 1 && 'border-b border-[#EBEBEB]'
+                index < filteredRefunds.length - 1 && 'border-b border-border-primary'
               )}
             >
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[10%] truncate">
+              <span className="font-sans text-body-sm-regular text-text-primary w-[10%] truncate">
                 {refund.id}
               </span>
-              <span className="font-['Neue_Montreal'] font-normal text-xs leading-none text-[#5F5971] w-[12%] truncate">
+              <span className="font-sans font-normal text-xs leading-none text-text-secondary w-[12%] truncate">
                 {refund.date}
               </span>
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[18%] truncate">
+              <span className="font-sans text-body-sm-regular text-text-primary w-[18%] truncate">
                 {refund.product}
               </span>
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[10%] truncate">
+              <span className="font-sans text-body-sm-regular text-text-primary w-[10%] truncate">
                 {refund.productType}
               </span>
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[15%] truncate">
+              <span className="font-sans text-body-sm-regular text-text-primary w-[15%] truncate">
                 {refund.creator}
               </span>
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[15%] truncate">
+              <span className="font-sans text-body-sm-regular text-text-primary w-[15%] truncate">
                 {refund.buyer}
               </span>
-              <span className="font-['Neue_Montreal'] font-normal text-[13.5px] leading-4 text-[#2B2834] w-[12%] truncate">
+              <span className="font-sans text-body-sm-regular text-text-primary w-[12%] truncate">
                 {refund.amount}
               </span>
               <div className="w-[8%]">
@@ -336,7 +336,7 @@ export default function RefundsTable() {
                   onClick={() => setOpenMenuId(openMenuId === `${refund.id}-${index}` ? null : `${refund.id}-${index}`)}
                   className="w-[18px] h-[18px] flex items-center justify-center"
                 >
-                  <MoreVertical size={18} className="text-[#5F5971]" />
+                  <MoreVertical size={18} className="text-text-secondary" />
                 </button>
               </div>
             </div>

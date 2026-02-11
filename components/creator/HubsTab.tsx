@@ -16,16 +16,16 @@ const CheckIcon = () => (
 const StatusBadge = ({ status }: { status: string }) => {
     if (status === 'Active') {
         return (
-            <div className="flex items-center justify-center gap-0.5 px-1.5 py-0.5 rounded-[4px] bg-[#E7F3EF] h-[14px] w-fit">
+            <div className="flex items-center justify-center gap-0.5 px-1.5 py-0.5 rounded-[4px] bg-surface-success h-[14px] w-fit">
                 <CheckIcon />
-                <span className="font-['Neue_Montreal'] font-medium text-[10px] leading-[12px] text-[#239B73]">Healthy</span>
+                <span className="font-sans text-caption-sm text-text-success">Healthy</span>
             </div>
         );
     }
     return (
-        <div className="flex items-center justify-center gap-0.5 px-1.5 py-0.5 rounded-[4px] bg-[#FBECEB] h-[14px] w-fit">
-            <AlertTriangle className="w-[10px] h-[10px] text-[#CD110A]" />
-            <span className="font-['Neue_Montreal'] font-medium text-[10px] leading-[12px] text-[#CD110A]">Flagged</span>
+        <div className="flex items-center justify-center gap-0.5 px-1.5 py-0.5 rounded-[4px] bg-surface-danger h-[14px] w-fit">
+            <AlertTriangle className="w-[10px] h-[10px] text-text-danger" />
+            <span className="font-sans text-caption-sm text-text-danger">Flagged</span>
         </div>
     );
 };
@@ -35,47 +35,47 @@ export default function HubsTab() {
 
     return (
         <>
-            <div className="flex flex-col w-full bg-[#F9F9FB] rounded-b-[36px] p-6 gap-6">
+            <div className="flex flex-col w-full bg-surface-secondary rounded-b-[36px] p-6 gap-6">
             {/* Title */}
-            <h3 className="font-['Neue_Montreal'] font-medium text-[16px] leading-[19px] text-[#2B2834]">Managed Hubs</h3>
+            <h3 className="font-sans text-heading-sm text-text-primary">Managed Hubs</h3>
 
             {/* Table Container */}
-            <div className="w-full bg-[#F9F9FB] rounded-xl p-1 flex flex-col">
+            <div className="w-full bg-surface-secondary rounded-xl p-1 flex flex-col">
                 {/* Header Row */}
                 <div className="flex items-center px-4 py-2 gap-6 h-[32px]">
-                    <div className="flex-1 font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#5F5971]">Hub name</div>
-                    <div className="flex-1 font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#5F5971]">No. of members</div>
-                    <div className="flex-1 font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#5F5971]">Posts today</div>
-                    <div className="flex-1 font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#5F5971]">Status</div>
+                    <div className="flex-1 font-sans text-body-sm text-text-secondary">Hub name</div>
+                    <div className="flex-1 font-sans text-body-sm text-text-secondary">No. of members</div>
+                    <div className="flex-1 font-sans text-body-sm text-text-secondary">Posts today</div>
+                    <div className="flex-1 font-sans text-body-sm text-text-secondary">Status</div>
                     <div className="w-[18px]"></div>
                 </div>
 
                 {/* Table Body */}
-                <div className="bg-white border border-[#EBEBEB] rounded-lg overflow-hidden">
+                <div className="bg-white border border-border-primary rounded-lg overflow-hidden">
                     {/* Rows */}
                     {creatorHubs.map((hub, index) => (
                         <div
                             key={hub.id}
                             className={cn(
                                 "flex items-center px-4 py-3 gap-6 h-[48px] bg-white",
-                                index !== creatorHubs.length - 1 && "border-b border-[#EBEBEB]"
+                                index !== creatorHubs.length - 1 && "border-b border-border-primary"
                             )}
                         >
                             {/* Hub name with avatar */}
                             <div className="flex-1 flex items-center gap-2">
                                 <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex-shrink-0" />
-                                <span className="font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#2B2834] truncate">
+                                <span className="font-sans text-body-sm text-text-primary truncate">
                                     {hub.name}
                                 </span>
                             </div>
 
                             {/* No. of members */}
-                            <div className="flex-1 font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#2B2834]">
+                            <div className="flex-1 font-sans text-body-sm text-text-primary">
                                 {hub.members.toLocaleString()}
                             </div>
 
                             {/* Posts today */}
-                            <div className="flex-1 font-['Neue_Montreal'] font-medium text-[13.5px] leading-[16px] text-[#2B2834]">
+                            <div className="flex-1 font-sans text-body-sm text-text-primary">
                                 {hub.posts}
                             </div>
 
@@ -90,7 +90,7 @@ export default function HubsTab() {
                                     className="p-0 hover:opacity-70 transition-opacity"
                                     onClick={() => setSelectedHub(hub)}
                                 >
-                                    <Eye className="w-[18px] h-[18px] text-[#5F5971]" />
+                                    <Eye className="w-[18px] h-[18px] text-text-secondary" />
                                 </button>
                             </div>
                         </div>
