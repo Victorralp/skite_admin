@@ -128,15 +128,15 @@ const StatusBadge = ({ status }: { status: Refund['status'] }) => {
 const FilterPill = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
   <button 
     onClick={onClick}
-    className={`flex items-center justify-center gap-1 px-[9px] py-1 border border-dashed rounded-full h-[22px] transition-colors ${
+    className={`flex items-center justify-center gap-1.5 pl-2.5 pr-3 border border-dashed rounded-full h-5 transition-colors ${
       active ? 'border-border-brand' : 'border-border-primary hover:bg-gray-50'
     }`}
   >
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="w-2.5 h-2.5">
       <circle cx="6" cy="6" r="5.25" stroke="currentColor" strokeWidth="1.2" fill="none" className={active ? 'text-text-brand' : 'text-text-secondary'} />
       <path d="M6 3V9M3 6H9" stroke="currentColor" strokeWidth="1.2" className={active ? 'text-text-brand' : 'text-text-secondary'} />
     </svg>
-    <span className={`text-xs font-medium leading-[14px] ${active ? 'text-text-brand' : 'text-text-secondary'}`}>{label}</span>
+    <span className={`text-[11px] leading-[13px] font-medium ${active ? 'text-text-brand' : 'text-text-secondary'}`}>{label}</span>
   </button>
 );
 

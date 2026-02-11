@@ -126,11 +126,11 @@ const FilterPill = ({
   <button 
     onClick={onClick}
     className={cn(
-      "flex items-center justify-center gap-1 px-[7px] py-1 border border-dashed rounded-full h-[22px] transition-colors",
+      "flex items-center justify-center gap-1.5 pl-2.5 pr-3 border border-dashed rounded-full h-5 transition-colors",
       active ? "border-border-brand" : "border-border-primary hover:bg-gray-50"
     )}
   >
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="w-2.5 h-2.5">
       <circle 
         cx="6" 
         cy="6" 
@@ -148,7 +148,7 @@ const FilterPill = ({
       />
     </svg>
     <span className={cn(
-      "text-xs font-medium leading-[14px]",
+      "text-[11px] leading-[13px] font-medium",
       active ? 'text-text-brand' : 'text-text-secondary'
     )}>
       {label}

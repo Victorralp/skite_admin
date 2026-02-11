@@ -152,12 +152,12 @@ export default function CreatorFilters({
                             setDateJoinedFilterActive(false);
                         }}
                         className={cn(
-                            "flex items-center gap-[4px] pl-[7px] pr-[9px] py-[4px] h-[22px] rounded-full border border-dashed transition-colors box-border",
+                            "flex items-center gap-1.5 pl-2.5 pr-3 h-5 rounded-full border border-dashed transition-colors box-border",
                             revenueFilterActive ? "border-border-brand" : "border-border-primary hover:bg-gray-50"
                         )}
                     >
-                        <FilterPlusIcon className={cn(revenueFilterActive ? "text-text-brand" : "text-text-secondary")} />
-                        <span className={cn("text-caption-lg font-sans", revenueFilterActive ? "text-text-brand" : "text-text-secondary")}>Revenue</span>
+                        <FilterPlusIcon className={cn("w-2.5 h-2.5", revenueFilterActive ? "text-text-brand" : "text-text-secondary")} />
+                        <span className={cn("text-[11px] leading-[13px] font-sans", revenueFilterActive ? "text-text-brand" : "text-text-secondary")}>Revenue</span>
                     </button>
                     {revenueFilterActive && (
                         <FilterDropdown
@@ -176,12 +176,12 @@ export default function CreatorFilters({
                             setRevenueFilterActive(false);
                         }}
                         className={cn(
-                            "flex items-center gap-[4px] pl-[7px] pr-[9px] py-[4px] h-[22px] rounded-full border border-dashed transition-colors box-border",
+                            "flex items-center gap-1.5 pl-2.5 pr-3 h-5 rounded-full border border-dashed transition-colors box-border",
                             dateJoinedFilterActive ? "border-border-brand" : "border-border-primary hover:bg-gray-50"
                         )}
                     >
-                        <FilterPlusIcon className={cn(dateJoinedFilterActive ? "text-text-brand" : "text-text-secondary")} />
-                        <span className={cn("text-caption-lg font-sans", dateJoinedFilterActive ? "text-text-brand" : "text-text-secondary")}>Date Joined</span>
+                        <FilterPlusIcon className={cn("w-2.5 h-2.5", dateJoinedFilterActive ? "text-text-brand" : "text-text-secondary")} />
+                        <span className={cn("text-[11px] leading-[13px] font-sans", dateJoinedFilterActive ? "text-text-brand" : "text-text-secondary")}>Date Joined</span>
                     </button>
                     {dateJoinedFilterActive && (
                         <FilterDropdown
@@ -201,12 +201,12 @@ export default function CreatorFilters({
                                     'all'
                     )}
                     className={cn(
-                        "flex items-center gap-[4px] pl-[7px] pr-[9px] py-[4px] h-[22px] rounded-full border border-dashed transition-colors box-border",
+                        "flex items-center gap-1.5 pl-2.5 pr-3 h-5 rounded-full border border-dashed transition-colors box-border",
                         statusFilter !== 'all' ? "border-border-brand" : "border-border-primary hover:bg-gray-50"
                     )}
                 >
-                    <FilterPlusIcon className={cn(statusFilter !== 'all' ? "text-text-brand" : "text-text-secondary")} />
-                    <span className={cn("text-caption-lg font-sans", statusFilter !== 'all' ? "text-text-brand" : "text-text-secondary")}>
+                    <FilterPlusIcon className={cn("w-2.5 h-2.5", statusFilter !== 'all' ? "text-text-brand" : "text-text-secondary")} />
+                    <span className={cn("text-[11px] leading-[13px] font-sans", statusFilter !== 'all' ? "text-text-brand" : "text-text-secondary")}>
                         {statusFilter === 'all' ? 'Status' :
                             statusFilter === 'active' ? 'Active' :
                                 statusFilter === 'suspended' ? 'Suspended' :

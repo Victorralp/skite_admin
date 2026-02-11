@@ -238,12 +238,12 @@ export default function LiveSessionsGrid() {
             <button 
               onClick={() => setCreatorFilterActive(!creatorFilterActive)}
               className={cn(
-                "flex items-center gap-[4px] pl-[7px] pr-[9px] py-[4px] h-[22px] rounded-full border border-dashed transition-colors box-border",
+                "flex items-center gap-1.5 pl-2.5 pr-3 h-5 rounded-full border border-dashed transition-colors box-border",
                 creatorFilterActive ? "border-border-brand" : "border-border-primary hover:bg-gray-50"
               )}
             >
-              <FilterPlusIcon className={cn(creatorFilterActive ? "text-text-brand" : "text-text-secondary")} />
-              <span className={cn("text-caption-lg font-sans", creatorFilterActive ? "text-text-brand" : "text-text-secondary")}>Creator</span>
+              <FilterPlusIcon className={cn("w-2.5 h-2.5", creatorFilterActive ? "text-text-brand" : "text-text-secondary")} />
+              <span className={cn("text-[11px] leading-[13px] font-sans", creatorFilterActive ? "text-text-brand" : "text-text-secondary")}>Creator</span>
             </button>
             {creatorFilterActive && (
               <FilterDropdown
@@ -263,12 +263,12 @@ export default function LiveSessionsGrid() {
             <button
               onClick={() => setCreatorFilterActive(!creatorFilterActive)}
               className={cn(
-                "flex items-center gap-[4px] pl-[7px] pr-[9px] py-[4px] h-[22px] rounded-full border border-dashed transition-colors box-border",
+                "flex items-center gap-1.5 pl-2.5 pr-3 h-5 rounded-full border border-dashed transition-colors box-border",
                 creatorFilterActive ? "border-border-brand" : "border-border-primary hover:bg-gray-50"
               )}
             >
-              <FilterPlusIcon className={cn(creatorFilterActive ? "text-text-brand" : "text-text-secondary")} />
-              <span className={cn("text-caption-lg font-sans", creatorFilterActive ? "text-text-brand" : "text-text-secondary")}>Creator</span>
+              <FilterPlusIcon className={cn("w-2.5 h-2.5", creatorFilterActive ? "text-text-brand" : "text-text-secondary")} />
+              <span className={cn("text-[11px] leading-[13px] font-sans", creatorFilterActive ? "text-text-brand" : "text-text-secondary")}>Creator</span>
             </button>
             {creatorFilterActive && (
               <FilterDropdown
@@ -287,12 +287,12 @@ export default function LiveSessionsGrid() {
                     'all'
             )}
             className={cn(
-              "flex items-center gap-[4px] pl-[7px] pr-[9px] py-[4px] h-[22px] rounded-full border border-dashed transition-colors box-border",
+              "flex items-center gap-1.5 pl-2.5 pr-3 h-5 rounded-full border border-dashed transition-colors box-border",
               statusFilter !== 'all' ? "border-border-brand" : "border-border-primary hover:bg-gray-50"
             )}
           >
-            <FilterPlusIcon className={cn(statusFilter !== 'all' ? "text-text-brand" : "text-text-secondary")} />
-            <span className={cn("text-caption-lg font-sans", statusFilter !== 'all' ? "text-text-brand" : "text-text-secondary")}>
+            <FilterPlusIcon className={cn("w-2.5 h-2.5", statusFilter !== 'all' ? "text-text-brand" : "text-text-secondary")} />
+            <span className={cn("text-[11px] leading-[13px] font-sans", statusFilter !== 'all' ? "text-text-brand" : "text-text-secondary")}>
               {statusFilter === 'all' ? 'Status' : statusFilter}
             </span>
           </button>

@@ -210,14 +210,14 @@ const FilterPill = ({ label, active, onClick }: { label: string; active: boolean
   <button
     onClick={onClick}
     className={cn(
-      "flex items-center justify-center px-2 py-1 gap-1 rounded-full border font-sans font-medium text-xs leading-none h-[22px]",
+      "flex items-center justify-center pl-2.5 pr-3 gap-1.5 rounded-full border font-sans font-medium text-[11px] leading-[13px] h-5",
       active
         ? "bg-brand-primary border-border-brand text-white"
         : "bg-white border-dashed border-border-primary text-text-secondary"
     )}
   >
     {!active && (
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-2.5 h-2.5">
         <circle cx="6" cy="6" r="5.25" stroke="#5F5971" strokeWidth="1.2"/>
         <path d="M6 3.5V8.5M3.5 6H8.5" stroke="#5F5971" strokeWidth="1.2" strokeLinecap="round"/>
       </svg>

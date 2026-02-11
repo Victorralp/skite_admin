@@ -151,13 +151,11 @@ export default function Overview() {
     <div className="w-full flex flex-col gap-2 items-start">
       <div className="w-full flex items-center justify-between">
         <h2 className="text-heading-lg text-text-primary m-0">Overview</h2>
-        <span className="text-caption-sm text-text-secondary">
-          {isLoading
-            ? 'Loading metrics...'
-            : hasError
-              ? 'Metrics unavailable'
-              : 'Updated this month'}
-        </span>
+        {(isLoading || hasError) && (
+          <span className="text-caption-sm text-text-secondary">
+            {isLoading ? 'Loading metrics...' : 'Metrics unavailable'}
+          </span>
+        )}
       </div>
 
       <div className="w-full flex items-start gap-2 flex-wrap">

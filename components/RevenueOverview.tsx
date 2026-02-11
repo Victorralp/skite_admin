@@ -348,13 +348,13 @@ export default function RevenueOverview() {
       <div className="flex flex-col items-start gap-1 w-full bg-surface-secondary rounded-xl p-1">
         <Card className="w-full min-h-[285px] rounded-lg bg-surface-primary border-none shadow-none">
           <CardContent className="p-4 flex flex-col gap-2">
-            <div className="flex justify-between items-center h-[30px]">
-              <span className="text-caption-lg text-text-primary">Daily Revenue</span>
-              <div className="relative" ref={revenueDropdownRef}>
+            <div className="flex items-center justify-between gap-2 h-[30px]">
+              <span className="min-w-0 flex-1 truncate text-caption-lg text-text-primary">Daily Revenue</span>
+              <div className="relative flex-shrink-0" ref={revenueDropdownRef}>
                 <button
                   type="button"
                   onClick={() => setIsRevenueDropdownOpen((prev) => !prev)}
-                  className="w-[94px] h-[30px] flex items-center py-[5px] pl-2.5 pr-[7px] bg-white border border-border-primary rounded-lg shadow-button-soft cursor-pointer gap-1"
+                  className="min-w-[105px] h-[30px] inline-flex items-center justify-between py-[5px] pl-2.5 pr-[7px] bg-white border border-border-primary rounded-lg shadow-button-soft cursor-pointer gap-1"
                 >
                   <span className="text-caption-lg-regular text-text-secondary whitespace-nowrap">
                     {selectedRevenueLabel}
@@ -456,13 +456,15 @@ export default function RevenueOverview() {
         <div className="flex flex-row items-center gap-1 w-full">
           <Card className="flex-[2_1_600px] h-[281px] rounded-lg bg-white border-none shadow-none">
             <CardContent className="p-4 flex flex-col gap-2">
-              <div className="flex justify-between items-center h-[30px]">
-                <span className="font-sans font-medium text-xs leading-none text-text-primary">Transaction Volume</span>
-                <div className="relative" ref={transactionDropdownRef}>
+              <div className="flex items-center justify-between gap-2 h-[30px]">
+                <span className="min-w-0 flex-1 truncate font-sans font-medium text-xs leading-none text-text-primary">
+                  Transaction Volume
+                </span>
+                <div className="relative flex-shrink-0" ref={transactionDropdownRef}>
                   <button
                     type="button"
                     onClick={() => setIsTransactionDropdownOpen((prev) => !prev)}
-                    className="min-w-[105px] h-[30px] flex items-center py-[5px] pl-2.5 pr-[7px] bg-white border border-border-primary rounded-lg shadow-button-soft cursor-pointer gap-1"
+                    className="min-w-[105px] h-[30px] inline-flex items-center justify-between py-[5px] pl-2.5 pr-[7px] bg-white border border-border-primary rounded-lg shadow-button-soft cursor-pointer gap-1"
                   >
                     <span className="text-caption-lg-regular text-text-secondary whitespace-nowrap">
                       {selectedTransactionLabel}
@@ -564,15 +566,15 @@ export default function RevenueOverview() {
 
           <Card className="flex-[1_1_350px] h-[281px] rounded-lg bg-white border-none shadow-none">
             <CardContent className="p-4 flex flex-col gap-2">
-              <div className="flex justify-between items-center h-[30px]">
-                <span className="font-sans font-medium text-xs leading-none text-text-primary">
+              <div className="flex items-center justify-between gap-2 h-[30px]">
+                <span className="min-w-0 flex-1 truncate font-sans font-medium text-xs leading-none text-text-primary">
                   Revenue Breakdown by Item Type
                 </span>
-                <div className="relative" ref={breakdownDropdownRef}>
+                <div className="relative flex-shrink-0" ref={breakdownDropdownRef}>
                   <button
                     type="button"
                     onClick={() => setIsBreakdownDropdownOpen((prev) => !prev)}
-                    className="min-w-[105px] h-[30px] flex items-center py-[5px] pl-2.5 pr-[7px] bg-white border border-border-primary rounded-lg shadow-button-soft cursor-pointer gap-1"
+                    className="min-w-[105px] h-[30px] inline-flex items-center justify-between py-[5px] pl-2.5 pr-[7px] bg-white border border-border-primary rounded-lg shadow-button-soft cursor-pointer gap-1"
                   >
                     <span className="font-sans font-normal text-xs leading-[14px] text-text-secondary whitespace-nowrap">
                       {selectedBreakdownLabel}

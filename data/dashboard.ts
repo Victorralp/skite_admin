@@ -587,6 +587,7 @@ export const recentTransactions = [
 
 export type Product = {
   id: string;
+  detailId?: string | null;
   name: string;
   thumbnail: string;
   image?: string; // Alias for thumbnail for backward compatibility

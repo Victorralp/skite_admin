@@ -265,14 +265,16 @@ export default function ChartsRow() {
     <div className="flex gap-1 flex-wrap w-full">
       <Card className="flex-[2_1_600px] h-[281px] rounded-lg bg-white p-0 border-none shadow-none">
         <CardContent className="pt-4 pr-4 pb-3 pl-4 flex flex-col gap-2 h-full">
-          <div className="flex justify-between items-center">
-            <h3 className="font-sans text-xs font-medium leading-none tracking-normal text-text-main">Transaction Volume</h3>
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="min-w-0 flex-1 truncate font-sans text-xs font-medium leading-none tracking-normal text-text-main">
+              Transaction Volume
+            </h3>
 
-            <div className="relative" ref={dropdownRef}>
+            <div className="relative flex-shrink-0" ref={dropdownRef}>
               <button
                 type="button"
                 onClick={() => setIsDropdownOpen((prev) => !prev)}
-                className="min-w-[105px] h-[30px] flex items-center py-[5px] pl-2.5 pr-[7px] bg-white border border-border-subtle rounded-lg shadow-button-soft cursor-pointer gap-1"
+                className="min-w-[105px] h-[30px] inline-flex items-center justify-between py-[5px] pl-2.5 pr-[7px] bg-white border border-border-subtle rounded-lg shadow-button-soft cursor-pointer gap-1"
               >
                 <span className="font-sans font-normal text-xs leading-[14px] text-text-muted whitespace-nowrap">
                   {selectedFilterLabel}
@@ -375,14 +377,16 @@ export default function ChartsRow() {
 
       <Card className="flex-[1_1_350px] h-[281px] rounded-lg p-0 border-none shadow-none">
         <CardContent className="p-4 flex flex-col gap-2 h-full">
-          <div className="flex justify-between items-center">
-            <h3 className="font-sans text-xs font-medium leading-none tracking-normal text-text-main">Revenue Breakdown by Item Type</h3>
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="min-w-0 flex-1 truncate font-sans text-xs font-medium leading-none tracking-normal text-text-main">
+              Revenue Breakdown by Item Type
+            </h3>
 
-            <div className="relative" ref={breakdownDropdownRef}>
+            <div className="relative flex-shrink-0" ref={breakdownDropdownRef}>
               <button
                 type="button"
                 onClick={() => setIsBreakdownDropdownOpen((prev) => !prev)}
-                className="min-w-[105px] h-[30px] flex items-center py-[5px] pl-2.5 pr-[7px] bg-white border border-border-subtle rounded-lg shadow-button-soft cursor-pointer gap-1"
+                className="min-w-[105px] h-[30px] inline-flex items-center justify-between py-[5px] pl-2.5 pr-[7px] bg-white border border-border-subtle rounded-lg shadow-button-soft cursor-pointer gap-1"
               >
                 <span className="font-sans font-normal text-xs leading-[14px] text-text-muted whitespace-nowrap">
                   {selectedBreakdownFilterLabel}

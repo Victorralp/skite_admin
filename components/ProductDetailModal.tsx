@@ -1,18 +1,21 @@
 'use client';
 
-import { X, ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, BookOpen, MoreHorizontal, PlayCircle, X } from 'lucide-react';
 import { Product } from '@/data/dashboard';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+    getProductReviews,
+    getProductById,
+    type ProductReviewItem,
+    type ProductReviewsResponse,
+    type ProductDetailResponse
+} from '@/lib/api';
 
 interface ProductDetailModalProps {
     product: Product | null;
     onClose: () => void;
-}
-
-const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', minimumFractionDigits: 0 }).format(amount);
 }
 
 const StarIcon = ({ filled = true, className = "" }: { filled?: boolean; className?: string }) => (
@@ -29,76 +32,117 @@ const SmallStarIcon = ({ filled = true }: { filled?: boolean }) => (
     </svg>
 );
 
-const mockComments = [
-    {
-        id: 1,
-        author: 'Jane Doe',
-        time: '1 Month ago',
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face',
-        text: 'Can someone please provide me with some examples of similar work that\'s been done before? I want to',
-        isCreator: false
-    },
-    {
-        id: 2,
-        author: 'John Doe',
-        time: '1 Month ago',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
-        text: 'Running behind schedule on this task, can someone please provide me with some help to catch up?',
-        isCreator: false
-    },
-    {
-        id: 3,
-        author: 'Sarah Smith',
-        time: '2 Months ago',
-        avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
-        text: 'This is exactly what I was looking for! Thank you for creating this course.',
-        isCreator: true
-    }
-];
+const formatDate = (value?: string) => {
+    if (!value) return '—';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '—';
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+};
 
-const mockReviews = [
-    {
-        id: 1,
-        author: 'Annette Black',
-        handle: '@evanlee',
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face',
-        rating: 4,
-        date: '1/15/12',
-        text: 'They are a great partner on both Strategic and Implementation. They have proven to be fair and resp'
-    },
-    {
-        id: 2,
-        author: 'Jane Cooper',
-        handle: '@lucyliu',
-        avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
-        rating: 4,
-        date: '6/19/14',
-        text: 'Very inspiring working experience with their representatives, responsible and active in communicati'
-    },
-    {
-        id: 3,
-        author: 'Arlene McCoy',
-        handle: '@chloegrace',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face',
-        rating: 4,
-        date: '8/30/14',
-        text: 'The partner been progressing well with the business change environment, talents of new skill set mi'
-    },
-    {
-        id: 4,
-        author: 'Jacob Jones',
-        handle: '@paigelee',
-        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',
-        rating: 4,
-        date: '7/18/17',
-        text: 'Incredible group of people and talented professionals. Focused on the development of flexible and i'
+const getRelativeTime = (value?: string) => {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    const now = new Date();
+    const diffMs = Math.max(now.getTime() - date.getTime(), 0);
+    const day = 24 * 60 * 60 * 1000;
+    const month = 30 * day;
+    if (diffMs >= month) {
+        const months = Math.max(1, Math.floor(diffMs / month));
+        return `${months} Month${months > 1 ? 's' : ''} ago`;
     }
-];
+    const days = Math.max(1, Math.floor(diffMs / day));
+    return `${days} Day${days > 1 ? 's' : ''} ago`;
+};
+
+const toBooleanFlag = (value: unknown) => {
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'number') return value === 1;
+    if (typeof value === 'string') {
+        const normalized = value.trim().toLowerCase();
+        return normalized === 'true' || normalized === '1' || normalized === 'yes' || normalized === 'active';
+    }
+    return false;
+};
+
+const stripHtml = (value?: string) => {
+    if (!value) return '';
+    return value
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/&nbsp;/gi, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+};
+
+const isUrl = (value?: string) =>
+    typeof value === 'string' && /^https?:\/\//i.test(value.trim());
+
+const detectContentKind = (rawType?: string, url?: string) => {
+    const type = (rawType ?? '').toLowerCase();
+    const normalizedUrl = (url ?? '').toLowerCase();
+    if (type.includes('image') || /\.(jpg|jpeg|png|gif|webp|bmp|svg|avif)(\?|$)/i.test(normalizedUrl)) {
+        return 'Image';
+    }
+    if (type.includes('video') || normalizedUrl.endsWith('.mp4') || normalizedUrl.endsWith('.m3u8')) {
+        return 'Video';
+    }
+    return 'Reading';
+};
+
+const firstValidUrl = (...values: Array<string | undefined>) =>
+    values.find((value) => isUrl(value));
+
+const pickPreferredContentUrl = ({
+    rawType,
+    fileOriginal,
+    fileMp4,
+    fileM3u8,
+    topLevelOriginal,
+    bodyUrl
+}: {
+    rawType?: string;
+    fileOriginal?: string;
+    fileMp4?: string;
+    fileM3u8?: string;
+    topLevelOriginal?: string;
+    bodyUrl?: string;
+}) => {
+    const hintedType = detectContentKind(
+        rawType,
+        firstValidUrl(fileM3u8, fileMp4, fileOriginal, topLevelOriginal, bodyUrl)
+    );
+    if (hintedType === 'Video') {
+        return firstValidUrl(fileM3u8, fileMp4, fileOriginal, topLevelOriginal, bodyUrl);
+    }
+    return firstValidUrl(topLevelOriginal, fileOriginal, fileMp4, fileM3u8, bodyUrl);
+};
 
 export default function ProductDetailModal({ product, onClose }: ProductDetailModalProps) {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState('Overview');
-    const [openContentMenuId, setOpenContentMenuId] = useState<number | null>(null);
+    const [reviews, setReviews] = useState<ProductReviewItem[]>([]);
+    const [averageRating, setAverageRating] = useState<number | null>(null);
+    const [distribution, setDistribution] = useState<Record<number, number>>({});
+    const [totalReviews, setTotalReviews] = useState<number>(0);
+    const [isReviewsLoading, setIsReviewsLoading] = useState(false);
+    const [hasReviewsError, setHasReviewsError] = useState(false);
+    const [productDetail, setProductDetail] = useState<ProductDetailResponse | null>(null);
+    const [isProductLoading, setIsProductLoading] = useState(false);
+    const [hasProductError, setHasProductError] = useState(false);
+    const [openContentMenuId, setOpenContentMenuId] = useState<string | null>(null);
+    const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+    const isObjectId = (value?: string | null) => Boolean(value && /^[0-9a-fA-F]{24}$/.test(value));
+    const productRecord = product as unknown as Record<string, unknown> | null;
+    const detailId =
+        typeof productRecord?.detailId === 'string' && productRecord.detailId.length > 0
+            ? productRecord.detailId
+            : product?.id;
+    const rowHasEmbeddedContent =
+        (Array.isArray(productRecord?.contents) && productRecord.contents.length > 0) ||
+        (Array.isArray(productRecord?.sections) && productRecord.sections.length > 0);
 
     useEffect(() => {
         if (product) {
@@ -111,13 +155,391 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
         };
     }, [product]);
 
-    if (!product) return null;
-
-    const handleViewContent = () => {
-        if (product?.id) {
-            router.push(`/products/${product.id}`);
-            onClose();
+    useEffect(() => {
+        if (!productRecord) {
+            setProductDetail(null);
+            setHasProductError(false);
+            setIsProductLoading(false);
+            return;
         }
+
+        const hasInlineDetailShape =
+            typeof productRecord.product_name === 'string' ||
+            typeof productRecord.product_description === 'string' ||
+            typeof productRecord.product_cover === 'string' ||
+            rowHasEmbeddedContent;
+
+        if (hasInlineDetailShape) {
+            setProductDetail(productRecord as unknown as ProductDetailResponse);
+        } else {
+            setProductDetail(null);
+        }
+
+        if (!detailId || !isObjectId(detailId)) {
+            setHasProductError(false);
+            setIsProductLoading(false);
+            return;
+        }
+
+        let isMounted = true;
+        const fetchProduct = async () => {
+            setIsProductLoading(true);
+            try {
+                const response = await getProductById(detailId, 'NGN');
+                if (!isMounted) return;
+                setProductDetail((previous) => ({
+                    ...(previous ?? {}),
+                    ...response
+                }));
+                setHasProductError(false);
+            } catch {
+                if (!isMounted) return;
+                setHasProductError(true);
+            } finally {
+                if (isMounted) {
+                    setIsProductLoading(false);
+                }
+            }
+        };
+
+        fetchProduct();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [detailId, product, rowHasEmbeddedContent]);
+
+    useEffect(() => {
+        setOpenContentMenuId(null);
+    }, [activeTab, detailId]);
+
+    useEffect(() => {
+        setIsDescriptionExpanded(false);
+    }, [detailId, product?.id, productDetail?.product_description]);
+
+    useEffect(() => {
+        if (!detailId || !isObjectId(detailId)) {
+            setReviews([]);
+            setAverageRating(null);
+            setDistribution({});
+            setTotalReviews(0);
+            setHasReviewsError(false);
+            return;
+        }
+
+        let isMounted = true;
+        const fetchReviews = async () => {
+            setIsReviewsLoading(true);
+            try {
+                const response: ProductReviewsResponse = await getProductReviews({
+                    product: detailId,
+                    page: 1,
+                    limit: 5
+                });
+                if (!isMounted) return;
+
+                setReviews(response.items ?? []);
+                setAverageRating(response.averageRating ?? null);
+                const dist: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+                Object.entries(response.distribution ?? {}).forEach(([key, value]) => {
+                    const n = Number(key);
+                    if (dist[n as 1 | 2 | 3 | 4 | 5] !== undefined) {
+                        dist[n as 1 | 2 | 3 | 4 | 5] = Number(value ?? 0);
+                    }
+                });
+                setDistribution(dist);
+                setTotalReviews(response.pagination?.total ?? response.items?.length ?? 0);
+                setHasReviewsError(false);
+            } catch {
+                if (!isMounted) return;
+                setReviews([]);
+                setAverageRating(null);
+                setDistribution({});
+                setTotalReviews(0);
+                setHasReviewsError(true);
+            } finally {
+                if (isMounted) setIsReviewsLoading(false);
+            }
+        };
+
+        fetchReviews();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [detailId]);
+
+    if (!product) return null;
+    const fallbackSource = {
+        contents: Array.isArray(productRecord?.contents) ? productRecord.contents : undefined,
+        sections: Array.isArray(productRecord?.sections) ? productRecord.sections : undefined
+    };
+    const sourceForContent = {
+        ...(fallbackSource as Record<string, unknown>),
+        ...((productDetail ?? {}) as Record<string, unknown>)
+    } as ProductDetailResponse;
+
+    const contentSections = (() => {
+        type ParsedContentItem = {
+            id: string;
+            url: string;
+            type: string;
+            label: string;
+            status: string;
+            section: string;
+        };
+
+        const sectionOrder: string[] = [];
+        const sectionDescriptionByName = new Map<string, string>();
+        const sectionItems = new Map<string, ParsedContentItem[]>();
+        const seen = new Set<string>();
+
+        const normalizeSectionName = (value?: string, fallback = 'Content') => {
+            if (typeof value !== 'string') return fallback;
+            const trimmed = value.trim();
+            return trimmed.length > 0 ? trimmed : fallback;
+        };
+
+        const registerSection = (name?: string, description?: string, fallback = 'Content') => {
+            const normalizedName = normalizeSectionName(name, fallback);
+            if (!sectionOrder.includes(normalizedName)) {
+                sectionOrder.push(normalizedName);
+            }
+            if (
+                typeof description === 'string' &&
+                description.trim().length > 0 &&
+                !sectionDescriptionByName.has(normalizedName)
+            ) {
+                sectionDescriptionByName.set(normalizedName, description.trim());
+            }
+            if (!sectionItems.has(normalizedName)) {
+                sectionItems.set(normalizedName, []);
+            }
+            return normalizedName;
+        };
+
+        const addItem = (payload: {
+            url?: string;
+            type?: string;
+            key?: string;
+            status?: string;
+            label?: string;
+            section?: string;
+            sectionDescription?: string;
+        }) => {
+            if (!payload.url) return;
+            if (seen.has(payload.url)) return;
+            seen.add(payload.url);
+            const sectionName = registerSection(payload.section, payload.sectionDescription);
+            const sectionBucket = sectionItems.get(sectionName);
+            if (!sectionBucket) return;
+            sectionBucket.push({
+                id: `${payload.key ?? payload.url}`,
+                url: payload.url,
+                type: payload.type ?? 'unknown',
+                label: payload.label ?? payload.key?.split('/').pop() ?? 'Content',
+                status: payload.status ?? '',
+                section: sectionName
+            });
+        };
+
+        if (Array.isArray(sourceForContent?.sections)) {
+            sourceForContent.sections.forEach((section, sectionIdx) => {
+                const sectionWithMeta = section as {
+                    name?: string;
+                    description?: string;
+                    contents?: Array<{
+                        title?: string;
+                        type?: string;
+                        body?: string;
+                        fileData?: {
+                            original?: string;
+                            mp4?: string;
+                            m3u8?: string;
+                            type?: string;
+                            key?: string;
+                            status?: string;
+                        };
+                        file_data?: {
+                            original?: string;
+                            mp4?: string;
+                            m3u8?: string;
+                            type?: string;
+                            key?: string;
+                            status?: string;
+                        };
+                    }>;
+                };
+                const sectionName = registerSection(
+                    sectionWithMeta.name,
+                    sectionWithMeta.description,
+                    `Section ${sectionIdx + 1}`
+                );
+                if (!Array.isArray(section.contents)) return;
+                section.contents.forEach((entry, entryIdx) => {
+                    const fileData = entry.fileData ?? entry.file_data;
+                    const preferredUrl = pickPreferredContentUrl({
+                        rawType: fileData?.type ?? entry.type,
+                        fileOriginal: fileData?.original,
+                        fileMp4: fileData?.mp4,
+                        fileM3u8: fileData?.m3u8,
+                        bodyUrl: isUrl(entry.body) ? entry.body : undefined
+                    });
+                    const sectionDescription =
+                        typeof entry.body === 'string' && !isUrl(entry.body)
+                            ? entry.body.trim()
+                            : undefined;
+                    if (!preferredUrl) return;
+                    addItem({
+                        url: preferredUrl,
+                        type: fileData?.type ?? entry.type,
+                        key: fileData?.key,
+                        status: fileData?.status,
+                        label: entry.title ?? fileData?.key?.split('/').pop() ?? `Content ${entryIdx + 1}`,
+                        section: sectionName,
+                        sectionDescription
+                    });
+                });
+            });
+        }
+
+        if (Array.isArray(sourceForContent?.contents)) {
+            const defaultSectionName = sectionOrder.length > 0 ? 'Additional Content' : 'Content';
+            registerSection(defaultSectionName);
+            sourceForContent.contents.forEach((item, idx) => {
+                if (!item) return;
+                if (typeof item === 'string') {
+                    addItem({
+                        url: item,
+                        label: `Content ${idx + 1}`,
+                        section: defaultSectionName
+                    });
+                    return;
+                }
+                const unknownItem = item as {
+                    original?: string;
+                    type?: string;
+                    key?: string;
+                    status?: string;
+                    body?: string;
+                    fileData?: {
+                        original?: string;
+                        mp4?: string;
+                        m3u8?: string;
+                        type?: string;
+                        key?: string;
+                        status?: string;
+                    };
+                    file_data?: {
+                        original?: string;
+                        mp4?: string;
+                        m3u8?: string;
+                        type?: string;
+                        key?: string;
+                        status?: string;
+                    };
+                };
+                const nestedFileData = unknownItem.fileData ?? unknownItem.file_data;
+                const preferredUrl = pickPreferredContentUrl({
+                    rawType: unknownItem.type ?? nestedFileData?.type,
+                    topLevelOriginal: unknownItem.original,
+                    fileOriginal: nestedFileData?.original,
+                    fileMp4: nestedFileData?.mp4,
+                    fileM3u8: nestedFileData?.m3u8,
+                    bodyUrl: isUrl(unknownItem.body) ? unknownItem.body : undefined
+                });
+                const sectionDescription =
+                    typeof unknownItem.body === 'string' && !isUrl(unknownItem.body)
+                        ? unknownItem.body.trim()
+                        : undefined;
+                addItem({
+                    url: preferredUrl,
+                    type: unknownItem.type ?? nestedFileData?.type,
+                    key: unknownItem.key ?? nestedFileData?.key,
+                    status: unknownItem.status ?? nestedFileData?.status,
+                    label:
+                        (unknownItem.key ?? nestedFileData?.key)?.split('/').pop() ??
+                        `Content ${idx + 1}`,
+                    section: defaultSectionName,
+                    sectionDescription
+                });
+            });
+        }
+
+        if ([...sectionItems.values()].every((entries) => entries.length === 0)) {
+            const mediaSection = sectionOrder.length > 0 ? 'Media' : 'Content';
+            registerSection(mediaSection);
+            ((sourceForContent?.product_media ?? []) as unknown[])
+                .filter((url): url is string => typeof url === 'string' && url.length > 0)
+                .forEach((url, idx) => {
+                    addItem({
+                        url,
+                        type: 'media',
+                        label: `Media ${idx + 1}`,
+                        section: mediaSection
+                    });
+                });
+        }
+
+        return sectionOrder
+            .map((sectionName, sectionIdx) => {
+                const items = sectionItems.get(sectionName) ?? [];
+                return {
+                    id: `${sectionName}-${sectionIdx}`,
+                    title: sectionName,
+                    heading: `${String(sectionIdx + 1).padStart(2, '0')} ${sectionName}`,
+                    description: sectionDescriptionByName.get(sectionName) ?? '',
+                    items
+                };
+            })
+            .filter((section) => section.items.length > 0);
+    })();
+
+    const getContentKind = (type: string, url: string) => {
+        const normalizedType = (type || '').toLowerCase();
+        const normalizedUrl = (url || '').toLowerCase();
+        if (
+            normalizedType.includes('image') ||
+            /\.(jpg|jpeg|png|gif|webp|bmp|svg|avif)(\?|$)/i.test(normalizedUrl)
+        ) {
+            return 'Image';
+        }
+        if (
+            normalizedType.includes('video') ||
+            normalizedUrl.endsWith('.mp4') ||
+            normalizedUrl.endsWith('.m3u8')
+        ) {
+            return 'Video';
+        }
+        return 'Reading';
+    };
+
+    const getContentMeta = (item: {
+        type: string;
+        status: string;
+        section?: string;
+    }) => {
+        const kind = getContentKind(item.type, '');
+        const parts = [kind];
+        if (item.status) parts.push(item.status);
+        return parts.join(' • ');
+    };
+
+    const openContentInApp = (item: { url: string; type: string; label: string }) => {
+        const targetId =
+            (typeof detailId === 'string' && detailId.length > 0 ? detailId : '') ||
+            (typeof product.id === 'string' && product.id.length > 0 ? product.id : '');
+        if (!targetId) {
+            return;
+        }
+        const params = new URLSearchParams({
+            contentUrl: item.url,
+            contentType: getContentKind(item.type, item.url),
+            contentLabel: item.label
+        });
+        setOpenContentMenuId(null);
+        onClose();
+        router.push(`/products/${encodeURIComponent(targetId)}?${params.toString()}`);
     };
 
     const handleViewCreatorProfile = () => {
@@ -127,6 +549,30 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
             onClose();
         }
     };
+
+    const modalComments = (
+        ((productDetail as unknown as { comments?: Array<{ name?: string; avatar?: string; text?: string; createdAt?: string }> })?.comments) ??
+        ((productRecord as { comments?: Array<{ name?: string; avatar?: string; text?: string; createdAt?: string }> | undefined })?.comments) ??
+        []
+    ).slice(0, 3);
+
+    const isExclusiveAccessEnabled = toBooleanFlag(
+        (productDetail as { exclusive_access?: unknown } | null)?.exclusive_access
+    );
+    const hasGroupChat = Boolean((productDetail as { group_Id?: string | null } | null)?.group_Id);
+    const createdAtLabel = formatDate((productDetail as { createdAt?: string } | null)?.createdAt);
+    const productCategoryLabel =
+        (productDetail as { product_category?: string } | null)?.product_category ??
+        product.type ??
+        'Product';
+    const productDescriptionText = stripHtml(productDetail?.product_description);
+    const fullProductDescription = productDescriptionText || productDetail?.product_name || product.name;
+    const maxDescriptionLength = 320;
+    const shouldTruncateDescription = fullProductDescription.length > maxDescriptionLength;
+    const visibleDescription =
+        isDescriptionExpanded || !shouldTruncateDescription
+            ? fullProductDescription
+            : `${fullProductDescription.slice(0, maxDescriptionLength).trimEnd()}...`;
 
     return (
         <>
@@ -162,21 +608,23 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                         <div className="relative w-full h-[304px] rounded-2xl overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent z-10" />
                             <img
-                                src={product.thumbnail}
-                                alt={product.name}
+                                src={productDetail?.product_cover || product.thumbnail}
+                                alt={productDetail?.product_name || product.name}
                                 className="w-full h-full object-cover"
                             />
-                            <div className="absolute top-3 left-3 z-20">
-                                <div className="flex items-center gap-0.5 px-1.5 py-0.5 bg-surface-success rounded-[13px]">
-                                    <svg width="16" height="16" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M0.5 6.5C0.5 7.28793 0.655194 8.06815 0.956723 8.7961C1.25825 9.52405 1.70021 10.1855 2.25736 10.7426C2.81451 11.2998 3.47595 11.7417 4.2039 12.0433C4.93185 12.3448 5.71207 12.5 6.5 12.5C7.28793 12.5 8.06815 12.3448 8.7961 12.0433C9.52405 11.7417 10.1855 11.2998 10.7426 10.7426C11.2998 10.1855 11.7417 9.52405 12.0433 8.7961C12.3448 8.06815 12.5 7.28793 12.5 6.5C12.5 5.71207 12.3448 4.93185 12.0433 4.2039C11.7417 3.47595 11.2998 2.81451 10.7426 2.25736C10.1855 1.70021 9.52405 1.25825 8.7961 0.956723C8.06815 0.655195 7.28793 0.5 6.5 0.5C5.71207 0.5 4.93185 0.655195 4.2039 0.956723C3.47595 1.25825 2.81451 1.70021 2.25736 2.25736C1.70021 2.81451 1.25825 3.47595 0.956723 4.2039C0.655194 4.93185 0.5 5.71207 0.5 6.5Z" stroke="#239B73" strokeLinecap="round" strokeLinejoin="round" />
-                                        <path d="M4.5 6.50008L5.83333 7.83341L8.5 5.16675" stroke="#239B73" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                    <span className="font-sans font-medium text-[13px] leading-[16px] text-text-success">
-                                        Approved
-                                    </span>
+                            {productDetail?.status && (
+                                <div className="absolute top-3 left-3 z-20">
+                                    <div className="flex items-center gap-0.5 px-1.5 py-0.5 bg-surface-success rounded-[13px]">
+                                        <svg width="16" height="16" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M0.5 6.5C0.5 7.28793 0.655194 8.06815 0.956723 8.7961C1.25825 9.52405 1.70021 10.1855 2.25736 10.7426C2.81451 11.2998 3.47595 11.7417 4.2039 12.0433C4.93185 12.3448 5.71207 12.5 6.5 12.5C7.28793 12.5 8.06815 12.3448 8.7961 12.0433C9.52405 11.7417 10.1855 11.2998 10.7426 10.7426C11.2998 10.1855 11.7417 9.52405 12.0433 8.7961C12.3448 8.06815 12.5 7.28793 12.5 6.5C12.5 5.71207 12.3448 4.93185 12.0433 4.2039C11.7417 3.47595 11.2998 2.81451 10.7426 2.25736C10.1855 1.70021 9.52405 1.25825 8.7961 0.956723C8.06815 0.655195 7.28793 0.5 6.5 0.5C5.71207 0.5 4.93185 0.655195 4.2039 0.956723C3.47595 1.25825 2.81451 1.70021 2.25736 2.25736C1.70021 2.81451 1.25825 3.47595 0.956723 4.2039C0.655194 4.93185 0.5 5.71207 0.5 6.5Z" stroke="#239B73" strokeLinecap="round" strokeLinejoin="round" />
+                                            <path d="M4.5 6.50008L5.83333 7.83341L8.5 5.16675" stroke="#239B73" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                        <span className="font-sans font-medium text-[13px] leading-[16px] text-text-success">
+                                            {productDetail.status}
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
 
                         {/* Product Details */}
@@ -186,20 +634,24 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                                 <div className="flex-1 flex flex-col gap-2">
                                     <div className="flex flex-col gap-0.5">
                                         <h3 className="font-sans text-body-lg text-text-primary">
-                                            {product.name}
+                                            {productDetail?.product_name ?? product.name}
                                         </h3>
                                         <span className="font-sans text-body-sm text-text-secondary">
-                                            {product.type || 'Product'}
+                                            {productCategoryLabel}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-4">
                                         <span className="font-sans text-body-lg text-text-primary">
-                                            {formatCurrency(product.price)}
+                                            {new Intl.NumberFormat('en-NG', {
+                                                style: 'currency',
+                                                currency: productDetail?.currency ?? 'NGN',
+                                                minimumFractionDigits: 0
+                                            }).format(productDetail?.product_price ?? product.price)}
                                         </span>
                                         <div className="flex items-center gap-1">
                                             <StarIcon filled={true} />
                                             <span className="font-sans text-body-lg text-text-primary">
-                                                4.3
+                                                {(averageRating ?? productDetail?.averageRating ?? 0).toFixed(1)}
                                             </span>
                                         </div>
                                     </div>
@@ -212,9 +664,20 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                             </div>
 
                             {/* Description */}
-                            <p className="font-sans text-body-sm-regular text-text-secondary">
-                                {product.name} - A comprehensive digital product designed to help you achieve your goals. This product includes everything you need to get started and succeed.
-                            </p>
+                            <div className="flex flex-col gap-1">
+                                <p className="font-sans text-body-sm-regular text-text-secondary">
+                                    {visibleDescription}
+                                </p>
+                                {shouldTruncateDescription && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsDescriptionExpanded((value) => !value)}
+                                        className="self-start font-sans text-caption-lg text-[#5F2EFC] underline"
+                                    >
+                                        {isDescriptionExpanded ? 'Show less' : 'Read more'}
+                                    </button>
+                                )}
+                            </div>
                         </div>
 
                         {/* Divider */}
@@ -272,379 +735,323 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                     </div>
 
                     {/* Tab Content */}
-                    <div className="px-6 py-4 bg-surface-secondary flex flex-col gap-4">
+                    <div className="px-6 pt-4 pb-6 bg-surface-secondary flex flex-col gap-4">
                         {activeTab === 'Overview' && (
-                            <>
-                                {/* Product Info Grid */}
-                                <div className="flex flex-col gap-1">
-                                    <div className="flex items-center px-4 h-[32px] bg-white border border-border-primary rounded">
-                                        <span className="w-[105px] font-sans text-caption-lg-regular text-text-secondary">
+                            <div className="w-full flex flex-col gap-4">
+                                <div className="w-full flex flex-col gap-1 rounded-lg">
+                                    <div className="h-8 bg-white border border-[#EBEBEB] rounded px-4 flex items-center gap-4">
+                                        <span className="w-[105px] text-[12px] leading-[14px] font-normal text-[#5F5971]">
                                             Exclusive Access
                                         </span>
-                                        <div className="w-px h-[32px] bg-[#EBEBEB] mx-4" />
-                                        <span className="flex-1 font-sans text-body-sm text-text-primary">
-                                            Active
+                                        <div className="w-px h-8 bg-[#EBEBEB]" />
+                                        <span className="flex-1 text-[13.5px] leading-4 font-medium text-[#2B2834]">
+                                            {isExclusiveAccessEnabled ? 'Active' : 'Inactive'}
                                         </span>
                                     </div>
-                                    <div className="flex items-center px-4 h-[32px] bg-white border border-border-primary rounded">
-                                        <span className="w-[105px] font-sans text-caption-lg-regular text-text-secondary">
+                                    <div className="h-8 bg-white border border-[#EBEBEB] rounded pl-4 pr-2 flex items-center gap-4">
+                                        <span className="w-[105px] text-[12px] leading-[14px] font-normal text-[#5F5971]">
                                             Product Group Chat
                                         </span>
-                                        <div className="w-px h-[32px] bg-[#EBEBEB] mx-4" />
-                                        <span className="flex-1 font-sans text-body-sm text-text-primary">
-                                            True
+                                        <div className="w-px h-8 bg-[#EBEBEB]" />
+                                        <span className="flex-1 text-[13.5px] leading-4 font-medium text-[#2B2834]">
+                                            {hasGroupChat ? 'True' : 'False'}
                                         </span>
-                                        <a href="#" className="flex items-center gap-1 font-sans text-caption-lg text-text-brand underline">
-                                            View Group Chat
-                                            <ArrowUpRight className="w-3.5 h-3.5" />
-                                        </a>
+                                        {hasGroupChat && (
+                                            <button
+                                                type="button"
+                                                className="flex items-center justify-end gap-1 flex-1 text-[12px] leading-[14px] font-medium text-[#5F2EFC] underline"
+                                            >
+                                                <span>View Group Chat</span>
+                                                <ArrowUpRight className="w-[14px] h-[14px]" />
+                                            </button>
+                                        )}
                                     </div>
-                                    <div className="flex items-center px-4 h-[32px] bg-white border border-border-primary rounded">
-                                        <span className="w-[105px] font-sans text-caption-lg-regular text-text-secondary">
+                                    <div className="h-8 bg-white border border-[#EBEBEB] rounded px-4 flex items-center gap-4">
+                                        <span className="w-[105px] text-[12px] leading-[14px] font-normal text-[#5F5971]">
                                             Date Created
                                         </span>
-                                        <div className="w-px h-[32px] bg-[#EBEBEB] mx-4" />
-                                        <span className="flex-1 font-sans text-body-sm text-text-primary">
-                                            {product.dateCreated}
+                                        <div className="w-px h-8 bg-[#EBEBEB]" />
+                                        <span className="flex-1 text-[13.5px] leading-4 font-medium text-[#2B2834]">
+                                            {createdAtLabel}
                                         </span>
                                     </div>
                                 </div>
 
-                                {/* Comments Section */}
-                                <div className="flex flex-col gap-3">
-                                    <h4 className="font-sans text-body-lg text-[#1F1F1F]">
-                                        Comments
-                                    </h4>
-                                    <div className="flex flex-col gap-4 p-4 bg-white border border-border-primary rounded">
-                                        {mockComments.map((comment, index) => (
+                                <div className="w-full flex flex-col gap-3">
+                                    <h4 className="text-[16px] leading-[19px] font-bold text-[#1F1F1F]">Comments</h4>
+                                    <div className="w-full bg-white border border-[#EBEBEB] rounded p-4 flex flex-col gap-4">
+                                        {modalComments.length === 0 && (
+                                            <span className="text-[13.5px] leading-4 font-normal text-[#5F5971]">
+                                                No comments yet.
+                                            </span>
+                                        )}
+                                        {modalComments.map((comment, index) => (
                                             <div
-                                                key={comment.id}
+                                                key={`${comment.name ?? 'comment'}-${index}`}
                                                 className={cn(
-                                                    "flex gap-2 pb-4",
-                                                    index !== mockComments.length - 1 && "border-b border-border-primary"
+                                                    "w-full flex items-start gap-2 pb-4",
+                                                    index !== modalComments.length - 1 && "border-b border-[#EBEBEB]"
                                                 )}
                                             >
-                                                <img
-                                                    src={comment.avatar}
-                                                    alt={comment.author}
-                                                    className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                                                />
-                                                <div className="flex-1 flex flex-col gap-1.5">
-                                                    <div className="flex items-center justify-between">
-                                                        <span className={cn(
-                                                            "font-sans text-[13.5px] leading-[16px] text-[#1F1F1F]",
-                                                            comment.isCreator ? "font-bold" : "font-medium"
-                                                        )}>
-                                                            {comment.author}
+                                                <div className="w-8 h-8 rounded-[200px] bg-surface-secondary overflow-hidden shrink-0">
+                                                    {comment.avatar ? (
+                                                        <img
+                                                            src={comment.avatar}
+                                                            alt={comment.name ?? 'User'}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : null}
+                                                </div>
+                                                <div className="flex-1 flex flex-col gap-[6px]">
+                                                    <div className="w-full flex items-center gap-2">
+                                                        <span className="flex-1 text-[13.5px] leading-4 font-medium text-[#1F1F1F]">
+                                                            {comment.name ?? 'Anonymous'}
                                                         </span>
-                                                        <span className="font-sans text-caption-sm-regular text-text-tertiary">
-                                                            {comment.time}
+                                                        <span className="text-[10px] leading-3 font-normal text-[#A5A1AF]">
+                                                            {getRelativeTime(comment.createdAt)}
                                                         </span>
                                                     </div>
-                                                    {comment.isCreator ? (
-                                                        <div className="px-2 py-1 bg-surface-secondary rounded-br-lg rounded-bl-lg rounded-tr-lg">
-                                                            <p className="font-sans text-body-sm-regular text-[#1F1F1F]">
-                                                                {comment.text}
-                                                            </p>
-                                                        </div>
-                                                    ) : (
-                                                        <p className="font-sans text-body-sm-regular text-text-secondary">
-                                                            {comment.text}
-                                                        </p>
-                                                    )}
+                                                    <span className="text-[13.5px] leading-4 font-normal text-[#5F5971]">
+                                                        {comment.text ?? 'No comment text.'}
+                                                    </span>
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
-                            </>
+                            </div>
                         )}
 
                         {activeTab === 'Content' && (
-                            <div className="flex flex-col gap-2">
-                                {/* Content Module */}
-                                <div className="flex flex-col p-4 gap-4 bg-white rounded-3xl">
-                                    <div className="flex flex-col gap-4">
-                                        <h4 className="font-sans text-body-lg text-text-primary">
-                                            01 Introduction
-                                        </h4>
-                                        <p className="font-sans text-body-sm-regular text-text-secondary">
-                                            Explore the fascinating realm of interior design with our comprehensive book! You&apos;ll discover inspiring projects and gain personalized insights to ignite your creativity.
-                                        </p>
-
-                                        {/* Content Items */}
+                            <div className="flex flex-col gap-3" onClick={() => setOpenContentMenuId(null)}>
+                                <div className="flex flex-col gap-4">
+                                    {isProductLoading && (
+                                        <span className="text-caption-sm text-text-secondary">Loading content…</span>
+                                    )}
+                                    {hasProductError && !isProductLoading && contentSections.length === 0 && (
+                                        <span className="text-caption-sm text-text-secondary">Unable to load content.</span>
+                                    )}
+                                    {!isProductLoading && !hasProductError && contentSections.length === 0 && (
+                                        <span className="text-caption-sm text-text-secondary">
+                                            {isObjectId(detailId)
+                                                ? 'No content returned by API. Access may be limited for this product.'
+                                                : 'Product ID missing from listing response. Content cannot be loaded.'}
+                                        </span>
+                                    )}
+                                    {!isProductLoading && contentSections.length > 0 && (
                                         <div className="flex flex-col gap-2">
-                                            {/* Reading Item */}
-                                            <div
-                                                className="flex items-center gap-2 p-3 bg-white border border-[#EAECF0] rounded-lg transition-colors cursor-pointer hover:bg-gray-50"
-                                                onClick={handleViewContent}
-                                            >
-                                                <div className="w-8 h-8 flex-shrink-0">
-                                                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <rect width="32" height="32" rx="8" fill="#5838FC" />
-                                                        <path d="M15.9999 22.7194C15.7999 22.7194 15.5999 22.6727 15.4333 22.5794C14.1866 21.8994 11.9933 21.1794 10.6199 20.9994L10.4266 20.9727C9.55325 20.866 8.83325 20.046 8.83325 19.1594V11.106C8.83325 10.5794 9.03992 10.0994 9.41992 9.75269C9.79992 9.40602 10.2933 9.23935 10.8133 9.28602C12.2799 9.39935 14.4933 10.1327 15.7466 10.9194L15.9066 11.0127C15.9533 11.0394 16.0533 11.0394 16.0933 11.0194L16.1999 10.9527C17.4533 10.166 19.6666 9.41935 21.1399 9.29269C21.1533 9.29269 21.2066 9.29269 21.2199 9.29269C21.7066 9.24602 22.2066 9.41935 22.5799 9.76602C22.9599 10.1127 23.1666 10.5927 23.1666 11.1194V19.166C23.1666 20.0594 22.4466 20.8727 21.5666 20.9794L21.3466 21.006C19.9733 21.186 17.7733 21.9127 16.5533 22.586C16.3933 22.6794 16.1999 22.7194 15.9999 22.7194ZM10.6533 10.2794C10.4399 10.2794 10.2466 10.3527 10.0933 10.4927C9.92659 10.646 9.83325 10.866 9.83325 11.106V19.1594C9.83325 19.5527 10.1733 19.9327 10.5533 19.986L10.7533 20.0127C12.2533 20.2127 14.5533 20.966 15.8866 21.6927C15.9466 21.7194 16.0333 21.726 16.0666 21.7127C17.3999 20.9727 19.7133 20.2127 21.2199 20.0127L21.4466 19.986C21.8266 19.9394 22.1666 19.5527 22.1666 19.1594V11.1127C22.1666 10.866 22.0733 10.6527 21.9066 10.4927C21.7333 10.3394 21.5133 10.266 21.2666 10.2794C21.2533 10.2794 21.1999 10.2794 21.1866 10.2794C19.9133 10.3927 17.8599 11.0794 16.7399 11.7794L16.6333 11.8527C16.2666 12.0794 15.7466 12.0794 15.3933 11.8594L15.2333 11.766C14.0933 11.066 12.0399 10.386 10.7333 10.2794C10.7066 10.2794 10.6799 10.2794 10.6533 10.2794Z" fill="white" />
-                                                        <path d="M16 22.1602C15.7267 22.1602 15.5 21.9335 15.5 21.6602V11.6602C15.5 11.3868 15.7267 11.1602 16 11.1602C16.2733 11.1602 16.5 11.3868 16.5 11.6602V21.6602C16.5 21.9402 16.2733 22.1602 16 22.1602Z" fill="white" />
-                                                        <path d="M13.1667 14.1602H11.6667C11.3934 14.1602 11.1667 13.9335 11.1667 13.6602C11.1667 13.3868 11.3934 13.1602 11.6667 13.1602H13.1667C13.4401 13.1602 13.6667 13.3868 13.6667 13.6602C13.6667 13.9335 13.4401 14.1602 13.1667 14.1602Z" fill="white" />
-                                                        <path d="M13.6667 16.1602H11.6667C11.3934 16.1602 11.1667 15.9335 11.1667 15.6602C11.1667 15.3868 11.3934 15.1602 11.6667 15.1602H13.6667C13.9401 15.1602 14.1667 15.3868 14.1667 15.6602C14.1667 15.9335 13.9401 16.1602 13.6667 16.1602Z" fill="white" />
-                                                    </svg>
+                                            {contentSections.map((section) => (
+                                                <div
+                                                    key={section.id}
+                                                    className="bg-white border border-border-primary rounded-[24px] p-4 flex flex-col gap-4 overflow-visible"
+                                                >
+                                                    <div className="flex flex-col gap-2">
+                                                        <h4 className="font-sans text-body-lg text-text-primary">
+                                                            {section.heading}
+                                                        </h4>
+                                                        {section.description && (
+                                                            <p className="font-sans text-body-sm-regular text-text-secondary">
+                                                                {section.description}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex flex-col gap-1 overflow-visible">
+                                                        {section.items.map((item, itemIndex) => {
+                                                            const isLastItem = itemIndex === section.items.length - 1;
+                                                            const isMenuOpen = openContentMenuId === item.id;
+                                                            return (
+                                                                <div
+                                                                    key={item.id}
+                                                                    className="relative isolate flex items-center gap-2 px-3 py-2 h-[52px] bg-white border border-[#EAECF0] rounded-lg transition-colors cursor-pointer hover:bg-gray-50 overflow-visible"
+                                                                    onClick={() => {
+                                                                        openContentInApp(item);
+                                                                    }}
+                                                                >
+                                                                    <div className="w-8 h-8 bg-[#5838FC] rounded-lg flex items-center justify-center flex-shrink-0">
+                                                                        {getContentKind(item.type, item.url) === 'Video' ? (
+                                                                            <PlayCircle className="w-4 h-4 text-white" />
+                                                                        ) : (
+                                                                            <BookOpen className="w-4 h-4 text-white" />
+                                                                        )}
+                                                                    </div>
+                                                                    <div className="flex-1 flex flex-col gap-0.5 min-w-0">
+                                                                        <span className="font-sans text-body-md text-text-primary line-clamp-1">
+                                                                            {item.label}
+                                                                        </span>
+                                                                        <span className="font-sans text-caption-md text-text-tertiary line-clamp-1">
+                                                                            {getContentMeta(item)}
+                                                                        </span>
+                                                                    </div>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={(event) => {
+                                                                            event.stopPropagation();
+                                                                            setOpenContentMenuId(
+                                                                                isMenuOpen ? null : item.id
+                                                                            );
+                                                                        }}
+                                                                        className="w-5 h-5 flex items-center justify-center text-text-secondary hover:text-text-primary transition-colors"
+                                                                    >
+                                                                        <MoreHorizontal className="w-4 h-4" />
+                                                                    </button>
+                                                                    {isMenuOpen && (
+                                                                        <div
+                                                                            className={cn(
+                                                                                "absolute right-2 z-30 w-32 bg-white border border-border-primary rounded-xl shadow-dropdown overflow-hidden",
+                                                                                isLastItem ? "bottom-[42px]" : "top-[42px]"
+                                                                            )}
+                                                                            onClick={(event) => event.stopPropagation()}
+                                                                        >
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => {
+                                                                                    openContentInApp(item);
+                                                                                }}
+                                                                                className="w-full text-left px-4 py-2.5 text-body-sm text-text-primary hover:bg-surface-secondary transition-colors border-b border-border-primary"
+                                                                            >
+                                                                                View
+                                                                            </button>
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => {
+                                                                                    setOpenContentMenuId(null);
+                                                                                }}
+                                                                                className="w-full text-left px-4 py-2.5 text-body-sm text-text-danger hover:bg-surface-secondary transition-colors"
+                                                                            >
+                                                                                Reject Content
+                                                                            </button>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
                                                 </div>
-                                                <div className="flex-1 flex flex-col gap-0.5">
-                                                    <span className="font-sans text-body-md text-text-primary">
-                                                        Introduction to Interior Design
-                                                    </span>
-                                                    <span className="font-sans text-caption-md text-text-tertiary">
-                                                        Reading • 2 min
-                                                    </span>
-                                                </div>
-                                                <div className="relative" onClick={(e) => e.stopPropagation()}>
-                                                    <button
-                                                        className="p-1"
-                                                        onClick={() => setOpenContentMenuId(openContentMenuId === 1 ? null : 1)}
-                                                    >
-                                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                            <circle cx="10" cy="10" r="1.5" fill="#5F5971" />
-                                                            <circle cx="10" cy="4" r="1.5" fill="#5F5971" />
-                                                            <circle cx="10" cy="16" r="1.5" fill="#5F5971" />
-                                                        </svg>
-                                                    </button>
-                                                    {openContentMenuId === 1 && (
-                                                        <div
-                                                            className="absolute right-[10px] top-[33px] w-[128px] bg-white border border-border-primary rounded-[12px] flex flex-col p-0 overflow-hidden z-50"
-                                                            style={{
-                                                                boxShadow: '0px 116px 46px rgba(0, 0, 0, 0.01), 0px 65px 39px rgba(0, 0, 0, 0.05), 0px 29px 29px rgba(0, 0, 0, 0.09), 0px 7px 16px rgba(0, 0, 0, 0.1)'
-                                                            }}
-                                                        >
-                                                            <button
-                                                                onClick={() => {
-                                                                    handleViewContent();
-                                                                    setOpenContentMenuId(null);
-                                                                }}
-                                                                className="w-[128px] h-[37px] flex items-center bg-white hover:bg-gray-50 transition-colors"
-                                                                style={{
-                                                                    padding: '10px 24px 10px 16px',
-                                                                    gap: '10px',
-                                                                    border: '0.5px solid #EBEBEB',
-                                                                    borderRadius: '0px'
-                                                                }}
-                                                            >
-                                                                <span className="text-[13.5px] font-medium text-text-primary leading-4 font-sans">
-                                                                    View
-                                                                </span>
-                                                            </button>
-                                                            <button
-                                                                onClick={() => {
-                                                                    console.log('Reject content');
-                                                                    setOpenContentMenuId(null);
-                                                                }}
-                                                                className="w-[128px] h-[37px] flex items-center bg-white hover:bg-gray-50 transition-colors"
-                                                                style={{
-                                                                    padding: '10px 24px 10px 16px',
-                                                                    gap: '10px',
-                                                                    border: '0.5px solid #EBEBEB',
-                                                                    borderRadius: '0px'
-                                                                }}
-                                                            >
-                                                                <span className="text-[13.5px] font-medium text-text-danger leading-4 font-sans">
-                                                                    Reject Content
-                                                                </span>
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            {/* Video Item */}
-                                            <div
-                                                className="flex items-center gap-2 p-3 bg-white border border-[#EAECF0] rounded-lg transition-colors cursor-pointer hover:bg-gray-50"
-                                                onClick={handleViewContent}
-                                            >
-                                                <div className="w-8 h-8 bg-[#5838FC] rounded-lg flex items-center justify-center flex-shrink-0">
-                                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M8 14.6667C11.6819 14.6667 14.6667 11.6819 14.6667 8C14.6667 4.3181 11.6819 1.33333 8 1.33333C4.3181 1.33333 1.33333 4.3181 1.33333 8C1.33333 11.6819 4.3181 14.6667 8 14.6667Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                                        <path d="M6.66666 5.33333L10.6667 8L6.66666 10.6667V5.33333Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                                    </svg>
-                                                </div>
-                                                <div className="flex-1 flex flex-col gap-0.5">
-                                                    <span className="font-sans text-body-md text-text-primary">
-                                                        Approaching Interior Design
-                                                    </span>
-                                                    <span className="font-sans text-caption-md text-text-tertiary">
-                                                        Video • 5 min
-                                                    </span>
-                                                </div>
-                                                <div className="relative" onClick={(e) => e.stopPropagation()}>
-                                                    <button
-                                                        className="p-1"
-                                                        onClick={() => setOpenContentMenuId(openContentMenuId === 2 ? null : 2)}
-                                                    >
-                                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                            <circle cx="10" cy="10" r="1.5" fill="#5F5971" />
-                                                            <circle cx="10" cy="4" r="1.5" fill="#5F5971" />
-                                                            <circle cx="10" cy="16" r="1.5" fill="#5F5971" />
-                                                        </svg>
-                                                    </button>
-                                                    {openContentMenuId === 2 && (
-                                                        <div
-                                                            className="absolute right-[10px] top-[33px] w-[128px] bg-white border border-border-primary rounded-[12px] flex flex-col p-0 overflow-hidden z-50"
-                                                            style={{
-                                                                boxShadow: '0px 116px 46px rgba(0, 0, 0, 0.01), 0px 65px 39px rgba(0, 0, 0, 0.05), 0px 29px 29px rgba(0, 0, 0, 0.09), 0px 7px 16px rgba(0, 0, 0, 0.1)'
-                                                            }}
-                                                        >
-                                                            <button
-                                                                onClick={() => {
-                                                                    handleViewContent();
-                                                                    setOpenContentMenuId(null);
-                                                                }}
-                                                                className="w-[128px] h-[37px] flex items-center bg-white hover:bg-gray-50 transition-colors"
-                                                                style={{
-                                                                    padding: '10px 24px 10px 16px',
-                                                                    gap: '10px',
-                                                                    border: '0.5px solid #EBEBEB',
-                                                                    borderRadius: '0px'
-                                                                }}
-                                                            >
-                                                                <span className="text-[13.5px] font-medium text-text-primary leading-4 font-sans">
-                                                                    View
-                                                                </span>
-                                                            </button>
-                                                            <button
-                                                                onClick={() => {
-                                                                    console.log('Reject content');
-                                                                    setOpenContentMenuId(null);
-                                                                }}
-                                                                className="w-[128px] h-[37px] flex items-center bg-white hover:bg-gray-50 transition-colors"
-                                                                style={{
-                                                                    padding: '10px 24px 10px 16px',
-                                                                    gap: '10px',
-                                                                    border: '0.5px solid #EBEBEB',
-                                                                    borderRadius: '0px'
-                                                                }}
-                                                            >
-                                                                <span className="text-[13.5px] font-medium text-text-danger leading-4 font-sans">
-                                                                    Reject Content
-                                                                </span>
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
+                                            ))}
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
                             </div>
                         )}
 
                         {activeTab === 'Reviews' && (
                             <div className="flex flex-col gap-1 p-1">
-                                {/* Rating Summary */}
-                                <div className="flex items-center h-[100px] bg-white border border-border-primary rounded">
-                                    {/* Total Reviews */}
-                                    <div className="flex-1 flex flex-col items-center justify-center gap-1 py-4 px-4 border-r border-border-primary">
-                                        <span className="font-sans text-caption-lg-regular text-text-secondary">
-                                            Total Reviews
-                                        </span>
-                                        <span className="font-sans font-medium text-[20px] leading-[24px] tracking-[-0.01em] text-text-primary">
-                                            10.0k
-                                        </span>
-                                    </div>
+                        {/* Rating Summary */}
+                        <div className="flex items-center h-[100px] bg-white border border-border-primary rounded">
+                            {/* Total Reviews */}
+                            <div className="flex-1 flex flex-col items-center justify-center gap-1 py-4 px-4 border-r border-border-primary">
+                                <span className="font-sans text-caption-lg-regular text-text-secondary">
+                                    Total Reviews
+                                </span>
+                                <span className="font-sans font-medium text-[20px] leading-[24px] tracking-[-0.01em] text-text-primary">
+                                    {isReviewsLoading ? '—' : totalReviews.toLocaleString('en-NG')}
+                                </span>
+                            </div>
 
-                                    {/* Average Rating */}
-                                    <div className="flex-1 flex flex-col items-center justify-center gap-1 py-4 px-4 border-r border-border-primary">
-                                        <span className="font-sans text-caption-lg-regular text-text-secondary">
-                                            Average Rating
-                                        </span>
-                                        <div className="flex items-center gap-2.5">
-                                            <span className="font-sans font-medium text-[20px] leading-[24px] tracking-[-0.01em] text-text-primary">
-                                                4.0
-                                            </span>
-                                            <div className="flex items-center gap-1">
-                                                {[1, 2, 3, 4].map((i) => (
-                                                    <StarIcon key={i} filled={true} />
-                                                ))}
-                                                <StarIcon filled={false} />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Rating Distribution */}
-                                    <div className="flex-1 flex flex-col justify-center gap-2 py-4 px-4">
-                                        {[
-                                            { stars: 5, count: '2.1k', width: '100%', opacity: 1 },
-                                            { stars: 4, count: '1.2k', width: '58%', opacity: 0.7 },
-                                            { stars: 3, count: '230', width: '17%', opacity: 0.5 },
-                                            { stars: 2, count: '0', width: '3%', opacity: 0.3 },
-                                            { stars: 1, count: '0', width: '3%', opacity: 0.2 }
-                                        ].map((item) => (
-                                            <div key={item.stars} className="flex items-center gap-1.5">
-                                                <div className="flex items-center gap-0.5 w-6">
-                                                    <SmallStarIcon filled={true} />
-                                                    <span className="font-sans text-caption-sm text-text-secondary flex-1 text-center">
-                                                        {item.stars}
-                                                    </span>
-                                                </div>
-                                                <div className="flex-1 h-[4px] bg-gray-100 rounded-full overflow-hidden">
-                                                    <div
-                                                        className="h-full bg-[#FF8D28] rounded-full"
-                                                        style={{ width: item.width, opacity: item.opacity }}
-                                                    />
-                                                </div>
-                                                <span className="font-sans text-caption-sm text-text-primary w-8 text-right">
-                                                    {item.count}
-                                                </span>
-                                            </div>
+                            {/* Average Rating */}
+                            <div className="flex-1 flex flex-col items-center justify-center gap-1 py-4 px-4 border-r border-border-primary">
+                                <span className="font-sans text-caption-lg-regular text-text-secondary">
+                                    Average Rating
+                                </span>
+                                <div className="flex items-center gap-2.5">
+                                    <span className="font-sans font-medium text-[20px] leading-[24px] tracking-[-0.01em] text-text-primary">
+                                        {averageRating !== null ? averageRating.toFixed(1) : isReviewsLoading ? '—' : '0.0'}
+                                    </span>
+                                    <div className="flex items-center gap-1">
+                                        {[1, 2, 3, 4, 5].map((i) => (
+                                            <StarIcon key={i} filled={averageRating !== null && averageRating >= i} />
                                         ))}
                                     </div>
                                 </div>
+                            </div>
 
-                                {/* Reviews List */}
-                                <div className="flex flex-col bg-white border border-border-primary rounded">
-                                    {mockReviews.map((review, index) => (
-                                        <div
-                                            key={review.id}
-                                            className={cn(
-                                                "flex flex-col gap-2 p-4",
-                                                index !== mockReviews.length - 1 && "border-b border-border-primary"
-                                            )}
-                                        >
-                                            {/* User Info */}
-                                            <div className="flex items-start gap-3">
-                                                <img
-                                                    src={review.avatar}
-                                                    alt={review.author}
-                                                    className="w-[45px] h-[45px] rounded-full object-cover"
-                                                />
-                                                <div className="flex flex-col gap-1">
-                                                    <span className="font-sans font-bold text-[18px] leading-[22px] text-text-primary">
-                                                        {review.author}
-                                                    </span>
-                                                    <span className="font-sans text-heading-sm tracking-[-0.02em] text-[#8E8E8D]">
-                                                        {review.handle}
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            {/* Rating and Date */}
-                                            <div className="flex items-center gap-2.5">
-                                                <div className="flex items-center gap-1">
-                                                    {[...Array(5)].map((_, i) => (
-                                                        <StarIcon
-                                                            key={i}
-                                                            filled={i < review.rating}
-                                                        />
-                                                    ))}
-                                                </div>
-                                                <span className="font-sans font-normal text-[14px] leading-[17px] tracking-[-0.02em] text-[#8E8E8D]">
-                                                    {review.date}
+                            {/* Rating Distribution */}
+                            <div className="flex-1 flex flex-col justify-center gap-2 py-4 px-4">
+                                {[5, 4, 3, 2, 1].map((stars) => {
+                                    const count = distribution[stars] ?? 0;
+                                    const width =
+                                        totalReviews > 0 ? `${Math.min((count / totalReviews) * 100, 100)}%` : '0%';
+                                    return (
+                                        <div key={stars} className="flex items-center gap-1.5">
+                                            <div className="flex items-center gap-0.5 w-6">
+                                                <SmallStarIcon filled={true} />
+                                                <span className="font-sans text-caption-sm text-text-secondary flex-1 text-center">
+                                                    {stars}
                                                 </span>
                                             </div>
-
-                                            {/* Review Text */}
-                                            <p className="font-sans font-normal text-[16px] leading-[19px] text-[#090A07]">
-                                                {review.text}
-                                            </p>
+                                            <div className="flex-1 h-[4px] bg-gray-100 rounded-full overflow-hidden">
+                                                <div
+                                                    className="h-full bg-[#FF8D28] rounded-full transition-all"
+                                                    style={{ width }}
+                                                />
+                                            </div>
+                                            <span className="font-sans text-caption-sm text-text-primary w-8 text-right">
+                                                {count.toLocaleString('en-NG')}
+                                            </span>
                                         </div>
-                                    ))}
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Reviews List */}
+                        <div className="flex flex-col bg-white border border-border-primary rounded">
+                            {isReviewsLoading && (
+                                <div className="p-4 text-caption-sm text-text-secondary">Loading reviews…</div>
+                            )}
+                            {hasReviewsError && !isReviewsLoading && (
+                                <div className="p-4 text-caption-sm text-text-secondary">Unable to load reviews.</div>
+                            )}
+                            {!isReviewsLoading && !hasReviewsError && reviews.length === 0 && (
+                                <div className="p-4 text-caption-sm text-text-secondary">No reviews yet.</div>
+                            )}
+                            {!isReviewsLoading && !hasReviewsError && reviews.map((review, index) => (
+                                <div
+                                    key={review._id}
+                                    className={cn(
+                                        "flex flex-col gap-2 p-4",
+                                        index !== reviews.length - 1 && "border-b border-border-primary"
+                                    )}
+                                >
+                                    {/* User Info */}
+                                    <div className="flex items-start gap-3">
+                                        <img
+                                            src={review.user_avatar}
+                                            alt={review.user_name}
+                                            className="w-[45px] h-[45px] rounded-full object-cover"
+                                        />
+                                        <div className="flex flex-col gap-1">
+                                            <span className="font-sans font-bold text-[18px] leading-[22px] text-text-primary">
+                                                {review.user_name}
+                                            </span>
+                                            <span className="font-sans text-heading-sm tracking-[-0.02em] text-[#8E8E8D]">
+                                                {review.user_id}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Rating and Date */}
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="flex items-center gap-1">
+                                            {[...Array(5)].map((_, i) => (
+                                                <StarIcon
+                                                    key={i}
+                                                    filled={i < review.rating}
+                                                />
+                                            ))}
+                                        </div>
+                                        <span className="font-sans font-normal text-[14px] leading-[17px] tracking-[-0.02em] text-[#8E8E8D]">
+                                            {new Date(review.createdAt).toLocaleDateString('en-NG')}
+                                        </span>
+                                    </div>
+
+                                    {/* Review Text */}
+                                    <p className="font-sans font-normal text-[16px] leading-[19px] text-[#090A07]">
+                                        {review.review}
+                                    </p>
                                 </div>
+                            ))}
+                        </div>
                             </div>
                         )}
                     </div>

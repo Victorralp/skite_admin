@@ -126,14 +126,16 @@ export default function RevenueTrend() {
     <section className="w-full">
       <Card className="w-full min-h-[285px] rounded-lg p-0 bg-white border-none shadow-none">
         <CardContent className="p-4 flex flex-col gap-2 h-full">
-          <div className="w-full h-[30px] flex justify-between items-center">
-            <div className="font-sans text-xs font-medium leading-none tracking-normal text-text-main">Daily Revenue</div>
+          <div className="w-full h-[30px] flex items-center justify-between gap-2">
+            <div className="min-w-0 flex-1 truncate font-sans text-xs font-medium leading-none tracking-normal text-text-main">
+              Daily Revenue
+            </div>
 
-            <div className="relative" ref={dropdownRef}>
+            <div className="relative flex-shrink-0" ref={dropdownRef}>
               <button
                 type="button"
                 onClick={() => setIsDropdownOpen((prev) => !prev)}
-                className="min-w-[105px] h-[30px] flex items-center py-[5px] pl-2.5 pr-[7px] bg-white border border-border-subtle rounded-lg shadow-button-soft cursor-pointer gap-1"
+                className="min-w-[105px] h-[30px] inline-flex items-center justify-between py-[5px] pl-2.5 pr-[7px] bg-white border border-border-subtle rounded-lg shadow-button-soft cursor-pointer gap-1"
               >
                 <span className="font-sans font-normal text-xs leading-[14px] text-text-muted whitespace-nowrap">
                   {selectedFilterLabel}

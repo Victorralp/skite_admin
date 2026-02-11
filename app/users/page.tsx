@@ -173,12 +173,12 @@ export default function UsersPage() {
                   );
                 }}
                 className={cn(
-                  "flex items-center gap-[4px] pl-[7px] pr-[9px] py-[4px] h-[22px] rounded-full border border-dashed transition-colors box-border",
+                  "flex items-center gap-1.5 pl-2.5 pr-3 h-5 rounded-full border border-dashed transition-colors box-border",
                   statusFilter !== 'all' ? "border-brand-primary" : "border-border-primary hover:bg-gray-50"
                 )}
               >
-                <FilterPlusIcon className={cn(statusFilter !== 'all' ? "text-brand-primary" : "text-text-secondary")} />
-                <span className={cn("text-caption-lg font-sans", statusFilter !== 'all' ? "text-brand-primary" : "text-text-secondary")}>
+                <FilterPlusIcon className={cn("w-2.5 h-2.5", statusFilter !== 'all' ? "text-brand-primary" : "text-text-secondary")} />
+                <span className={cn("text-[11px] leading-[13px] font-sans", statusFilter !== 'all' ? "text-brand-primary" : "text-text-secondary")}>
                   {statusFilter === 'all' ? 'Status' :
                     statusFilter === 'active' ? 'Active' :
                       statusFilter === 'inactive' ? 'Inactive' : 'Pending'}
@@ -256,12 +256,12 @@ function FilterPill({ label, active, onClick }: { label: string; active: boolean
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center gap-[4px] pl-[7px] pr-[9px] py-[4px] h-[22px] rounded-full border border-dashed transition-colors box-border",
+        "flex items-center gap-1.5 pl-2.5 pr-3 h-5 rounded-full border border-dashed transition-colors box-border",
         active ? "border-brand-primary" : "border-border-primary hover:bg-gray-50"
       )}
     >
-      <FilterPlusIcon className={cn(active ? "text-brand-primary" : "text-text-secondary")} />
-      <span className={cn("text-caption-lg font-sans", active ? "text-brand-primary" : "text-text-secondary")}>{label}</span>
+      <FilterPlusIcon className={cn("w-2.5 h-2.5", active ? "text-brand-primary" : "text-text-secondary")} />
+      <span className={cn("text-[11px] leading-[13px] font-sans", active ? "text-brand-primary" : "text-text-secondary")}>{label}</span>
     </button>
   );
 }

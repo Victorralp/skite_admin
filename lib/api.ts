@@ -58,6 +58,128 @@ export type AdminDashboardMetricsResponse = {
   total_products: DashboardMetricValue;
 };
 
+export type AdminProductMetricsResponse = {
+  totalProducts: number;
+  totalProductsPercentageChange: number;
+  activeProducts: number;
+  activeToday: number;
+  inactiveProducts: number;
+  inactiveToday: number;
+  rejectedProducts: number;
+  rejectedToday: number;
+};
+
+export type AdminProductListingItem = {
+  _id?: string;
+  id?: string;
+  product?: string;
+  product_id?: string;
+  productName: string;
+  productCover: string;
+  status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED' | 'BANNED' | string;
+  creatorName: string;
+  hubName: string;
+  productType: string;
+  createdAt: string;
+  price: number;
+  sales: number;
+  revenue: number;
+  productId?: string;
+};
+
+export type AdminProductListingParams = {
+  status?: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED' | 'BANNED';
+  hubOwnerName?: string;
+  productType?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  minRevenue?: number;
+  maxRevenue?: number;
+  page?: number;
+  limit?: number;
+};
+
+export type ProductReviewItem = {
+  _id: string;
+  product: string;
+  user_id: string;
+  user_name: string;
+  user_avatar: string;
+  rating: number;
+  review: string;
+  createdAt: string;
+};
+
+export type ProductReviewDistribution = Record<string, number>;
+
+export type ProductReviewPagination = {
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
+};
+
+export type ProductReviewsResponse = {
+  pagination: ProductReviewPagination;
+  averageRating: number;
+  distribution: ProductReviewDistribution;
+  items: ProductReviewItem[];
+};
+
+export type ProductDetailResponse = {
+  _id: string;
+  product_name: string;
+  product_description: string;
+  product_cover: string;
+  is_paid: boolean;
+  exclusive_access?: boolean;
+  currency: string;
+  product_price: number;
+  status: string;
+  hub: string;
+  product_category?: string;
+  group_Id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  creator?: string;
+  contents?: Array<
+    | string
+    | {
+        original?: string;
+        type?: string;
+        key?: string;
+        status?: string;
+      }
+  >;
+  sections?: Array<{
+    name?: string;
+    contents?: Array<{
+      title?: string;
+      type?: string;
+      body?: string;
+      fileData?: {
+        original?: string;
+        mp4?: string;
+        m3u8?: string;
+        type?: string;
+        key?: string;
+        status?: string;
+      };
+      file_data?: {
+        original?: string;
+        mp4?: string;
+        m3u8?: string;
+        type?: string;
+        key?: string;
+        status?: string;
+      };
+    }>;
+  }>;
+  averageRating?: number;
+  ratingCount?: number;
+  product_media?: string[];
+};
+
 export type RevenueTrendFilter =
   | 'today'
   | 'yesterday'
@@ -86,6 +208,9 @@ export type AdminDashboardRevenueBreakdownPoint = {
 
 const adminDashboardSessionCache = new Map<string, unknown>();
 const adminDashboardInFlightRequests = new Map<string, Promise<unknown>>();
+const productDetailInFlightRequests = new Map<string, Promise<ProductDetailResponse>>();
+const productDetailSessionCache = new Map<string, ProductDetailResponse>();
+const productReviewsInFlightRequests = new Map<string, Promise<ProductReviewsResponse>>();
 
 function getSessionUserKey() {
   return auth.currentUser?.uid ?? 'anonymous';
@@ -126,6 +251,9 @@ async function withAdminDashboardSessionCache<T>(
 export function clearAdminDashboardSessionCache() {
   adminDashboardSessionCache.clear();
   adminDashboardInFlightRequests.clear();
+  productDetailSessionCache.clear();
+  productDetailInFlightRequests.clear();
+  productReviewsInFlightRequests.clear();
 }
 
 function baseUrl() {
@@ -307,6 +435,300 @@ export async function getAdminDashboardMetrics() {
 
     return json as AdminDashboardMetricsResponse;
   });
+}
+
+export async function getAdminProductMetrics() {
+  const cacheKey = getDashboardCacheKey('product-metrics');
+  return withAdminDashboardSessionCache(cacheKey, async () => {
+    let idToken: string | null = null;
+    try {
+      idToken = (await auth.currentUser?.getIdToken()) ?? null;
+    } catch {
+      idToken = null;
+    }
+
+    const headers: HeadersInit = {};
+    if (idToken) {
+      headers.authorization = `Bearer ${idToken}`;
+    }
+
+    const response = await fetch(`${baseUrl()}/admin-product/metrics`, {
+      method: 'GET',
+      credentials: 'include',
+      cache: 'no-store',
+      headers
+    });
+
+    const json = (await response
+      .json()
+      .catch(() => null)) as
+      | AdminProductMetricsResponse
+      | { message?: string; error?: string }
+      | null;
+
+    if (!response.ok) {
+      const errorPayload = json as { message?: string; error?: string } | null;
+      const message = errorPayload?.message ?? errorPayload?.error ?? 'PRODUCT_METRICS_FAILED';
+      throw new Error(message);
+    }
+
+    if (!json || typeof json !== 'object') {
+      throw new Error('PRODUCT_METRICS_INVALID_RESPONSE');
+    }
+
+    return json as AdminProductMetricsResponse;
+  });
+}
+
+export async function getAdminProductListing(
+  params: AdminProductListingParams = {}
+) {
+  const cacheKey = getDashboardCacheKey(
+    `product-listing:${JSON.stringify(params)}`
+  );
+
+  return withAdminDashboardSessionCache(cacheKey, async () => {
+    let idToken: string | null = null;
+    try {
+      idToken = (await auth.currentUser?.getIdToken()) ?? null;
+    } catch {
+      idToken = null;
+    }
+
+    const headers: HeadersInit = {};
+    if (idToken) {
+      headers.authorization = `Bearer ${idToken}`;
+    }
+
+    const buildSearchParams = (statusOverride?: string) => {
+      const searchParams = new URLSearchParams();
+      const statusValue = statusOverride ?? params.status;
+      if (statusValue) searchParams.set('status', statusValue);
+      if (params.hubOwnerName) searchParams.set('hubOwnerName', params.hubOwnerName);
+      if (params.productType) searchParams.set('productType', params.productType);
+      if (params.minPrice !== undefined) searchParams.set('minPrice', String(params.minPrice));
+      if (params.maxPrice !== undefined) searchParams.set('maxPrice', String(params.maxPrice));
+      if (params.minRevenue !== undefined) searchParams.set('minRevenue', String(params.minRevenue));
+      if (params.maxRevenue !== undefined) searchParams.set('maxRevenue', String(params.maxRevenue));
+      if (params.page !== undefined) searchParams.set('page', String(params.page));
+      if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
+      return searchParams;
+    };
+
+    const extractList = (payload: unknown): AdminProductListingItem[] | null => {
+      if (Array.isArray(payload)) return payload as AdminProductListingItem[];
+      if (!payload || typeof payload !== 'object') return null;
+      const obj = payload as Record<string, unknown>;
+      if (Array.isArray(obj.items)) return obj.items as AdminProductListingItem[];
+      if (Array.isArray(obj.data)) return obj.data as AdminProductListingItem[];
+      if (Array.isArray(obj.results)) return obj.results as AdminProductListingItem[];
+      return null;
+    };
+
+    const statusCandidates = params.status
+      ? Array.from(new Set([params.status, params.status.toLowerCase()]))
+      : [undefined];
+
+    let lastErrorPayload: { message?: string; error?: string } | null = null;
+
+    for (const statusCandidate of statusCandidates) {
+      const queryString = buildSearchParams(statusCandidate).toString();
+      const response = await fetch(
+        `${baseUrl()}/admin-product/listing${queryString ? `?${queryString}` : ''}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          cache: 'no-store',
+          headers
+        }
+      );
+
+      const json = (await response
+        .json()
+        .catch(() => null)) as
+        | AdminProductListingItem[]
+        | { items?: AdminProductListingItem[]; data?: AdminProductListingItem[]; results?: AdminProductListingItem[]; message?: string; error?: string }
+        | null;
+
+      if (response.ok) {
+        const extracted = extractList(json);
+        if (!extracted) {
+          throw new Error('PRODUCT_LISTING_INVALID_RESPONSE');
+        }
+        return extracted;
+      }
+
+      lastErrorPayload = json as { message?: string; error?: string } | null;
+      // If first status format fails with validation-ish status, try alternate casing.
+      if (response.status === 400 || response.status === 404 || response.status === 422) {
+        continue;
+      }
+      const message = lastErrorPayload?.message ?? lastErrorPayload?.error ?? 'PRODUCT_LISTING_FAILED';
+      throw new Error(message);
+    }
+
+    const message = lastErrorPayload?.message ?? lastErrorPayload?.error ?? 'PRODUCT_LISTING_FAILED';
+    throw new Error(message);
+  });
+}
+
+export async function getProductReviews(params: {
+  product: string;
+  page?: number;
+  limit?: number;
+}) {
+  const { product, page = 1, limit = 10 } = params;
+  if (!product) {
+    throw new Error('PRODUCT_ID_REQUIRED');
+  }
+
+  const cacheKey = getDashboardCacheKey(
+    `product-reviews:${product}:${page}:${limit}`
+  );
+
+  return withAdminDashboardSessionCache(cacheKey, async () => {
+    const inFlightKey = `${product}:${page}:${limit}`;
+    const existingRequest = productReviewsInFlightRequests.get(inFlightKey);
+    if (existingRequest) {
+      return existingRequest;
+    }
+
+    const request = (async () => {
+    let idToken: string | null = null;
+    try {
+      idToken = (await auth.currentUser?.getIdToken()) ?? null;
+    } catch {
+      idToken = null;
+    }
+
+    const headers: HeadersInit = {};
+    if (idToken) {
+      headers.authorization = `Bearer ${idToken}`;
+    }
+
+    const searchParams = new URLSearchParams({
+      product,
+      page: String(page),
+      limit: String(limit)
+    });
+
+    const reviewEndpoints = [
+      `${baseUrl()}/product/list-product-reviews?${searchParams.toString()}`,
+      `${baseUrl()}/product/list-reviews?${searchParams.toString()}`
+    ];
+
+    let lastErrorPayload: { message?: string; error?: string } | null = null;
+    let successfulPayload: ProductReviewsResponse | null = null;
+
+    for (const endpoint of reviewEndpoints) {
+      const response = await fetch(endpoint, {
+        method: 'GET',
+        credentials: 'include',
+        cache: 'no-store',
+        headers
+      });
+
+      const json = (await response
+        .json()
+        .catch(() => null)) as ProductReviewsResponse | { message?: string; error?: string } | null;
+
+      if (response.ok) {
+        if (!json || typeof json !== 'object') {
+          throw new Error('PRODUCT_REVIEWS_INVALID_RESPONSE');
+        }
+        successfulPayload = json as ProductReviewsResponse;
+        break;
+      }
+
+      lastErrorPayload = json as { message?: string; error?: string } | null;
+      if (response.status !== 404) {
+        const message =
+          lastErrorPayload?.message ?? lastErrorPayload?.error ?? 'PRODUCT_REVIEWS_FAILED';
+        throw new Error(message);
+      }
+    }
+
+    if (!successfulPayload) {
+      const message =
+        lastErrorPayload?.message ?? lastErrorPayload?.error ?? 'PRODUCT_REVIEWS_FAILED';
+      throw new Error(message);
+    }
+
+    return successfulPayload;
+    })();
+
+    productReviewsInFlightRequests.set(inFlightKey, request);
+    try {
+      return await request;
+    } finally {
+      productReviewsInFlightRequests.delete(inFlightKey);
+    }
+  });
+}
+
+export async function getProductById(id: string, currency: 'NGN' | 'USD' = 'NGN') {
+  if (!id) {
+    throw new Error('PRODUCT_ID_REQUIRED');
+  }
+
+  const inFlightKey = `${id}:${currency}`;
+  const cachedResponse = productDetailSessionCache.get(inFlightKey);
+  if (cachedResponse) {
+    return cachedResponse;
+  }
+
+  const existingRequest = productDetailInFlightRequests.get(inFlightKey);
+  if (existingRequest) {
+    return existingRequest;
+  }
+
+  const request = (async () => {
+  let idToken: string | null = null;
+  try {
+    idToken = (await auth.currentUser?.getIdToken()) ?? null;
+  } catch {
+    idToken = null;
+  }
+
+  const headers: HeadersInit = {};
+  if (idToken) {
+    headers.authorization = `Bearer ${idToken}`;
+  }
+
+  const query = new URLSearchParams({ currency }).toString();
+  const response = await fetch(`${baseUrl()}/hub/product/${id}?${query}`, {
+    method: 'GET',
+    credentials: 'include',
+    cache: 'no-store',
+    headers
+  });
+
+  const json = (await response.json().catch(() => null)) as
+    | ProductDetailResponse
+    | { message?: string; error?: string }
+    | null;
+
+  if (!response.ok) {
+    const errorPayload = json as { message?: string; error?: string } | null;
+    const message = errorPayload?.message ?? errorPayload?.error ?? 'PRODUCT_FETCH_FAILED';
+    throw new Error(message);
+  }
+
+  if (!json || typeof json !== 'object') {
+    throw new Error('PRODUCT_FETCH_INVALID_RESPONSE');
+  }
+
+  const payload = json as ProductDetailResponse;
+  productDetailSessionCache.set(inFlightKey, payload);
+  return payload;
+  })();
+
+  productDetailInFlightRequests.set(inFlightKey, request);
+  try {
+    return await request;
+  } finally {
+    productDetailInFlightRequests.delete(inFlightKey);
+  }
 }
 
 export async function getAdminDashboardRevenueTrend(
