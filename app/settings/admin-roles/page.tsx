@@ -2,7 +2,7 @@
 
 import { Plus, Check, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import PageContainer from '@/components/layout/PageContainer';
 import AddAdminModal from '@/components/AddAdminModal';
 import EditPermissionsModal from '@/components/EditPermissionsModal';
@@ -50,6 +50,7 @@ export default function AdminRolesPage() {
     type: 'success' | 'error';
     text: string;
   } | null>(null);
+  const feedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [roles, setRoles] = useState<UiRole[]>([
     {
@@ -193,6 +194,24 @@ export default function AdminRolesPage() {
     console.log('Permissions updated:', updatedPermissions);
   };
 
+  useEffect(() => {
+    if (!feedback) return;
+    if (feedbackTimeoutRef.current) {
+      clearTimeout(feedbackTimeoutRef.current);
+    }
+    feedbackTimeoutRef.current = setTimeout(() => {
+      setFeedback(null);
+      feedbackTimeoutRef.current = null;
+    }, 4000);
+
+    return () => {
+      if (feedbackTimeoutRef.current) {
+        clearTimeout(feedbackTimeoutRef.current);
+        feedbackTimeoutRef.current = null;
+      }
+    };
+  }, [feedback]);
+
   return (
     <PageContainer>
       {/* Go Back Button */}
@@ -276,18 +295,6 @@ export default function AdminRolesPage() {
           </div>
         </div>
 
-        {feedback ? (
-          <div
-            className={`w-full rounded-md border px-3 py-2 text-sm ${
-              feedback.type === 'success'
-                ? 'border-[#B5E3D3] bg-surface-success text-text-success'
-                : 'border-[#F1C6C4] bg-surface-danger text-text-danger'
-            }`}
-          >
-            {feedback.text}
-          </div>
-        ) : null}
-
         {/* Permissions Table */}
         <div className="flex flex-col p-1 gap-1 w-full bg-surface-secondary rounded-lg overflow-x-auto">
           {/* Table Header */}
@@ -363,7 +370,6 @@ export default function AdminRolesPage() {
         isOpen={showAddAdminModal}
         onClose={() => {
           setShowAddAdminModal(false);
-          setFeedback(null);
         }}
         onConfirm={handleAddAdmin}
       />
@@ -374,6 +380,21 @@ export default function AdminRolesPage() {
         onSave={handleSavePermissions}
         initialPermissions={roles}
       />
+      {feedback && (
+        <div className="fixed bottom-4 right-4 z-[120]">
+          <div
+            className={`min-w-[280px] max-w-[360px] rounded-lg border px-4 py-3 shadow-lg ${
+              feedback.type === 'success'
+                ? 'border-[#C7E8DA] bg-[#EAF8F1] text-[#1F7A5A]'
+                : 'border-[#F2C3C1] bg-[#FCEDEC] text-[#A42520]'
+            }`}
+            role="status"
+            aria-live="polite"
+          >
+            <p className="text-[13px] leading-5 font-medium">{feedback.text}</p>
+          </div>
+        </div>
+      )}
     </PageContainer>
   );
 }
