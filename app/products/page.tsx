@@ -36,6 +36,8 @@ type ProductMetricCard = {
   trendDirection?: 'up' | 'down' | 'neutral';
 };
 
+const STATUS_OPTIONS = ['DRAFT', 'PUBLISHED', 'ARCHIVED', 'BANNED'] as const;
+
 const normalizeCurrency = (value: unknown) => {
   if (typeof value !== 'string') return 'NGN';
   const normalized = value.trim().toUpperCase();
@@ -54,7 +56,6 @@ export default function ProductsPage() {
   const [statusFilterActive, setStatusFilterActive] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [appliedStatusFilter, setAppliedStatusFilter] = useState<string>('all');
-  const [statusOptions, setStatusOptions] = useState<string[]>([]);
   const [typeFilterActive, setTypeFilterActive] = useState(false);
   const [typeOptions, setTypeOptions] = useState<string[]>([]);
   const [priceFilterActive, setPriceFilterActive] = useState(false);
@@ -81,6 +82,7 @@ export default function ProductsPage() {
   const [hasProductsError, setHasProductsError] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
+  const [lastPageReached, setLastPageReached] = useState<number | null>(null);
   const [snackbar, setSnackbar] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const snackbarTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -330,14 +332,6 @@ export default function ProductsPage() {
           ...params
         });
         if (!isMounted) return;
-        const nextStatuses = response
-          .map((entry) => String((entry.status ?? '')).trim())
-          .filter((entry) => entry.length > 0);
-        setStatusOptions((previous) =>
-          Array.from(new Set([...previous, ...nextStatuses])).sort((a, b) =>
-            a.localeCompare(b)
-          )
-        );
         const nextTypes = response
           .map((entry) => String((entry.productType ?? '')).trim())
           .filter((entry) => entry.length > 0);
@@ -346,8 +340,19 @@ export default function ProductsPage() {
             a.localeCompare(b)
           )
         );
+        if (response.length === 0 && currentPage > 1) {
+          const previousPage = currentPage - 1;
+          setLastPageReached(previousPage);
+          setHasNextPage(false);
+          setCurrentPage(previousPage);
+          showSnackbar('error', 'No more products.');
+          return;
+        }
         setProducts(response.map(mapListingToProduct));
-        setHasNextPage(response.length === 12);
+        setHasNextPage(
+          response.length === 12 &&
+            (lastPageReached === null || currentPage < lastPageReached)
+        );
         setHasProductsError(false);
       } catch {
         if (!isMounted) return;
@@ -374,11 +379,13 @@ export default function ProductsPage() {
     appliedPriceMaxValue,
     appliedRevenueMinValue,
     appliedRevenueMaxValue,
-    currentPage
+    currentPage,
+    lastPageReached
   ]);
 
   useEffect(() => {
     setCurrentPage(1);
+    setLastPageReached(null);
   }, [
     appliedStatusFilter,
     appliedCreatorFilterValue,
@@ -542,7 +549,7 @@ export default function ProductsPage() {
                 />
                 {statusFilterActive && (
                   <StatusFilterDropdown
-                    options={statusOptions}
+                    options={[...STATUS_OPTIONS]}
                     selected={statusFilter}
                     onSelect={setStatusFilter}
                     onApply={() => {
