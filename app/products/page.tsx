@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import StatsCard from '@/components/StatsCard';
 import ProductDetailModal from '@/components/ProductDetailModal';
-import ActionMenu from '@/components/ActionMenu';
 import { MoreVertical } from 'lucide-react';
 import PageContainer from '@/components/layout/PageContainer';
 import { Product } from '@/data/dashboard';
@@ -13,7 +12,9 @@ import {
   getAdminProductListing,
   type AdminProductMetricsResponse,
   type AdminProductListingItem,
-  type AdminProductListingParams
+  type AdminProductListingParams,
+  banAdminProduct,
+  unbanAdminProduct
 } from '@/lib/api';
 
 const FilterPlusIcon = ({ className }: { className?: string }) => (
@@ -34,6 +35,19 @@ type ProductMetricCard = {
   trend?: string;
   trendDirection?: 'up' | 'down' | 'neutral';
 };
+
+const normalizeCurrency = (value: unknown) => {
+  if (typeof value !== 'string') return 'NGN';
+  const normalized = value.trim().toUpperCase();
+  return normalized.length > 0 ? normalized : 'NGN';
+};
+
+const formatMoney = (amount: number, currency: string) =>
+  new Intl.NumberFormat('en-NG', {
+    style: 'currency',
+    currency: normalizeCurrency(currency),
+    minimumFractionDigits: 0
+  }).format(Number.isFinite(amount) ? amount : 0);
 
 export default function ProductsPage() {
   const [creatorFilterActive, setCreatorFilterActive] = useState(false);
@@ -57,6 +71,10 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isProductsLoading, setIsProductsLoading] = useState(true);
   const [hasProductsError, setHasProductsError] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [snackbar, setSnackbar] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const snackbarTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const creatorFilterRef = useRef<HTMLDivElement>(null);
@@ -64,6 +82,17 @@ export default function ProductsPage() {
   const typeFilterRef = useRef<HTMLDivElement>(null);
   const priceFilterRef = useRef<HTMLDivElement>(null);
   const revenueFilterRef = useRef<HTMLDivElement>(null);
+
+  const showSnackbar = (type: 'success' | 'error', message: string) => {
+    setSnackbar({ type, message });
+    if (snackbarTimeoutRef.current) {
+      clearTimeout(snackbarTimeoutRef.current);
+    }
+    snackbarTimeoutRef.current = setTimeout(() => {
+      setSnackbar(null);
+      snackbarTimeoutRef.current = null;
+    }, 4000);
+  };
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -168,6 +197,14 @@ export default function ProductsPage() {
   }, []);
 
   useEffect(() => {
+    return () => {
+      if (snackbarTimeoutRef.current) {
+        clearTimeout(snackbarTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     let isMounted = true;
 
     const parseOptionalNumber = (value: string) => {
@@ -221,7 +258,7 @@ export default function ProductsPage() {
       const productCover =
         (itemRecord.productCover as string | undefined) ??
         (itemRecord.product_cover as string | undefined) ??
-        '/placeholder.png';
+        '/image.png';
       const productType =
         (itemRecord.productType as string | undefined) ??
         (itemRecord.product_category as string | undefined) ??
@@ -278,8 +315,8 @@ export default function ProductsPage() {
           maxPrice: parseOptionalNumber(priceMaxValue),
           minRevenue: parseOptionalNumber(revenueMinValue),
           maxRevenue: parseOptionalNumber(revenueMaxValue),
-          page: 1,
-          limit: 50
+          page: currentPage,
+          limit: 12
         };
         const response = await getAdminProductListing({
           ...params
@@ -294,10 +331,12 @@ export default function ProductsPage() {
           )
         );
         setProducts(response.map(mapListingToProduct));
+        setHasNextPage(response.length === 12);
         setHasProductsError(false);
       } catch {
         if (!isMounted) return;
         setProducts([]);
+        setHasNextPage(false);
         setHasProductsError(true);
       } finally {
         if (isMounted) {
@@ -318,6 +357,19 @@ export default function ProductsPage() {
     priceMinValue,
     priceMaxValue,
     revenueMinValue,
+    revenueMaxValue,
+    currentPage
+  ]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    statusFilter,
+    creatorFilterValue,
+    typeFilterValue,
+    priceMinValue,
+    priceMaxValue,
+    revenueMinValue,
     revenueMaxValue
   ]);
 
@@ -326,13 +378,70 @@ export default function ProductsPage() {
     setOpenMenuId(null);
   };
 
+  const handleToggleBanProduct = async (product: Product) => {
+    const productId = (product as Record<string, unknown>)?.detailId ?? product.id;
+    if (!productId) return;
+    const isBanned = product.status === 'rejected';
+    const isPublished = product.status === 'active';
+
+    if (!isBanned && !isPublished) {
+      showSnackbar('error', 'Only published products can be banned');
+      return;
+    }
+
+    setOpenMenuId(null);
+    setIsProductsLoading(true);
+    try {
+      const successMessage = isBanned
+        ? await unbanAdminProduct(String(productId))
+        : await banAdminProduct(String(productId));
+      setProducts((prev) =>
+        prev.map((entry) =>
+          entry.id === product.id
+            ? { ...entry, status: (isBanned ? 'active' : 'rejected') as Product['status'] }
+            : entry
+        )
+      );
+      setHasProductsError(false);
+      showSnackbar('success', successMessage || (isBanned ? 'Product unbanned successfully' : 'Product banned successfully'));
+    } catch (error) {
+      const fallback = isBanned ? 'Unable to unban product right now' : 'Unable to ban product right now';
+      const rawMessage =
+        error instanceof Error && error.message.trim().length > 0
+          ? error.message
+          : fallback;
+      showSnackbar('error', rawMessage);
+    } finally {
+      setIsProductsLoading(false);
+    }
+  };
+
   const handleCloseModal = () => {
     setSelectedProduct(null);
+  };
+
+  const handleSelectedProductStatusChange = (productId: string, nextStatus: Product['status']) => {
+    setSelectedProduct((previous) =>
+      previous && previous.id === productId ? { ...previous, status: nextStatus } : previous
+    );
+    setProducts((previous) =>
+      previous.map((entry) =>
+        entry.id === productId ? { ...entry, status: nextStatus } : entry
+      )
+    );
   };
 
   return (
     <>
       <PageContainer>
+        {(isProductsLoading || isMetricsLoading) && (
+          <div className="fixed inset-0 z-[80] bg-white/75 backdrop-blur-sm flex items-center justify-center">
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-8 h-8 rounded-full border-2 border-border-primary border-t-transparent animate-spin" />
+              <span className="font-sans text-caption-lg text-text-secondary">Loading products...</span>
+            </div>
+          </div>
+        )}
         {/* Stats Section */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
@@ -529,15 +638,18 @@ export default function ProductsPage() {
           {/* Table */}
           <div className="rounded-lg border border-border-primary flex flex-col w-full shadow-none p-1 gap-1" style={{ backgroundColor: '#F9F9FB' }}>
             {/* Table Header */}
-            <div className="flex items-center h-[30px] shrink-0" style={{ padding: '8px 24px', gap: '16px' }}>
-              <div className="w-[240px] text-xs font-medium text-text-primary font-sans leading-[14px]">Product</div>
-              <div className="w-[180px] text-xs font-medium text-text-primary font-sans leading-[14px]">Creator</div>
-              <div className="w-[120px] text-xs font-medium text-text-primary font-sans leading-[14px]">Type</div>
-              <div className="w-[120px] text-xs font-medium text-text-primary font-sans leading-[14px]">Date Created</div>
-              <div className="w-[100px] text-xs font-medium text-text-primary font-sans leading-[14px]">Price</div>
-              <div className="w-[80px] text-xs font-medium text-text-primary font-sans leading-[14px]">Sales</div>
-              <div className="w-[120px] text-xs font-medium text-text-primary font-sans leading-[14px]">Revenue</div>
-              <div className="w-[18px] ml-auto opacity-0">•</div>
+            <div
+              className="grid grid-cols-[repeat(7,minmax(0,1fr))_24px] items-center h-[30px] shrink-0 gap-4"
+              style={{ padding: '8px 24px' }}
+            >
+              <div className="text-xs font-medium text-text-primary font-sans leading-[14px]">Product</div>
+              <div className="text-xs font-medium text-text-primary font-sans leading-[14px]">Creator</div>
+              <div className="text-xs font-medium text-text-primary font-sans leading-[14px]">Type</div>
+              <div className="text-xs font-medium text-text-primary font-sans leading-[14px]">Date Created</div>
+              <div className="text-xs font-medium text-text-primary font-sans leading-[14px]">Price</div>
+              <div className="text-xs font-medium text-text-primary font-sans leading-[14px]">Sales</div>
+              <div className="text-xs font-medium text-text-primary font-sans leading-[14px]">Revenue</div>
+              <div className="flex justify-end opacity-0">•</div>
             </div>
 
             {/* Table Body */}
@@ -558,6 +670,7 @@ export default function ProductsPage() {
                   isMenuOpen={openMenuId === product.id}
                   onMenuToggle={() => setOpenMenuId(openMenuId === product.id ? null : product.id)}
                   onViewDetails={() => handleViewProductDetails(product)}
+                  onToggleBanProduct={() => handleToggleBanProduct(product)}
                   menuRef={openMenuId === product.id ? menuRef : null}
                 />
               ))}
@@ -565,14 +678,30 @@ export default function ProductsPage() {
 
             {/* Pagination */}
             <div className="flex justify-between items-center pl-6 h-[30px]">
-              <span className="text-xs text-black/50">Showing 1 to 12 of 200 results</span>
+              <span className="text-xs text-black/50">
+                {products.length === 0
+                  ? 'Showing 0 results'
+                  : `Showing ${(currentPage - 1) * 12 + 1} to ${(currentPage - 1) * 12 + products.length} results`}
+              </span>
               <div className="flex gap-2">
-                <button className="p-[1px] bg-surface-secondary rounded-md opacity-30 shadow-segmented-outer h-[30px] w-[87.5px]">
+                <button
+                  className={cn(
+                    "p-[1px] bg-surface-secondary rounded-md shadow-segmented-outer h-[30px] w-[87.5px]",
+                    currentPage > 1 ? "hover:opacity-90 transition-opacity" : "opacity-30"
+                  )}
+                  onClick={currentPage > 1 ? () => setCurrentPage((prev) => Math.max(1, prev - 1)) : undefined}
+                >
                   <div className="flex items-center justify-center bg-white rounded-[5px] h-[28px] shadow-segmented-inner">
                     <span className="text-[13px] font-medium text-text-secondary leading-4">Previous</span>
                   </div>
                 </button>
-                <button className="p-[1px] bg-surface-secondary rounded-md shadow-segmented-outer h-[30px] w-[87.5px]">
+                <button
+                  className={cn(
+                    "p-[1px] bg-surface-secondary rounded-md shadow-segmented-outer h-[30px] w-[87.5px]",
+                    hasNextPage ? "hover:opacity-90 transition-opacity" : "opacity-30"
+                  )}
+                  onClick={hasNextPage ? () => setCurrentPage((prev) => prev + 1) : undefined}
+                >
                   <div className="flex items-center justify-center bg-white rounded-[5px] h-[28px] shadow-segmented-inner">
                     <span className="text-[13px] font-medium text-text-secondary leading-4">Next</span>
                   </div>
@@ -587,9 +716,25 @@ export default function ProductsPage() {
       {selectedProduct && (
         <ProductDetailModal
           product={selectedProduct}
-
+          onStatusChange={handleSelectedProductStatusChange}
           onClose={handleCloseModal}
         />
+      )}
+      {snackbar && (
+        <div className="fixed bottom-4 right-4 z-[120]">
+          <div
+            className={cn(
+              "min-w-[260px] max-w-[360px] rounded-lg border px-4 py-3 shadow-lg",
+              snackbar.type === 'success'
+                ? "border-[#C7E8DA] bg-[#EAF8F1] text-[#1F7A5A]"
+                : "border-[#F2C3C1] bg-[#FCEDEC] text-[#A42520]"
+            )}
+            role="status"
+            aria-live="polite"
+          >
+            <p className="text-[13px] leading-5 font-medium">{snackbar.message}</p>
+          </div>
+        </div>
       )}
     </>
   );
@@ -833,23 +978,43 @@ function StatusFilterDropdown({
   );
 }
 
-function ProductRow({ product, isMenuOpen, onMenuToggle, onViewDetails, menuRef }: { product: Product; isMenuOpen: boolean; onMenuToggle: () => void; onViewDetails: () => void; menuRef: React.RefObject<HTMLDivElement> | null }) {
+function ProductRow({ product, isMenuOpen, onMenuToggle, onViewDetails, onToggleBanProduct, menuRef }: { product: Product; isMenuOpen: boolean; onMenuToggle: () => void; onViewDetails: () => void; onToggleBanProduct: () => void; menuRef: React.RefObject<HTMLDivElement> | null }) {
   const statusConfig = {
     active: '#239B73',
     rejected: '#CD110A',
     inactive: '#5F5971',
   };
+  const isBanned = product.status === 'rejected';
+  const canToggleBan = product.status === 'active' || isBanned;
 
   const statusColor = statusConfig[product.status as keyof typeof statusConfig] || '#5F5971';
+  const productRecord = product as Record<string, unknown>;
+  const currency = normalizeCurrency(productRecord.currency);
   return (
-    <div className="flex items-center h-[50px] bg-white border-b border-border-primary last:border-0" style={{ padding: '10px 24px', gap: '16px' }}>
+    <div
+      className="grid grid-cols-[repeat(7,minmax(0,1fr))_24px] items-center h-[50px] bg-white border-b border-border-primary last:border-0 gap-4 cursor-pointer hover:bg-gray-50 transition-colors"
+      style={{ padding: '10px 24px' }}
+      onClick={onViewDetails}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onViewDetails();
+        }
+      }}
+    >
       {/* Product */}
-      <div className="flex items-center gap-1.5 w-[240px] relative">
+      <div className="flex items-center gap-1.5 relative min-w-0">
         {product.thumbnail ? (
           <img
             src={product.thumbnail}
             alt={product.name}
             className="w-[30px] h-[30px] rounded object-cover flex-shrink-0 bg-gray-100"
+            onError={(event) => {
+              event.currentTarget.onerror = null;
+              event.currentTarget.src = '/image.png';
+            }}
           />
         ) : (
           <div className="w-[30px] h-[30px] rounded bg-gray-200 flex-shrink-0" />
@@ -862,30 +1027,33 @@ function ProductRow({ product, isMenuOpen, onMenuToggle, onViewDetails, menuRef 
       </div>
 
       {/* Creator */}
-      <div className="flex flex-col w-[180px]">
+      <div className="flex flex-col min-w-0">
         <span className="text-[13.5px] font-medium text-text-primary leading-4 truncate">{product.creator?.name ?? '—'}</span>
         <span className="text-xs text-text-secondary leading-[14px] truncate">{product.creator?.username ?? ''}</span>
       </div>
 
       {/* Type */}
-      <div className="w-[120px] text-[13.5px] text-text-primary leading-4 truncate">{product.type}</div>
+      <div className="text-[13.5px] text-text-primary leading-4 truncate">{product.type}</div>
 
       {/* Date Created */}
-      <div className="w-[120px] text-[13.5px] text-text-primary leading-4">{product.dateCreated}</div>
+      <div className="text-[13.5px] text-text-primary leading-4 truncate">{product.dateCreated}</div>
 
       {/* Price */}
-      <div className="w-[100px] text-[13.5px] text-text-primary leading-4">₦{product.price.toLocaleString()}</div>
+      <div className="text-[13.5px] text-text-primary leading-4 truncate">{formatMoney(product.price, currency)}</div>
 
       {/* Sales */}
-      <div className="w-[80px] text-[13.5px] text-text-primary leading-4">{product.sales}</div>
+      <div className="text-[13.5px] text-text-primary leading-4 truncate">{product.sales}</div>
 
       {/* Revenue */}
-      <div className="w-[120px] text-[13.5px] text-text-primary leading-4">₦{product.revenue.toLocaleString()}</div>
+      <div className="text-[13.5px] text-text-primary leading-4 truncate">₦{product.revenue.toLocaleString()}</div>
 
       {/* Actions */}
-      <div className="relative w-[18px] h-[18px] flex-shrink-0 ml-auto" ref={isMenuOpen ? menuRef : null}>
+      <div className="relative flex justify-end h-[18px] flex-shrink-0" ref={isMenuOpen ? menuRef : null}>
         <button
-          onClick={onMenuToggle}
+          onClick={(event) => {
+            event.stopPropagation();
+            onMenuToggle();
+          }}
           aria-label={`Open actions for ${product.name}`}
           className="w-[18px] h-[18px] flex items-center justify-center"
         >
@@ -893,15 +1061,35 @@ function ProductRow({ product, isMenuOpen, onMenuToggle, onViewDetails, menuRef 
         </button>
 
         {isMenuOpen && (
-          <ActionMenu
-            simpleMode={true}
-            option1Label="View Product Details"
-            option2Label="Ban Product"
-            onOption1={onViewDetails}
-            onOption2={() => {
-              onMenuToggle();
-            }}
-          />
+          <div className="absolute right-0 top-8 w-40 bg-white border border-border-primary rounded-xl flex flex-col items-center p-0 overflow-hidden shadow-dropdown z-50">
+            <button
+              onClick={(event) => {
+                event.stopPropagation();
+                onViewDetails();
+              }}
+              className={cn(
+                "w-40 h-menu-item flex items-center bg-white hover:bg-gray-50 transition-colors px-4 py-2.5 gap-2.5",
+                canToggleBan ? "border-b border-border-primary" : ""
+              )}
+            >
+              <span className="text-body-sm font-medium text-text-primary leading-4">
+                View Product Details
+              </span>
+            </button>
+            {canToggleBan && (
+              <button
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onToggleBanProduct();
+                }}
+                className="w-40 h-menu-item flex items-center bg-white hover:bg-gray-50 transition-colors px-4 py-2.5 gap-2.5"
+              >
+                <span className="text-body-sm font-medium text-text-danger leading-4">
+                  {isBanned ? 'Unban Product' : 'Ban Product'}
+                </span>
+              </button>
+            )}
+          </div>
         )}
       </div>
     </div>

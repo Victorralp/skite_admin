@@ -99,6 +99,83 @@ export type AdminProductListingParams = {
   limit?: number;
 };
 
+export async function banAdminProduct(productId: string) {
+  if (!productId) {
+    throw new Error('PRODUCT_ID_REQUIRED');
+  }
+
+  let idToken: string | null = null;
+  try {
+    idToken = (await auth.currentUser?.getIdToken()) ?? null;
+  } catch {
+    idToken = null;
+  }
+
+  const headers: HeadersInit = { 'content-type': 'application/json' };
+  if (idToken) {
+    headers.authorization = `Bearer ${idToken}`;
+  }
+
+  const response = await fetch(`${baseUrl()}/admin-product/${productId}/ban`, {
+    method: 'PATCH',
+    credentials: 'include',
+    cache: 'no-store',
+    headers
+  });
+
+  const json = (await response
+    .json()
+    .catch(() => null)) as { message?: string; error?: string } | null;
+
+  if (!response.ok) {
+    const message = json?.message ?? json?.error ?? 'PRODUCT_BAN_FAILED';
+    throw new Error(message);
+  }
+
+  // Ban affects product listing caches; clear so next fetch is fresh.
+  clearAdminDashboardSessionCache();
+
+  return json?.message ?? 'Product banned successfully';
+}
+
+export async function unbanAdminProduct(productId: string) {
+  if (!productId) {
+    throw new Error('PRODUCT_ID_REQUIRED');
+  }
+
+  let idToken: string | null = null;
+  try {
+    idToken = (await auth.currentUser?.getIdToken()) ?? null;
+  } catch {
+    idToken = null;
+  }
+
+  const headers: HeadersInit = { 'content-type': 'application/json' };
+  if (idToken) {
+    headers.authorization = `Bearer ${idToken}`;
+  }
+
+  const response = await fetch(`${baseUrl()}/admin-product/${productId}/unban`, {
+    method: 'PATCH',
+    credentials: 'include',
+    cache: 'no-store',
+    headers
+  });
+
+  const json = (await response
+    .json()
+    .catch(() => null)) as { message?: string; error?: string } | null;
+
+  if (!response.ok) {
+    const message = json?.message ?? json?.error ?? 'PRODUCT_UNBAN_FAILED';
+    throw new Error(message);
+  }
+
+  clearAdminDashboardSessionCache();
+
+  return json?.message ?? 'Product unbanned successfully';
+}
+
 export type ProductReviewItem = {
   _id: string;
   product: string;

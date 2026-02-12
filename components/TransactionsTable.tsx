@@ -407,35 +407,35 @@ export default function TransactionsTable() {
       {/* Table Container */}
       <div className="flex flex-col items-start p-1 gap-1 w-full bg-surface-secondary rounded-lg">
         {/* Table Header */}
-        <div className="flex items-center px-6 py-2 gap-4 w-full h-[30px]">
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[72.67px] whitespace-nowrap">
+        <div className="grid grid-cols-[repeat(9,minmax(0,1fr))_24px] items-center px-6 py-2 gap-4 w-full h-[30px]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary whitespace-nowrap">
             TXN ID
           </span>
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[98.88px] whitespace-nowrap">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary whitespace-nowrap">
             Date
           </span>
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[129.05px] whitespace-nowrap flex-grow">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary whitespace-nowrap">
             Creator
           </span>
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[129.05px] whitespace-nowrap flex-grow">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary whitespace-nowrap">
             Buyer
           </span>
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[129.05px] whitespace-nowrap flex-grow">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary whitespace-nowrap">
             Product/Service
           </span>
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[82.12px] whitespace-nowrap">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary whitespace-nowrap">
             Amount
           </span>
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[54.77px] whitespace-nowrap">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary whitespace-nowrap">
             Fee
           </span>
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[81.39px] whitespace-nowrap">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary whitespace-nowrap">
             Creator Net
           </span>
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[59px] whitespace-nowrap">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary whitespace-nowrap">
             Status
           </span>
-          <div className="w-[18px]" />
+          <div className="flex justify-end" />
         </div>
         {/* Table Body */}
         <div className="flex flex-col items-start w-full bg-white border border-border-primary rounded-lg">
@@ -450,38 +450,38 @@ export default function TransactionsTable() {
                   setIsDetailsModalOpen(true);
                 }}
                 className={cn(
-                  'flex items-center px-6 py-3.5 gap-4 w-full h-[46px] bg-white cursor-pointer hover:bg-gray-50 transition-colors',
+                  'grid grid-cols-[repeat(9,minmax(0,1fr))_24px] items-center px-6 py-3.5 gap-4 w-full h-[46px] bg-white cursor-pointer hover:bg-gray-50 transition-colors',
                   index < filteredTransactions.length - 1 && 'border-b border-border-primary'
                 )}
               >
-                <span className="font-sans text-body-sm-regular text-text-primary w-[72.67px] whitespace-nowrap overflow-hidden text-ellipsis">
+                <span className="font-sans text-body-sm-regular text-text-primary whitespace-nowrap overflow-hidden text-ellipsis">
                   {txn.id}
                 </span>
-                <span className="font-sans font-normal text-xs leading-none text-text-secondary w-[98.88px] whitespace-nowrap overflow-hidden text-ellipsis">
+                <span className="font-sans font-normal text-xs leading-none text-text-secondary whitespace-nowrap overflow-hidden text-ellipsis">
                   {txn.date}
                 </span>
-                <span className="font-sans text-body-sm-regular text-text-primary w-[129.05px] whitespace-nowrap overflow-hidden text-ellipsis flex-grow">
+                <span className="font-sans text-body-sm-regular text-text-primary whitespace-nowrap overflow-hidden text-ellipsis">
                   {txn.creator}
                 </span>
-                <span className="font-sans text-body-sm-regular text-text-primary w-[129.05px] whitespace-nowrap overflow-hidden text-ellipsis flex-grow">
+                <span className="font-sans text-body-sm-regular text-text-primary whitespace-nowrap overflow-hidden text-ellipsis">
                   {txn.buyer}
                 </span>
-                <span className="font-sans text-body-sm-regular text-text-primary w-[129.05px] whitespace-nowrap overflow-hidden text-ellipsis flex-grow">
+                <span className="font-sans text-body-sm-regular text-text-primary whitespace-nowrap overflow-hidden text-ellipsis">
                   {txn.product}
                 </span>
-                <span className="font-sans text-body-sm-regular text-text-primary w-[82.12px] whitespace-nowrap overflow-hidden text-ellipsis">
+                <span className="font-sans text-body-sm-regular text-text-primary whitespace-nowrap overflow-hidden text-ellipsis">
                   {txn.amount}
                 </span>
-                <span className="font-sans text-body-sm-regular text-text-primary w-[54.77px] whitespace-nowrap overflow-hidden text-ellipsis">
+                <span className="font-sans text-body-sm-regular text-text-primary whitespace-nowrap overflow-hidden text-ellipsis">
                   {txn.fee}
                 </span>
-                <span className="font-sans text-body-sm-regular text-text-primary w-[81.39px] whitespace-nowrap overflow-hidden text-ellipsis">
+                <span className="font-sans text-body-sm-regular text-text-primary whitespace-nowrap overflow-hidden text-ellipsis">
                   {txn.creatorNet}
                 </span>
-                <div className="w-[59px] flex items-center">
+                <div className="flex items-center">
                   <StatusBadge status={txn.status} />
                 </div>
-                <div className="relative w-[18px] h-[18px]" ref={openMenuId === `${txn.id}-${index}` ? menuRef : null}>
+                <div className="relative flex justify-end h-[18px]" ref={openMenuId === `${txn.id}-${index}` ? menuRef : null}>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();

@@ -110,7 +110,11 @@ const formatTooltipDate = (dateString: string) => {
   }).format(date);
 };
 
-export default function RevenueOverview() {
+type RevenueOverviewProps = {
+  onLoadingChange?: (isLoading: boolean) => void;
+};
+
+export default function RevenueOverview({ onLoadingChange }: RevenueOverviewProps = {}) {
   const [selectedRevenueFilter, setSelectedRevenueFilter] =
     useState<RevenueTrendFilter>(() => getDashboardUiState('revenueOverviewRevenueFilter'));
   const [isRevenueDropdownOpen, setIsRevenueDropdownOpen] = useState(false);
@@ -219,6 +223,11 @@ export default function RevenueOverview() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    const isAnyLoading = isRevenueLoading || isVolumeLoading || isBreakdownLoading;
+    onLoadingChange?.(isAnyLoading);
+  }, [isRevenueLoading, isVolumeLoading, isBreakdownLoading, onLoadingChange]);
 
   useEffect(() => {
     let isMounted = true;
@@ -354,7 +363,7 @@ export default function RevenueOverview() {
                 <button
                   type="button"
                   onClick={() => setIsRevenueDropdownOpen((prev) => !prev)}
-                  className="min-w-[105px] h-[30px] inline-flex items-center justify-between py-[5px] pl-2.5 pr-[7px] bg-white border border-border-primary rounded-lg shadow-button-soft cursor-pointer gap-1"
+                  className="w-fit h-[30px] inline-flex items-center justify-between py-[5px] pl-2.5 pr-[7px] bg-white border border-border-primary rounded-lg shadow-button-soft cursor-pointer gap-1"
                 >
                   <span className="text-caption-lg-regular text-text-secondary whitespace-nowrap">
                     {selectedRevenueLabel}
@@ -464,7 +473,7 @@ export default function RevenueOverview() {
                   <button
                     type="button"
                     onClick={() => setIsTransactionDropdownOpen((prev) => !prev)}
-                    className="min-w-[105px] h-[30px] inline-flex items-center justify-between py-[5px] pl-2.5 pr-[7px] bg-white border border-border-primary rounded-lg shadow-button-soft cursor-pointer gap-1"
+                    className="w-fit h-[30px] inline-flex items-center justify-between py-[5px] pl-2.5 pr-[7px] bg-white border border-border-primary rounded-lg shadow-button-soft cursor-pointer gap-1"
                   >
                     <span className="text-caption-lg-regular text-text-secondary whitespace-nowrap">
                       {selectedTransactionLabel}
@@ -574,7 +583,7 @@ export default function RevenueOverview() {
                   <button
                     type="button"
                     onClick={() => setIsBreakdownDropdownOpen((prev) => !prev)}
-                    className="min-w-[105px] h-[30px] inline-flex items-center justify-between py-[5px] pl-2.5 pr-[7px] bg-white border border-border-primary rounded-lg shadow-button-soft cursor-pointer gap-1"
+                    className="w-fit h-[30px] inline-flex items-center justify-between py-[5px] pl-2.5 pr-[7px] bg-white border border-border-primary rounded-lg shadow-button-soft cursor-pointer gap-1"
                   >
                     <span className="font-sans font-normal text-xs leading-[14px] text-text-secondary whitespace-nowrap">
                       {selectedBreakdownLabel}

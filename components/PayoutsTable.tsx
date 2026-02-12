@@ -240,26 +240,26 @@ export default function PayoutsTable() {
       {/* Table Container */}
       <div className="flex flex-col items-start p-1 gap-1 w-full bg-surface-secondary rounded-lg">
         {/* Table Header */}
-        <div className="flex items-center px-6 py-2 gap-4 w-full h-[30px]">
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[10%]">
+        <div className="grid grid-cols-[repeat(6,minmax(0,1fr))_24px] items-center px-6 py-2 gap-4 w-full h-[30px]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary">
             Payout ID
           </span>
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[15%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary">
             Date
           </span>
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[25%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary">
             Creator
           </span>
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[20%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary">
             Balance
           </span>
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[15%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary">
             Payout Amount
           </span>
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[10%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary">
             Status
           </span>
-          <div className="w-[5%] opacity-0">1</div>
+          <div className="flex justify-end opacity-0">1</div>
         </div>
 
         {/* Table Body */}
@@ -268,17 +268,17 @@ export default function PayoutsTable() {
             <div
               key={`${payout.id}-${index}`}
               className={cn(
-                'flex items-center px-6 py-2.5 gap-4 w-full h-[50px] bg-white',
+                'grid grid-cols-[repeat(6,minmax(0,1fr))_24px] items-center px-6 py-2.5 gap-4 w-full h-[50px] bg-white',
                 index < filteredPayouts.length - 1 && 'border-b border-border-primary'
               )}
             >
-              <span className="font-sans text-body-sm-regular text-text-primary w-[10%] truncate">
+              <span className="font-sans text-body-sm-regular text-text-primary truncate">
                 {payout.id}
               </span>
-              <span className="font-sans text-body-sm-regular text-text-primary w-[15%] truncate">
+              <span className="font-sans text-body-sm-regular text-text-primary truncate">
                 {payout.date}
               </span>
-              <div className="w-[25%] flex flex-col items-start">
+              <div className="flex flex-col items-start min-w-0">
                 <span className="font-sans text-body-sm text-text-primary truncate w-full">
                   {payout.creatorName}
                 </span>
@@ -286,16 +286,16 @@ export default function PayoutsTable() {
                   {payout.creatorHandle}
                 </span>
               </div>
-              <span className="font-sans text-body-sm-regular text-text-primary w-[20%] truncate">
+              <span className="font-sans text-body-sm-regular text-text-primary truncate">
                 {payout.balance}
               </span>
-              <span className="font-sans text-body-sm-regular text-text-primary w-[15%] truncate">
+              <span className="font-sans text-body-sm-regular text-text-primary truncate">
                 {payout.payoutAmount}
               </span>
-              <div className="w-[10%] flex items-center">
+              <div className="flex items-center">
                 <StatusBadge status={payout.status} />
               </div>
-              <div className="relative w-[5%] h-[18px]" ref={openMenuId === `${payout.id}-${index}` ? menuRef : null}>
+              <div className="relative flex justify-end h-[18px]" ref={openMenuId === `${payout.id}-${index}` ? menuRef : null}>
                 <button 
                   onClick={() => setOpenMenuId(openMenuId === `${payout.id}-${index}` ? null : `${payout.id}-${index}`)}
                   className="w-[18px] h-[18px] flex items-center justify-center"

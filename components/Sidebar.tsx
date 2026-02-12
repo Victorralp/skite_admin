@@ -210,6 +210,7 @@ export default function Sidebar({ className }: SidebarProps) {
     };
   }, []);
 
+
   const avatarSeed = encodeURIComponent(getInitials(currentUser?.name));
 
   return (

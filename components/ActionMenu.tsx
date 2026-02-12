@@ -37,7 +37,10 @@ export default function ActionMenu({
         return (
             <div className="absolute right-0 top-8 w-40 bg-white border border-border-primary rounded-xl flex flex-col items-center p-0 overflow-hidden shadow-dropdown z-50">
                 <button
-                    onClick={onOption1}
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        onOption1();
+                    }}
                     className="w-40 h-menu-item flex items-center bg-white hover:bg-gray-50 transition-colors px-4 py-2.5 gap-2.5 border-b border-border-primary"
                 >
                     <span className="text-body-sm font-medium text-text-primary leading-4">
@@ -45,7 +48,10 @@ export default function ActionMenu({
                     </span>
                 </button>
                 <button
-                    onClick={onOption2}
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        onOption2();
+                    }}
                     className="w-40 h-menu-item flex items-center bg-white hover:bg-gray-50 transition-colors px-4 py-2.5 gap-2.5"
                 >
                     <span className="text-body-sm font-medium text-text-danger leading-4">

@@ -3,11 +3,13 @@
 import { ArrowUpRight, BookOpen, MoreHorizontal, PlayCircle, X } from 'lucide-react';
 import { Product } from '@/data/dashboard';
 import { cn } from '@/lib/utils';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
     getProductReviews,
     getProductById,
+    banAdminProduct,
+    unbanAdminProduct,
     type ProductReviewItem,
     type ProductReviewsResponse,
     type ProductDetailResponse
@@ -16,6 +18,7 @@ import {
 interface ProductDetailModalProps {
     product: Product | null;
     onClose: () => void;
+    onStatusChange?: (productId: string, nextStatus: Product['status']) => void;
 }
 
 const StarIcon = ({ filled = true, className = "" }: { filled?: boolean; className?: string }) => (
@@ -120,7 +123,7 @@ const pickPreferredContentUrl = ({
     return firstValidUrl(topLevelOriginal, fileOriginal, fileMp4, fileM3u8, bodyUrl);
 };
 
-export default function ProductDetailModal({ product, onClose }: ProductDetailModalProps) {
+export default function ProductDetailModal({ product, onClose, onStatusChange }: ProductDetailModalProps) {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState('Overview');
     const [reviews, setReviews] = useState<ProductReviewItem[]>([]);
@@ -134,6 +137,9 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
     const [hasProductError, setHasProductError] = useState(false);
     const [openContentMenuId, setOpenContentMenuId] = useState<string | null>(null);
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+    const [isStatusActionLoading, setIsStatusActionLoading] = useState(false);
+    const [statusActionMessage, setStatusActionMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+    const statusMessageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const isObjectId = (value?: string | null) => Boolean(value && /^[0-9a-fA-F]{24}$/.test(value));
     const productRecord = product as unknown as Record<string, unknown> | null;
     const detailId =
@@ -143,6 +149,14 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
     const rowHasEmbeddedContent =
         (Array.isArray(productRecord?.contents) && productRecord.contents.length > 0) ||
         (Array.isArray(productRecord?.sections) && productRecord.sections.length > 0);
+    const rowHasInlineDetailShape =
+        typeof productRecord?.product_name === 'string' ||
+        typeof productRecord?.product_description === 'string' ||
+        typeof productRecord?.product_cover === 'string' ||
+        rowHasEmbeddedContent;
+    const shouldShowLoadingOverlay =
+        (isObjectId(detailId) && !rowHasInlineDetailShape && (isProductLoading || !productDetail)) &&
+        !hasProductError;
 
     useEffect(() => {
         if (product) {
@@ -216,6 +230,14 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
     useEffect(() => {
         setIsDescriptionExpanded(false);
     }, [detailId, product?.id, productDetail?.product_description]);
+
+    useEffect(() => {
+        return () => {
+            if (statusMessageTimeoutRef.current) {
+                clearTimeout(statusMessageTimeoutRef.current);
+            }
+        };
+    }, []);
 
     useEffect(() => {
         if (!detailId || !isObjectId(detailId)) {
@@ -542,6 +564,55 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
         router.push(`/products/${encodeURIComponent(targetId)}?${params.toString()}`);
     };
 
+    const rawStatus = (productDetail?.status ?? '').toUpperCase();
+    const fallbackStatus = product?.status === 'rejected' ? 'BANNED' : product?.status === 'active' ? 'PUBLISHED' : '';
+    const resolvedStatus = rawStatus || fallbackStatus;
+    const isBanned = resolvedStatus === 'BANNED';
+    const isPublished = resolvedStatus === 'PUBLISHED';
+    const canToggleBan = isBanned || isPublished;
+
+    const showStatusMessage = (type: 'success' | 'error', text: string) => {
+        setStatusActionMessage({ type, text });
+        if (statusMessageTimeoutRef.current) {
+            clearTimeout(statusMessageTimeoutRef.current);
+        }
+        statusMessageTimeoutRef.current = setTimeout(() => {
+            setStatusActionMessage(null);
+            statusMessageTimeoutRef.current = null;
+        }, 4000);
+    };
+
+    const handleToggleProductStatus = async () => {
+        const productId = typeof detailId === 'string' && detailId.length > 0 ? detailId : product?.id;
+        if (!productId) return;
+        if (!canToggleBan) {
+            showStatusMessage('error', 'Only published products can be banned');
+            return;
+        }
+
+        setIsStatusActionLoading(true);
+        try {
+            const message = isBanned
+                ? await unbanAdminProduct(productId)
+                : await banAdminProduct(productId);
+            setProductDetail((previous) => {
+                if (!previous) return previous;
+                return {
+                    ...previous,
+                    status: isBanned ? 'PUBLISHED' : 'BANNED'
+                };
+            });
+            onStatusChange?.(product.id, isBanned ? 'active' : 'rejected');
+            showStatusMessage('success', message || (isBanned ? 'Product unbanned successfully' : 'Product banned successfully'));
+        } catch (error) {
+            const fallback = isBanned ? 'Unable to unban product right now' : 'Unable to ban product right now';
+            const message = error instanceof Error && error.message.trim().length > 0 ? error.message : fallback;
+            showStatusMessage('error', message);
+        } finally {
+            setIsStatusActionLoading(false);
+        }
+    };
+
     const handleViewCreatorProfile = () => {
         // Navigate to creator details page using the product's creatorId
         if (product?.creatorId) {
@@ -573,17 +644,25 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
         isDescriptionExpanded || !shouldTruncateDescription
             ? fullProductDescription
             : `${fullProductDescription.slice(0, maxDescriptionLength).trimEnd()}...`;
+    const creatorImageFromDetail = (productDetail as Record<string, unknown> | null)?.creatorImage;
+    const creatorImageFromDetailAlt = (productDetail as Record<string, unknown> | null)?.creator_image;
+    const creatorImageFromRow = productRecord?.creatorImage;
+    const creatorAvatar =
+        (typeof creatorImageFromDetail === 'string' && isUrl(creatorImageFromDetail) && creatorImageFromDetail) ||
+        (typeof creatorImageFromDetailAlt === 'string' && isUrl(creatorImageFromDetailAlt) && creatorImageFromDetailAlt) ||
+        (typeof creatorImageFromRow === 'string' && isUrl(creatorImageFromRow) && creatorImageFromRow) ||
+        '/image.png';
 
     return (
         <>
             {/* Backdrop */}
             <div
-                className="fixed inset-0 bg-black/50 z-40"
+                className="fixed inset-0 bg-black/50 z-[60]"
                 onClick={onClose}
             />
 
             {/* Modal */}
-            <div className="fixed right-0 top-0 h-full w-[600px] bg-white z-50 flex flex-col shadow-2xl animate-slide-in">
+            <div className="fixed right-0 top-0 h-full w-[600px] bg-white z-[70] flex flex-col shadow-2xl animate-slide-in">
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 h-[60px] border-b border-border-secondary">
                     <h2 className="font-sans text-heading-sm tracking-[-0.01em] text-text-primary">
@@ -601,7 +680,17 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto no-scrollbar">
+                <div className="flex-1 overflow-y-auto no-scrollbar relative">
+                    {shouldShowLoadingOverlay && (
+                        <div className="absolute inset-0 z-10 bg-white/75 backdrop-blur-sm flex items-center justify-center">
+                            <div className="flex flex-col items-center gap-2">
+                                <div className="w-8 h-8 rounded-full border-2 border-border-primary border-t-transparent animate-spin" />
+                                <span className="font-sans text-caption-lg text-text-secondary">
+                                    Loading product details...
+                                </span>
+                            </div>
+                        </div>
+                    )}
                     {/* Product Info Section */}
                     <div className="px-6 py-6 flex flex-col gap-4">
                         {/* Product Image */}
@@ -611,6 +700,10 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                                 src={productDetail?.product_cover || product.thumbnail}
                                 alt={productDetail?.product_name || product.name}
                                 className="w-full h-full object-cover"
+                                onError={(event) => {
+                                    event.currentTarget.onerror = null;
+                                    event.currentTarget.src = '/image.png';
+                                }}
                             />
                             {productDetail?.status && (
                                 <div className="absolute top-3 left-3 z-20">
@@ -656,9 +749,17 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                                         </div>
                                     </div>
                                 </div>
-                                <button className="flex items-center justify-center px-4 py-2 h-[32px] bg-[#CD110A] rounded-lg border border-[rgba(251,236,235,0.2)] shadow-button-inset">
+                                <button
+                                    onClick={handleToggleProductStatus}
+                                    disabled={isStatusActionLoading || !canToggleBan}
+                                    className={cn(
+                                        "flex items-center justify-center px-4 py-2 h-[32px] rounded-lg border border-[rgba(251,236,235,0.2)] shadow-button-inset",
+                                        canToggleBan ? "bg-[#CD110A]" : "bg-[#9CA3AF]",
+                                        isStatusActionLoading ? "opacity-70 cursor-not-allowed" : ""
+                                    )}
+                                >
                                     <span className="font-sans text-body-sm text-white">
-                                        Ban Product
+                                        {isStatusActionLoading ? 'Processing...' : isBanned ? 'Unban Product' : 'Ban Product'}
                                     </span>
                                 </button>
                             </div>
@@ -690,9 +791,13 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                             </span>
                             <div className="flex items-center gap-2">
                                 <img
-                                    src={product.creator?.name ? `https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face` : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face'}
+                                    src={creatorAvatar}
                                     alt={product.creator?.name || 'Creator'}
                                     className="w-[34px] h-[35px] rounded-full object-cover"
+                                    onError={(event) => {
+                                        event.currentTarget.onerror = null;
+                                        event.currentTarget.src = '/image.png';
+                                    }}
                                 />
                                 <div className="flex-1 flex flex-col gap-0.5">
                                     <span className="font-sans text-heading-sm text-text-primary">
@@ -1057,6 +1162,22 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                     </div>
                 </div>
             </div>
+            {statusActionMessage && (
+                <div className="fixed bottom-4 right-4 z-[120]">
+                    <div
+                        className={cn(
+                            "min-w-[260px] max-w-[360px] rounded-lg border px-4 py-3 shadow-lg",
+                            statusActionMessage.type === 'success'
+                                ? "border-[#C7E8DA] bg-[#EAF8F1] text-[#1F7A5A]"
+                                : "border-[#F2C3C1] bg-[#FCEDEC] text-[#A42520]"
+                        )}
+                        role="status"
+                        aria-live="polite"
+                    >
+                        <p className="text-[13px] leading-5 font-medium">{statusActionMessage.text}</p>
+                    </div>
+                </div>
+            )}
         </>
     );
 }

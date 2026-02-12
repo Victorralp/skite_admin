@@ -56,29 +56,29 @@ export default function PastSessionsTable({ statusFilter = 'all' }: { statusFilt
   return (
     <div className="w-full bg-surface-secondary rounded-lg p-1 flex flex-col gap-1">
       {/* Table Header */}
-      <div className="flex items-center px-6 py-2 gap-4 h-[30px]">
-        <div className="flex-1 min-w-[180px] text-[12px] font-medium text-text-primary leading-[14px] font-sans">
+      <div className="grid grid-cols-[repeat(7,minmax(0,1fr))_24px] items-center px-6 py-2 gap-4 h-[30px]">
+        <div className="text-[12px] font-medium text-text-primary leading-[14px] font-sans">
           Session Title
         </div>
-        <div className="flex-1 min-w-[160px] text-[12px] font-medium text-text-primary leading-[14px] font-sans">
+        <div className="text-[12px] font-medium text-text-primary leading-[14px] font-sans">
           Creator
         </div>
-        <div className="flex-1 min-w-[90px] text-[12px] font-medium text-text-primary leading-[14px] font-sans">
+        <div className="text-[12px] font-medium text-text-primary leading-[14px] font-sans">
           Date
         </div>
-        <div className="flex-1 min-w-[80px] text-[12px] font-medium text-text-primary leading-[14px] font-sans">
+        <div className="text-[12px] font-medium text-text-primary leading-[14px] font-sans">
           Time
         </div>
-        <div className="flex-1 min-w-[80px] text-[12px] font-medium text-text-primary leading-[14px] font-sans">
+        <div className="text-[12px] font-medium text-text-primary leading-[14px] font-sans">
           Attendees
         </div>
-        <div className="flex-1 min-w-[80px] text-[12px] font-medium text-text-primary leading-[14px] font-sans">
+        <div className="text-[12px] font-medium text-text-primary leading-[14px] font-sans">
           Duration
         </div>
-        <div className="flex-1 min-w-[70px] text-[12px] font-medium text-text-primary leading-[14px] font-sans">
+        <div className="text-[12px] font-medium text-text-primary leading-[14px] font-sans">
           Status
         </div>
-        <div className="w-[18px] opacity-0">1</div>
+        <div className="flex justify-end opacity-0">1</div>
       </div>
 
       {/* Table Body */}
@@ -168,11 +168,11 @@ function SessionRow({
   const status = statusConfig[session.status];
 
   return (
-    <div className="flex items-center px-6 py-2.5 gap-4 border-b border-border-primary last:border-b-0 h-[50px]">
-      <div className="flex-1 min-w-[180px] text-[13.5px] font-medium text-text-primary leading-4 font-sans overflow-hidden text-ellipsis whitespace-nowrap">
+    <div className="grid grid-cols-[repeat(7,minmax(0,1fr))_24px] items-center px-6 py-2.5 gap-4 border-b border-border-primary last:border-b-0 h-[50px]">
+      <div className="text-[13.5px] font-medium text-text-primary leading-4 font-sans overflow-hidden text-ellipsis whitespace-nowrap">
         {session.sessionTitle}
       </div>
-      <div className="flex-1 min-w-[160px] flex flex-col">
+      <div className="flex flex-col min-w-0">
         <span className="text-[13.5px] font-medium text-text-primary leading-4 font-sans overflow-hidden text-ellipsis whitespace-nowrap">
           {session.creator}
         </span>
@@ -180,19 +180,19 @@ function SessionRow({
           {session.username}
         </span>
       </div>
-      <div className="flex-1 min-w-[90px] text-[13.5px] font-normal text-text-primary leading-4 font-sans overflow-hidden text-ellipsis whitespace-nowrap">
+      <div className="text-[13.5px] font-normal text-text-primary leading-4 font-sans overflow-hidden text-ellipsis whitespace-nowrap">
         {session.date}
       </div>
-      <div className="flex-1 min-w-[80px] text-[13.5px] font-normal text-text-primary leading-4 font-sans overflow-hidden text-ellipsis whitespace-nowrap">
+      <div className="text-[13.5px] font-normal text-text-primary leading-4 font-sans overflow-hidden text-ellipsis whitespace-nowrap">
         {session.time}
       </div>
-      <div className="flex-1 min-w-[80px] text-[13.5px] font-normal text-text-primary leading-4 font-sans overflow-hidden text-ellipsis whitespace-nowrap">
+      <div className="text-[13.5px] font-normal text-text-primary leading-4 font-sans overflow-hidden text-ellipsis whitespace-nowrap">
         {session.attendees}
       </div>
-      <div className="flex-1 min-w-[80px] text-[13.5px] font-normal text-text-primary leading-4 font-sans overflow-hidden text-ellipsis whitespace-nowrap">
+      <div className="text-[13.5px] font-normal text-text-primary leading-4 font-sans overflow-hidden text-ellipsis whitespace-nowrap">
         {session.duration}
       </div>
-      <div className="flex-1 min-w-[70px]">
+      <div>
         <span
           className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium leading-3 font-sans"
           style={{ backgroundColor: status.bg, color: status.color }}
@@ -201,7 +201,7 @@ function SessionRow({
           {status.label}
         </span>
       </div>
-      <div className="relative w-[18px] h-[18px] flex-shrink-0" ref={menuRef}>
+      <div className="relative flex justify-end h-[18px] flex-shrink-0" ref={menuRef}>
         <button onClick={onMenuToggle} className="w-[18px] h-[18px] flex items-center justify-center">
           <MoreVertical className="h-[18px] w-[18px] text-text-secondary" strokeWidth={2.25} />
         </button>

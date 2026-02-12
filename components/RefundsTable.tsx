@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MoreVertical, CircleCheck, AlertTriangle, Clock } from 'lucide-react';
+import { MoreVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type Refund = {
@@ -83,38 +83,44 @@ const StatusBadge = ({ status }: { status: Refund['status'] }) => {
     Success: {
       bg: '#E7F3EF',
       color: '#239B73',
-      label: 'Success'
+      label: 'Success',
+      icon: (
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="5" cy="5" r="3.75" stroke="#239B73" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M3.75 5.00033L4.58333 5.83366L6.25 4.16699" stroke="#239B73" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      )
     },
     Pending: {
       bg: '#FFF3EB',
       color: '#FB6A00',
-      label: 'Pending'
+      label: 'Pending',
+      icon: (
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4.16667 8.65694C3.80411 8.57433 3.45585 8.43826 3.13333 8.25319M5.83333 1.34277C6.66173 1.53197 7.40135 1.99681 7.9311 2.66119C8.46086 3.32557 8.74935 4.15013 8.74935 4.99986C8.74935 5.84959 8.46086 6.67414 7.9311 7.33852C7.40135 8.0029 6.66173 8.46774 5.83333 8.65694M1.90792 7.12194C1.68087 6.79158 1.50826 6.42695 1.39667 6.04194M1.30167 4.37486C1.36833 3.97902 1.49667 3.60402 1.67667 3.26027L1.74708 3.13319M2.87792 1.90777C3.268 1.63981 3.70528 1.4481 4.16667 1.34277M5 3.33319V4.99986M5 6.66652V6.67069" stroke="#FB6A00" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      )
     },
     Declined: {
       bg: '#FBECEB',
       color: '#CD110A',
-      label: 'Declined'
+      label: 'Declined',
+      icon: (
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 3.74975V5.41642M5 6.66642H5.00417M4.31792 1.496L0.940416 7.13517C0.870789 7.25575 0.833944 7.39245 0.833545 7.53169C0.833146 7.67092 0.869208 7.80784 0.938143 7.92881C1.00708 8.04978 1.10648 8.1506 1.22647 8.22123C1.34646 8.29187 1.48286 8.32986 1.62208 8.33142H8.37792C8.51708 8.32981 8.6534 8.29182 8.77334 8.22121C8.89327 8.15059 8.99263 8.04983 9.06156 7.92892C9.13048 7.808 9.16656 7.67116 9.16621 7.53199C9.16587 7.39281 9.12911 7.25615 9.05958 7.13559L5.68208 1.49559C5.61102 1.3783 5.51092 1.28131 5.39144 1.214C5.27196 1.14669 5.13714 1.11133 5 1.11133C4.86286 1.11133 4.72804 1.14669 4.60856 1.214C4.48908 1.28131 4.38898 1.3783 4.31792 1.49559V1.496Z" stroke="#CD110A" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      )
     }
   };
 
-  const { bg, color, label } = config[status];
+  const { bg, color, label, icon } = config[status];
 
   return (
     <div
-      className="flex items-center justify-center gap-0.5 px-1.5 py-0.5 rounded"
+      className="flex items-center justify-center px-1.5 py-0.5 gap-0.5 rounded w-fit h-[14px]"
       style={{ backgroundColor: bg }}
     >
-      {status === 'Success' && (
-        <CircleCheck size={10} style={{ color }} />
-      )}
-      {status === 'Pending' && (
-        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M4.16676 8.65792C3.8042 8.57531 3.45595 8.43924 3.13342 8.25417M5.83342 1.34375C6.66182 1.53295 7.40144 1.99779 7.9312 2.66217C8.46095 3.32655 8.74944 4.1511 8.74944 5.00083C8.74944 5.85056 8.46095 6.67512 7.9312 7.3395C7.40144 8.00388 6.66182 8.46872 5.83342 8.65792M1.90801 7.12292C1.68096 6.79256 1.50836 6.42793 1.39676 6.04292M1.30176 4.37583C1.36842 3.98 1.49676 3.605 1.67676 3.26125L1.74717 3.13417M2.87801 1.90875C3.26809 1.64078 3.70537 1.44907 4.16676 1.34375M5.00009 3.33417V5.00083M5.00009 6.6675V6.67167" stroke="#FB6A00" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      )}
-      {status === 'Declined' && (
-        <AlertTriangle size={10} style={{ color }} />
-      )}
+      {icon}
       <span
         className="font-sans font-medium text-[10px] leading-3"
         style={{ color }}
@@ -269,32 +275,32 @@ export default function RefundsTable() {
       {/* Table Container */}
       <div className="flex flex-col items-start p-1 gap-1 w-full bg-surface-secondary rounded-lg">
         {/* Table Header */}
-        <div className="flex items-center px-6 py-2 gap-4 w-full h-[30px]">
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[10%]">
+        <div className="grid grid-cols-[repeat(8,minmax(0,1fr))_24px] items-center px-6 py-2 gap-4 w-full h-[30px]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary">
             TXN ID
           </span>
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[12%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary">
             Date
           </span>
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[18%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary">
             Product
           </span>
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[10%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary">
             Product type
           </span>
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[15%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary">
             Creator
           </span>
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[15%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary">
             Buyer
           </span>
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[12%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary">
             Amount
           </span>
-          <span className="font-sans font-medium text-xs leading-none text-text-primary w-[8%]">
+          <span className="font-sans font-medium text-xs leading-none text-text-primary">
             Status
           </span>
-          <div className="w-[4%]" />
+          <div className="flex justify-end" />
         </div>
 
         {/* Table Body */}
@@ -303,35 +309,35 @@ export default function RefundsTable() {
             <div
               key={`${refund.id}-${index}`}
               className={cn(
-                'flex items-center px-6 py-3.5 gap-4 w-full h-[46px] bg-white',
+                'grid grid-cols-[repeat(8,minmax(0,1fr))_24px] items-center px-6 py-3.5 gap-4 w-full h-[46px] bg-white',
                 index < filteredRefunds.length - 1 && 'border-b border-border-primary'
               )}
             >
-              <span className="font-sans text-body-sm-regular text-text-primary w-[10%] truncate">
+              <span className="font-sans text-body-sm-regular text-text-primary truncate">
                 {refund.id}
               </span>
-              <span className="font-sans font-normal text-xs leading-none text-text-secondary w-[12%] truncate">
+              <span className="font-sans font-normal text-xs leading-none text-text-secondary truncate">
                 {refund.date}
               </span>
-              <span className="font-sans text-body-sm-regular text-text-primary w-[18%] truncate">
+              <span className="font-sans text-body-sm-regular text-text-primary truncate">
                 {refund.product}
               </span>
-              <span className="font-sans text-body-sm-regular text-text-primary w-[10%] truncate">
+              <span className="font-sans text-body-sm-regular text-text-primary truncate">
                 {refund.productType}
               </span>
-              <span className="font-sans text-body-sm-regular text-text-primary w-[15%] truncate">
+              <span className="font-sans text-body-sm-regular text-text-primary truncate">
                 {refund.creator}
               </span>
-              <span className="font-sans text-body-sm-regular text-text-primary w-[15%] truncate">
+              <span className="font-sans text-body-sm-regular text-text-primary truncate">
                 {refund.buyer}
               </span>
-              <span className="font-sans text-body-sm-regular text-text-primary w-[12%] truncate">
+              <span className="font-sans text-body-sm-regular text-text-primary truncate">
                 {refund.amount}
               </span>
-              <div className="w-[8%]">
+              <div>
                 <StatusBadge status={refund.status} />
               </div>
-              <div className="relative w-[4%] h-[18px]">
+              <div className="relative flex justify-end h-[18px]">
                 <button 
                   onClick={() => setOpenMenuId(openMenuId === `${refund.id}-${index}` ? null : `${refund.id}-${index}`)}
                   className="w-[18px] h-[18px] flex items-center justify-center"

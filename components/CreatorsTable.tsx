@@ -38,15 +38,15 @@ export default function CreatorsTable({
     return (
         <Card className="rounded-lg border border-border-primary flex flex-col w-full shadow-none p-1 gap-1 bg-surface-secondary">
             {/* Header Row - Outside white container */}
-            <div className="flex items-center h-table-header shrink-0 px-table-padding-x gap-table-gap">
-                <div className="flex-1 min-w-[200px] text-caption-lg text-text-primary">Creator</div>
-                <div className="flex-1 min-w-[120px] text-caption-lg text-text-primary">Revenue</div>
-                <div className="w-[100px] text-caption-lg text-text-primary">Products</div>
-                <div className="w-[100px] text-caption-lg text-text-primary">Sales Count</div>
-                <div className="w-[120px] text-caption-lg text-text-primary">Subscribers</div>
-                <div className="w-[100px] text-caption-lg text-text-primary">Hub Views</div>
-                <div className="flex-1 min-w-[120px] text-caption-lg text-text-primary">Last Active</div>
-                <div className="w-action-button opacity-0">1</div>
+            <div className="grid grid-cols-[repeat(7,minmax(0,1fr))_24px] items-center h-table-header shrink-0 px-table-padding-x gap-table-gap">
+                <div className="text-caption-lg text-text-primary">Creator</div>
+                <div className="text-caption-lg text-text-primary">Revenue</div>
+                <div className="text-caption-lg text-text-primary">Products</div>
+                <div className="text-caption-lg text-text-primary">Sales Count</div>
+                <div className="text-caption-lg text-text-primary">Subscribers</div>
+                <div className="text-caption-lg text-text-primary">Hub Views</div>
+                <div className="text-caption-lg text-text-primary">Last Active</div>
+                <div className="flex justify-end opacity-0">1</div>
             </div>
 
             {/* White container with border */}
@@ -59,15 +59,15 @@ export default function CreatorsTable({
                         </div>
                     ) : (
                         creators.map((creator) => (
-                            <div
-                                key={creator.id}
-                                className="flex items-center h-table-row bg-white border-b border-border-primary last:border-0 hover:bg-gray-50/50 transition-colors cursor-pointer px-table-padding-x gap-table-gap"
-                                onClick={() => onCreatorClick(creator)}
-                            >
-                                <div className="flex-1 min-w-[200px] flex items-center gap-1.5 relative">
-                                    <div className="relative">
-                                        <img
-                                            src={creator.avatar}
+                        <div
+                            key={creator.id}
+                            className="grid grid-cols-[repeat(7,minmax(0,1fr))_24px] items-center h-table-row bg-white border-b border-border-primary last:border-0 hover:bg-gray-50/50 transition-colors cursor-pointer px-table-padding-x gap-table-gap"
+                            onClick={() => onCreatorClick(creator)}
+                        >
+                            <div className="flex items-center gap-1.5 relative min-w-0">
+                                <div className="relative">
+                                    <img
+                                        src={creator.avatar}
                                             alt={creator.name}
                                             className="h-avatar-sm w-avatar-sm rounded-full object-cover"
                                         />
@@ -93,42 +93,42 @@ export default function CreatorsTable({
                                 </div>
 
                                 {/* Revenue Column */}
-                                <div className="flex-1 min-w-[120px]">
+                                <div>
                                     <span className="text-body-sm font-normal text-text-primary leading-4">
                                         {creator.revenue}
                                     </span>
                                 </div>
 
                                 {/* Products Column */}
-                                <div className="w-[100px]">
+                                <div>
                                     <span className="text-body-sm font-normal text-text-primary leading-4">
                                         {creator.products}
                                     </span>
                                 </div>
 
                                 {/* Sales Count Column */}
-                                <div className="w-[100px]">
+                                <div>
                                     <span className="text-body-sm font-normal text-text-primary leading-4">
                                         {creator.salesCount}
                                     </span>
                                 </div>
 
                                 {/* Subscribers Column */}
-                                <div className="w-[120px]">
+                                <div>
                                     <span className="text-body-sm font-normal text-text-primary leading-4">
                                         {creator.subscribers.toLocaleString()}
                                     </span>
                                 </div>
 
                                 {/* Hub Views Column */}
-                                <div className="w-[100px]">
+                                <div>
                                     <span className="text-body-sm font-normal text-text-primary leading-4">
                                         {creator.hubViews}
                                     </span>
                                 </div>
 
                                 {/* Last Active Column */}
-                                <div className="flex-1 min-w-[120px]">
+                                <div>
                                     <span className="text-caption-lg font-normal text-text-secondary leading-[14px]">
                                         {creator.lastActive}
                                     </span>
@@ -137,7 +137,7 @@ export default function CreatorsTable({
                                 {/* Actions Column */}
                                 <div
                                     id={`menu-container-${creator.id}`}
-                                    className="w-action-button flex items-center justify-center relative"
+                                    className="flex items-center justify-end relative"
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     <button

@@ -58,7 +58,11 @@ const formatTooltipDate = (dateString: string) => {
   }).format(date);
 };
 
-export default function RevenueTrend() {
+type RevenueTrendProps = {
+  onLoadingChange?: (isLoading: boolean) => void;
+};
+
+export default function RevenueTrend({ onLoadingChange }: RevenueTrendProps = {}) {
   const [selectedFilter, setSelectedFilter] = useState<RevenueTrendFilter>(
     () => getDashboardUiState('revenueTrendFilter')
   );
@@ -111,14 +115,17 @@ export default function RevenueTrend() {
       } finally {
         if (isMounted) {
           setIsLoading(false);
+          onLoadingChange?.(false);
         }
       }
     };
 
+    onLoadingChange?.(true);
     fetchRevenueTrend();
 
     return () => {
       isMounted = false;
+      onLoadingChange?.(false);
     };
   }, [selectedFilter]);
 
@@ -135,7 +142,7 @@ export default function RevenueTrend() {
               <button
                 type="button"
                 onClick={() => setIsDropdownOpen((prev) => !prev)}
-                className="min-w-[105px] h-[30px] inline-flex items-center justify-between py-[5px] pl-2.5 pr-[7px] bg-white border border-border-subtle rounded-lg shadow-button-soft cursor-pointer gap-1"
+                className="h-[30px] inline-flex items-center justify-between py-[5px] pl-2.5 pr-[7px] bg-white border border-border-subtle rounded-lg shadow-button-soft cursor-pointer gap-1 w-fit"
               >
                 <span className="font-sans font-normal text-xs leading-[14px] text-text-muted whitespace-nowrap">
                   {selectedFilterLabel}
@@ -146,7 +153,7 @@ export default function RevenueTrend() {
               </button>
 
               {isDropdownOpen && (
-                <div className="absolute right-0 top-[34px] z-50 rounded-lg flex flex-col overflow-hidden bg-white w-[130px] border border-border-subtle shadow-dropdown p-0">
+                <div className="absolute right-0 top-[34px] z-50 rounded-lg flex flex-col overflow-hidden bg-white border border-border-subtle shadow-dropdown p-0 w-[130px]">
                   {FILTER_OPTIONS.map((item, i) => (
                     <button
                       key={item.value}
