@@ -52,14 +52,6 @@ const FILTER_OPTIONS: Array<{ label: string; value: RevenueTrendFilter }> = [
   { label: 'Last 6 months', value: 'six_months' }
 ];
 
-const TRANSACTION_FILTER_OPTIONS: Array<{ label: string; value: RevenueTrendFilter }> = [
-  { label: 'Today', value: 'today' },
-  { label: 'Yesterday', value: 'yesterday' },
-  { label: 'This week', value: 'week' },
-  { label: 'This month', value: 'month' },
-  { label: '6 months', value: 'six_months' }
-];
-
 const BREAKDOWN_COLORS = ['#FFBEDD', '#FF9A9A', '#9DAAFF', '#9AC3FF', '#FFD6A5', '#B7E4C7'];
 
 const formatCurrency = (value: number) => {
@@ -122,39 +114,19 @@ export default function RevenueOverview({ onLoadingChange }: RevenueOverviewProp
   const [isRevenueLoading, setIsRevenueLoading] = useState(true);
   const [hasRevenueError, setHasRevenueError] = useState(false);
 
-  const [selectedTransactionFilter, setSelectedTransactionFilter] =
-    useState<RevenueTrendFilter>(() => getDashboardUiState('revenueOverviewTransactionFilter'));
-  const [isTransactionDropdownOpen, setIsTransactionDropdownOpen] = useState(false);
   const [volumeData, setVolumeData] = useState<TransactionVolumePoint[]>([]);
   const [isVolumeLoading, setIsVolumeLoading] = useState(true);
   const [hasVolumeError, setHasVolumeError] = useState(false);
 
-  const [selectedBreakdownFilter, setSelectedBreakdownFilter] =
-    useState<RevenueTrendFilter>(() => getDashboardUiState('revenueOverviewBreakdownFilter'));
-  const [isBreakdownDropdownOpen, setIsBreakdownDropdownOpen] = useState(false);
   const [breakdownData, setBreakdownData] = useState<AdminDashboardRevenueBreakdownPoint[]>([]);
   const [isBreakdownLoading, setIsBreakdownLoading] = useState(true);
   const [hasBreakdownError, setHasBreakdownError] = useState(false);
 
   const revenueDropdownRef = useRef<HTMLDivElement>(null);
-  const transactionDropdownRef = useRef<HTMLDivElement>(null);
-  const breakdownDropdownRef = useRef<HTMLDivElement>(null);
 
   const selectedRevenueLabel = useMemo(
     () => FILTER_OPTIONS.find((option) => option.value === selectedRevenueFilter)?.label ?? 'Today',
     [selectedRevenueFilter]
-  );
-
-  const selectedTransactionLabel = useMemo(
-    () =>
-      TRANSACTION_FILTER_OPTIONS.find((option) => option.value === selectedTransactionFilter)
-        ?.label ?? 'Today',
-    [selectedTransactionFilter]
-  );
-
-  const selectedBreakdownLabel = useMemo(
-    () => FILTER_OPTIONS.find((option) => option.value === selectedBreakdownFilter)?.label ?? 'Today',
-    [selectedBreakdownFilter]
   );
 
   const chartBreakdownData = useMemo(
@@ -203,18 +175,6 @@ export default function RevenueOverview({ onLoadingChange }: RevenueOverviewProp
     const handleClickOutside = (event: MouseEvent) => {
       if (revenueDropdownRef.current && !revenueDropdownRef.current.contains(event.target as Node)) {
         setIsRevenueDropdownOpen(false);
-      }
-      if (
-        transactionDropdownRef.current &&
-        !transactionDropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsTransactionDropdownOpen(false);
-      }
-      if (
-        breakdownDropdownRef.current &&
-        !breakdownDropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsBreakdownDropdownOpen(false);
       }
     };
 
@@ -272,7 +232,7 @@ export default function RevenueOverview({ onLoadingChange }: RevenueOverviewProp
     const fetchTransactionVolume = async () => {
       setIsVolumeLoading(true);
       try {
-        const response = await getAdminDashboardTransactionVolume(selectedTransactionFilter);
+        const response = await getAdminDashboardTransactionVolume(selectedRevenueFilter);
         if (!isMounted) return;
 
         const normalized = response
@@ -311,7 +271,7 @@ export default function RevenueOverview({ onLoadingChange }: RevenueOverviewProp
     return () => {
       isMounted = false;
     };
-  }, [selectedTransactionFilter]);
+  }, [selectedRevenueFilter]);
 
   useEffect(() => {
     let isMounted = true;
@@ -319,7 +279,7 @@ export default function RevenueOverview({ onLoadingChange }: RevenueOverviewProp
     const fetchRevenueBreakdown = async () => {
       setIsBreakdownLoading(true);
       try {
-        const response = await getAdminDashboardRevenueBreakdown(selectedBreakdownFilter);
+        const response = await getAdminDashboardRevenueBreakdown(selectedRevenueFilter);
         if (!isMounted) return;
 
         const normalized = response
@@ -348,7 +308,7 @@ export default function RevenueOverview({ onLoadingChange }: RevenueOverviewProp
     return () => {
       isMounted = false;
     };
-  }, [selectedBreakdownFilter]);
+  }, [selectedRevenueFilter]);
 
   return (
     <div className="flex flex-col items-center justify-center gap-2 w-full">
@@ -469,43 +429,6 @@ export default function RevenueOverview({ onLoadingChange }: RevenueOverviewProp
                 <span className="min-w-0 flex-1 truncate font-sans font-medium text-xs leading-none text-text-primary">
                   Transaction Volume
                 </span>
-                <div className="relative flex-shrink-0" ref={transactionDropdownRef}>
-                  <button
-                    type="button"
-                    onClick={() => setIsTransactionDropdownOpen((prev) => !prev)}
-                    className="w-fit h-[30px] inline-flex items-center justify-between py-[5px] pl-2.5 pr-[7px] bg-white border border-border-primary rounded-lg shadow-button-soft cursor-pointer gap-1"
-                  >
-                    <span className="text-caption-lg-regular text-text-secondary whitespace-nowrap">
-                      {selectedTransactionLabel}
-                    </span>
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path fillRule="evenodd" clipRule="evenodd" d="M5.83337 7.5L10 11.6667L14.1667 7.5H5.83337Z" fill="#5F5971" />
-                    </svg>
-                  </button>
-
-                  {isTransactionDropdownOpen && (
-                    <div className="absolute right-0 top-[34px] z-50 rounded-lg flex flex-col overflow-hidden bg-white w-[130px] border border-border-primary shadow-dropdown p-0">
-                      {TRANSACTION_FILTER_OPTIONS.map((item, i) => (
-                        <button
-                          key={item.value}
-                          type="button"
-                          onClick={() => {
-                            setDashboardUiState('revenueOverviewTransactionFilter', item.value);
-                            setSelectedTransactionFilter(item.value);
-                            setIsTransactionDropdownOpen(false);
-                          }}
-                          className={cn(
-                            'w-full h-[33px] flex items-center px-4 py-2 gap-2.5 bg-white cursor-pointer hover:bg-gray-50 text-left',
-                            i < TRANSACTION_FILTER_OPTIONS.length - 1 && 'border-b border-border-primary',
-                            selectedTransactionFilter === item.value && 'bg-gray-50'
-                          )}
-                        >
-                          <span className="text-body-sm-regular text-text-secondary">{item.label}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
               </div>
               <div className="w-full h-0 border border-border-primary" />
               <div className="h-[207px] w-full">
@@ -579,45 +502,6 @@ export default function RevenueOverview({ onLoadingChange }: RevenueOverviewProp
                 <span className="min-w-0 flex-1 truncate font-sans font-medium text-xs leading-none text-text-primary">
                   Revenue Breakdown by Item Type
                 </span>
-                <div className="relative flex-shrink-0" ref={breakdownDropdownRef}>
-                  <button
-                    type="button"
-                    onClick={() => setIsBreakdownDropdownOpen((prev) => !prev)}
-                    className="w-fit h-[30px] inline-flex items-center justify-between py-[5px] pl-2.5 pr-[7px] bg-white border border-border-primary rounded-lg shadow-button-soft cursor-pointer gap-1"
-                  >
-                    <span className="font-sans font-normal text-xs leading-[14px] text-text-secondary whitespace-nowrap">
-                      {selectedBreakdownLabel}
-                    </span>
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path fillRule="evenodd" clipRule="evenodd" d="M5.83337 7.5L10 11.6667L14.1667 7.5H5.83337Z" fill="#5F5971" />
-                    </svg>
-                  </button>
-
-                  {isBreakdownDropdownOpen && (
-                    <div className="absolute right-0 top-[34px] z-50 rounded-lg flex flex-col overflow-hidden bg-white w-[140px] border border-border-primary shadow-dropdown p-0">
-                      {FILTER_OPTIONS.map((item, i) => (
-                        <button
-                          key={item.value}
-                          type="button"
-                          onClick={() => {
-                            setDashboardUiState('revenueOverviewBreakdownFilter', item.value);
-                            setSelectedBreakdownFilter(item.value);
-                            setIsBreakdownDropdownOpen(false);
-                          }}
-                          className={cn(
-                            'w-full h-[33px] flex items-center px-4 py-2 gap-2.5 bg-white cursor-pointer hover:bg-gray-50 text-left',
-                            i < FILTER_OPTIONS.length - 1 && 'border-b border-border-primary',
-                            selectedBreakdownFilter === item.value && 'bg-gray-50'
-                          )}
-                        >
-                          <span className="font-sans text-body-sm-regular text-text-secondary">
-                            {item.label}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
               </div>
               <div className="w-full h-0 border border-border-primary" />
               <div className="flex items-center justify-center gap-8 py-2 px-3 h-[203px]">

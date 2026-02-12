@@ -53,16 +53,24 @@ export default function ProductsPage() {
   const [creatorFilterActive, setCreatorFilterActive] = useState(false);
   const [statusFilterActive, setStatusFilterActive] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [appliedStatusFilter, setAppliedStatusFilter] = useState<string>('all');
   const [statusOptions, setStatusOptions] = useState<string[]>([]);
   const [typeFilterActive, setTypeFilterActive] = useState(false);
+  const [typeOptions, setTypeOptions] = useState<string[]>([]);
   const [priceFilterActive, setPriceFilterActive] = useState(false);
   const [revenueFilterActive, setRevenueFilterActive] = useState(false);
   const [creatorFilterValue, setCreatorFilterValue] = useState('');
+  const [appliedCreatorFilterValue, setAppliedCreatorFilterValue] = useState('');
   const [typeFilterValue, setTypeFilterValue] = useState('');
+  const [appliedTypeFilterValue, setAppliedTypeFilterValue] = useState('');
   const [priceMinValue, setPriceMinValue] = useState('');
   const [priceMaxValue, setPriceMaxValue] = useState('');
+  const [appliedPriceMinValue, setAppliedPriceMinValue] = useState('');
+  const [appliedPriceMaxValue, setAppliedPriceMaxValue] = useState('');
   const [revenueMinValue, setRevenueMinValue] = useState('');
   const [revenueMaxValue, setRevenueMaxValue] = useState('');
+  const [appliedRevenueMinValue, setAppliedRevenueMinValue] = useState('');
+  const [appliedRevenueMaxValue, setAppliedRevenueMaxValue] = useState('');
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [metricCards, setMetricCards] = useState<ProductMetricCard[]>([]);
@@ -308,13 +316,13 @@ export default function ProductsPage() {
       setIsProductsLoading(true);
       try {
         const params: AdminProductListingParams = {
-          status: statusFilter === 'all' ? undefined : (statusFilter as AdminProductListingParams['status']),
-          hubOwnerName: creatorFilterValue.trim() || undefined,
-          productType: typeFilterValue.trim() || undefined,
-          minPrice: parseOptionalNumber(priceMinValue),
-          maxPrice: parseOptionalNumber(priceMaxValue),
-          minRevenue: parseOptionalNumber(revenueMinValue),
-          maxRevenue: parseOptionalNumber(revenueMaxValue),
+          status: appliedStatusFilter === 'all' ? undefined : (appliedStatusFilter as AdminProductListingParams['status']),
+          hubOwnerName: appliedCreatorFilterValue.trim() || undefined,
+          productType: appliedTypeFilterValue.trim() || undefined,
+          minPrice: parseOptionalNumber(appliedPriceMinValue),
+          maxPrice: parseOptionalNumber(appliedPriceMaxValue),
+          minRevenue: parseOptionalNumber(appliedRevenueMinValue),
+          maxRevenue: parseOptionalNumber(appliedRevenueMaxValue),
           page: currentPage,
           limit: 12
         };
@@ -327,6 +335,14 @@ export default function ProductsPage() {
           .filter((entry) => entry.length > 0);
         setStatusOptions((previous) =>
           Array.from(new Set([...previous, ...nextStatuses])).sort((a, b) =>
+            a.localeCompare(b)
+          )
+        );
+        const nextTypes = response
+          .map((entry) => String((entry.productType ?? '')).trim())
+          .filter((entry) => entry.length > 0);
+        setTypeOptions((previous) =>
+          Array.from(new Set([...previous, ...nextTypes])).sort((a, b) =>
             a.localeCompare(b)
           )
         );
@@ -351,26 +367,26 @@ export default function ProductsPage() {
       isMounted = false;
     };
   }, [
-    statusFilter,
-    creatorFilterValue,
-    typeFilterValue,
-    priceMinValue,
-    priceMaxValue,
-    revenueMinValue,
-    revenueMaxValue,
+    appliedStatusFilter,
+    appliedCreatorFilterValue,
+    appliedTypeFilterValue,
+    appliedPriceMinValue,
+    appliedPriceMaxValue,
+    appliedRevenueMinValue,
+    appliedRevenueMaxValue,
     currentPage
   ]);
 
   useEffect(() => {
     setCurrentPage(1);
   }, [
-    statusFilter,
-    creatorFilterValue,
-    typeFilterValue,
-    priceMinValue,
-    priceMaxValue,
-    revenueMinValue,
-    revenueMaxValue
+    appliedStatusFilter,
+    appliedCreatorFilterValue,
+    appliedTypeFilterValue,
+    appliedPriceMinValue,
+    appliedPriceMaxValue,
+    appliedRevenueMinValue,
+    appliedRevenueMaxValue
   ]);
 
   const handleViewProductDetails = (product: Product) => {
@@ -479,9 +495,10 @@ export default function ProductsPage() {
               <div className="relative overflow-visible" ref={creatorFilterRef}>
                 <FilterPill
                   label="Creator"
-                  active={creatorFilterActive || creatorFilterValue.trim().length > 0}
+                  active={creatorFilterActive || appliedCreatorFilterValue.trim().length > 0}
                   onClick={() => {
                     setCreatorFilterActive(!creatorFilterActive);
+                    setStatusFilterActive(false);
                     setTypeFilterActive(false);
                     setPriceFilterActive(false);
                     setRevenueFilterActive(false);
@@ -493,10 +510,12 @@ export default function ProductsPage() {
                     value={creatorFilterValue}
                     placeholder="Hub owner name"
                     onChange={setCreatorFilterValue}
-                    onApply={() => setCreatorFilterActive(false)}
+                    onApply={() => {
+                      setAppliedCreatorFilterValue(creatorFilterValue);
+                      setCreatorFilterActive(false);
+                    }}
                     onClear={() => {
                       setCreatorFilterValue('');
-                      setCreatorFilterActive(false);
                     }}
                   />
                 )}
@@ -505,14 +524,14 @@ export default function ProductsPage() {
               <div className="relative overflow-visible" ref={statusFilterRef}>
                 <FilterPill
                   label={
-                    statusFilter === 'all'
+                    appliedStatusFilter === 'all'
                       ? 'Status'
-                      : statusFilter
+                      : appliedStatusFilter
                           .toLowerCase()
                           .replace(/_/g, ' ')
                           .replace(/\b\w/g, (char) => char.toUpperCase())
                   }
-                  active={statusFilterActive || statusFilter !== 'all'}
+                  active={statusFilterActive || appliedStatusFilter !== 'all'}
                   onClick={() => {
                     setStatusFilterActive(!statusFilterActive);
                     setCreatorFilterActive(false);
@@ -525,13 +544,13 @@ export default function ProductsPage() {
                   <StatusFilterDropdown
                     options={statusOptions}
                     selected={statusFilter}
-                    onSelect={(value) => {
-                      setStatusFilter(value);
+                    onSelect={setStatusFilter}
+                    onApply={() => {
+                      setAppliedStatusFilter(statusFilter);
                       setStatusFilterActive(false);
                     }}
                     onClear={() => {
                       setStatusFilter('all');
-                      setStatusFilterActive(false);
                     }}
                   />
                 )}
@@ -539,25 +558,28 @@ export default function ProductsPage() {
 
               <div className="relative overflow-visible" ref={typeFilterRef}>
                 <FilterPill
-                  label="Type"
-                  active={typeFilterActive || typeFilterValue.trim().length > 0}
+                  label={appliedTypeFilterValue.trim().length > 0 ? appliedTypeFilterValue : 'Type'}
+                  active={typeFilterActive || appliedTypeFilterValue.trim().length > 0}
                   onClick={() => {
                     setTypeFilterActive(!typeFilterActive);
                     setCreatorFilterActive(false);
+                    setStatusFilterActive(false);
                     setPriceFilterActive(false);
                     setRevenueFilterActive(false);
                   }}
                 />
                 {typeFilterActive && (
-                  <TextFilterDropdown
+                  <TypeFilterDropdown
                     title="Filter by: Type"
-                    value={typeFilterValue}
-                    placeholder="COURSE, DIGITAL_PRODUCT..."
-                    onChange={setTypeFilterValue}
-                    onApply={() => setTypeFilterActive(false)}
+                    options={typeOptions}
+                    selected={typeFilterValue}
+                    onSelect={setTypeFilterValue}
+                    onApply={() => {
+                      setAppliedTypeFilterValue(typeFilterValue);
+                      setTypeFilterActive(false);
+                    }}
                     onClear={() => {
                       setTypeFilterValue('');
-                      setTypeFilterActive(false);
                     }}
                   />
                 )}
@@ -568,12 +590,13 @@ export default function ProductsPage() {
                   label="Price"
                   active={
                     priceFilterActive ||
-                    priceMinValue.trim().length > 0 ||
-                    priceMaxValue.trim().length > 0
+                    appliedPriceMinValue.trim().length > 0 ||
+                    appliedPriceMaxValue.trim().length > 0
                   }
                   onClick={() => {
                     setPriceFilterActive(!priceFilterActive);
                     setCreatorFilterActive(false);
+                    setStatusFilterActive(false);
                     setTypeFilterActive(false);
                     setRevenueFilterActive(false);
                   }}
@@ -586,11 +609,14 @@ export default function ProductsPage() {
                     onFromChange={setPriceMinValue}
                     onToChange={setPriceMaxValue}
                     showCurrency={true}
-                    onApply={() => setPriceFilterActive(false)}
+                    onApply={() => {
+                      setAppliedPriceMinValue(priceMinValue);
+                      setAppliedPriceMaxValue(priceMaxValue);
+                      setPriceFilterActive(false);
+                    }}
                     onClear={() => {
                       setPriceMinValue('');
                       setPriceMaxValue('');
-                      setPriceFilterActive(false);
                     }}
                   />
                 )}
@@ -601,12 +627,13 @@ export default function ProductsPage() {
                   label="Revenue"
                   active={
                     revenueFilterActive ||
-                    revenueMinValue.trim().length > 0 ||
-                    revenueMaxValue.trim().length > 0
+                    appliedRevenueMinValue.trim().length > 0 ||
+                    appliedRevenueMaxValue.trim().length > 0
                   }
                   onClick={() => {
                     setRevenueFilterActive(!revenueFilterActive);
                     setCreatorFilterActive(false);
+                    setStatusFilterActive(false);
                     setTypeFilterActive(false);
                     setPriceFilterActive(false);
                   }}
@@ -619,11 +646,14 @@ export default function ProductsPage() {
                     onFromChange={setRevenueMinValue}
                     onToChange={setRevenueMaxValue}
                     showCurrency={true}
-                    onApply={() => setRevenueFilterActive(false)}
+                    onApply={() => {
+                      setAppliedRevenueMinValue(revenueMinValue);
+                      setAppliedRevenueMaxValue(revenueMaxValue);
+                      setRevenueFilterActive(false);
+                    }}
                     onClear={() => {
                       setRevenueMinValue('');
                       setRevenueMaxValue('');
-                      setRevenueFilterActive(false);
                     }}
                   />
                 )}
@@ -920,11 +950,13 @@ function StatusFilterDropdown({
   options,
   selected,
   onSelect,
+  onApply,
   onClear
 }: {
   options: string[];
   selected: string;
   onSelect: (value: string) => void;
+  onApply: () => void;
   onClear: () => void;
 }) {
   const normalizedOptions = options.length > 0 ? options : ['PUBLISHED', 'DRAFT', 'ARCHIVED', 'BANNED'];
@@ -965,13 +997,100 @@ function StatusFilterDropdown({
           {formatLabel(status)}
         </button>
       ))}
-      <div className="w-full pt-1">
+      <div className="w-full pt-1 flex items-center gap-2">
         <button
           type="button"
           onClick={onClear}
           className="w-full h-8 rounded-[9px] border border-border-primary bg-white text-[13px] font-medium text-text-secondary leading-4 font-sans"
         >
           Clear
+        </button>
+        <button
+          type="button"
+          onClick={onApply}
+          className="w-full h-8 rounded-[9px] text-[13px] font-medium text-white leading-4 font-sans"
+          style={{
+            background: 'linear-gradient(180deg, #5F2EFC 22.58%, #4E18FC 100%)',
+            boxShadow: 'inset 0px 1.5px 1px rgba(255, 255, 255, 0.11)'
+          }}
+        >
+          Apply
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function TypeFilterDropdown({
+  title,
+  options,
+  selected,
+  onSelect,
+  onApply,
+  onClear
+}: {
+  title: string;
+  options: string[];
+  selected: string;
+  onSelect: (value: string) => void;
+  onApply: () => void;
+  onClear: () => void;
+}) {
+  const normalizedOptions = options.length > 0 ? options : ['COURSE', 'DIGITAL_PRODUCT'];
+  const formatLabel = (value: string) =>
+    value
+      .toLowerCase()
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+
+  return (
+    <div
+      className="absolute left-[-0.75px] top-[27px] w-[220px] bg-white border border-border-brand rounded-[16px] flex flex-col items-start p-3 gap-[10px]"
+      style={{
+        boxShadow: '0px 116px 46px rgba(0, 0, 0, 0.01), 0px 65px 39px rgba(0, 0, 0, 0.05), 0px 29px 29px rgba(0, 0, 0, 0.09), 0px 7px 16px rgba(0, 0, 0, 0.1)',
+        zIndex: 50
+      }}
+    >
+      <span className="text-[12px] font-medium text-text-primary leading-[14px] font-sans">
+        {title}
+      </span>
+
+      <div className="w-full h-[30px] bg-surface-secondary border border-border-primary rounded-[6px] px-2">
+        <select
+          value={selected}
+          onChange={(event) => onSelect(event.target.value)}
+          className="w-full h-full bg-transparent text-[12px] font-medium text-text-primary leading-[14px] font-sans outline-none border-none"
+        >
+          <option value="">All types</option>
+          {normalizedOptions.map((type) => (
+            <option key={type} value={type}>
+              {formatLabel(type)}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="w-full flex items-center gap-2">
+        <button
+          onClick={onClear}
+          className="w-full h-8 flex items-center justify-center rounded-[9px] border border-border-primary bg-white"
+        >
+          <span className="text-[13px] font-medium text-text-secondary leading-4 font-sans">Clear</span>
+        </button>
+        <button
+          onClick={onApply}
+          className="w-full h-8 flex items-center justify-center rounded-[9px]"
+          style={{
+            background: 'linear-gradient(180deg, #5F2EFC 22.58%, #4E18FC 100%)',
+            boxShadow: 'inset 0px 1.5px 1px rgba(255, 255, 255, 0.11)'
+          }}
+        >
+          <span
+            className="text-[13px] font-medium text-white leading-4 font-sans"
+            style={{ textShadow: '0px -1px 6px rgba(0, 0, 0, 0.25)' }}
+          >
+            Apply
+          </span>
         </button>
       </div>
     </div>

@@ -8,6 +8,8 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Maximize,
+  Minimize,
   Minus,
   Pause,
   Play,
@@ -23,6 +25,8 @@ type CourseContentItem = {
   id: string;
   title: string;
   url: string;
+  hlsUrl?: string;
+  fallbackVideoUrl?: string;
   type: 'Reading' | 'Video' | 'Image';
   description?: string;
   meta: string;
@@ -60,6 +64,14 @@ const resolveContentType = (rawType?: string, url?: string): 'Reading' | 'Video'
 
 const firstValidUrl = (...values: Array<string | undefined>) =>
   values.find((value) => isUrl(value));
+
+const isM3u8Url = (value?: string) =>
+  typeof value === 'string' && /\.m3u8($|\?)/i.test(value);
+
+const readOptionalString = (record: Record<string, unknown> | undefined, key: string) => {
+  const value = record?.[key];
+  return typeof value === 'string' && value.trim().length > 0 ? value : undefined;
+};
 
 const pickPreferredContentUrl = ({
   rawType,
@@ -104,25 +116,6 @@ const formatTime = (value: number) => {
   const seconds = Math.floor(value % 60);
   return `${minutes}:${String(seconds).padStart(2, '0')}`;
 };
-
-const PresentationIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M4 5C3.44772 5 3 5.44772 3 6V18C3 18.5523 3.44772 19 4 19H20C20.5523 19 21 18.5523 21 18V6C21 5.44772 20.5523 5 20 5H4ZM1 6C1 4.34315 2.34315 3 4 3H20C21.6569 3 23 4.34315 23 6V18C23 19.6569 21.6569 21 20 21H4C2.34315 21 1 19.6569 1 18V6Z"
-      fill="white"
-    />
-    <path
-      d="M9.39615 8.36625C8.87496 9.02145 9.34154 9.98877 10.1788 9.98877H13.8214C14.6586 9.98877 15.1252 9.02145 14.604 8.36625L12.7827 6.07659C12.3823 5.57329 11.6178 5.57329 11.2175 6.07659L9.39615 8.36625Z"
-      fill="white"
-    />
-    <path
-      d="M14.6038 15.7153C15.125 15.0601 14.6585 14.0928 13.8212 14.0928H10.1786C9.3414 14.0928 8.87483 15.0601 9.39602 15.7153L11.2173 18.005C11.6177 18.5083 12.3822 18.5083 12.7825 18.005L14.6038 15.7153Z"
-      fill="white"
-    />
-  </svg>
-);
 
 const ResetViewIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -265,6 +258,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   const [hasPdfError, setHasPdfError] = useState(false);
   const [isPdfMenuOpen, setIsPdfMenuOpen] = useState(false);
   const [isPdfFullscreen, setIsPdfFullscreen] = useState(false);
+  const [isVideoFullscreen, setIsVideoFullscreen] = useState(false);
   const pdfFrameRef = useRef<HTMLDivElement | null>(null);
   const pdfViewportRef = useRef<HTMLDivElement | null>(null);
   const pdfCanvasRefs = useRef<Record<number, HTMLCanvasElement | null>>({});
@@ -343,11 +337,23 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
         section.contents.forEach((entry, itemIndex) => {
           const fileData = entry.fileData ?? entry.file_data;
+          const fileRecord = fileData as Record<string, unknown> | undefined;
+          const hlsUrl = firstValidUrl(
+            fileData?.m3u8,
+            readOptionalString(fileRecord, 'm3u8Url'),
+            readOptionalString(fileRecord, 'm3u8_url'),
+            readOptionalString(fileRecord, 'hls')
+          );
+          const fallbackVideoUrl = firstValidUrl(
+            fileData?.mp4,
+            fileData?.original,
+            isUrl(entry.body) ? entry.body : undefined
+          );
           const url = pickPreferredContentUrl({
             rawType: fileData?.type ?? entry.type,
             fileOriginal: fileData?.original,
             fileMp4: fileData?.mp4,
-            fileM3u8: fileData?.m3u8,
+            fileM3u8: hlsUrl,
             bodyUrl: isUrl(entry.body) ? entry.body : undefined
           });
 
@@ -369,6 +375,8 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
             id: `${targetSection.id}-item-${itemIndex + 1}-${title}`,
             title,
             url,
+            hlsUrl,
+            fallbackVideoUrl,
             type,
             description,
             meta: metaPieces.join(' • '),
@@ -424,12 +432,29 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
         };
 
         const nestedFile = maybeObject.fileData ?? maybeObject.file_data;
+        const nestedFileRecord = nestedFile as Record<string, unknown> | undefined;
+        const maybeRecord = maybeObject as Record<string, unknown>;
+        const hlsUrl = firstValidUrl(
+          nestedFile?.m3u8,
+          readOptionalString(maybeRecord, 'm3u8'),
+          readOptionalString(maybeRecord, 'm3u8Url'),
+          readOptionalString(maybeRecord, 'm3u8_url'),
+          readOptionalString(nestedFileRecord, 'm3u8Url'),
+          readOptionalString(nestedFileRecord, 'm3u8_url'),
+          readOptionalString(nestedFileRecord, 'hls')
+        );
+        const fallbackVideoUrl = firstValidUrl(
+          nestedFile?.mp4,
+          nestedFile?.original,
+          maybeObject.original,
+          isUrl(maybeObject.body) ? maybeObject.body : undefined
+        );
         const url = pickPreferredContentUrl({
           rawType: maybeObject.type ?? nestedFile?.type,
           topLevelOriginal: maybeObject.original,
           fileOriginal: nestedFile?.original,
           fileMp4: nestedFile?.mp4,
-          fileM3u8: nestedFile?.m3u8,
+          fileM3u8: hlsUrl,
           bodyUrl: isUrl(maybeObject.body) ? maybeObject.body : undefined
         });
 
@@ -453,6 +478,8 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
           id: `${targetSection.id}-item-${itemIndex + 1}-${title}`,
           title,
           url,
+          hlsUrl,
+          fallbackVideoUrl,
           type,
           description,
           meta: metaPieces.join(' • '),
@@ -549,6 +576,16 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   const viewerType =
     selectedItem?.type ??
     (viewerUrl ? resolveContentType(previewContentTypeParam ?? '', viewerUrl) : previewContentType);
+  const viewerVideoUrl =
+    viewerType === 'Video'
+      ? (selectedItem?.hlsUrl && isM3u8Url(selectedItem.hlsUrl)
+          ? selectedItem.hlsUrl
+          : selectedItem?.fallbackVideoUrl ?? viewerUrl)
+      : null;
+  const viewerVideoFallbackUrl =
+    viewerType === 'Video'
+      ? selectedItem?.fallbackVideoUrl
+      : null;
   const contentTitle =
     selectedItem?.title ??
     previewContentLabel ??
@@ -579,7 +616,10 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
     const onLoaded = () => setDuration(video.duration || 0);
     const onTime = () => setCurrentTime(video.currentTime || 0);
-    const onPlay = () => setIsPlaying(true);
+    const onPlay = () => {
+      setIsPlaying(true);
+      setVideoError(null);
+    };
     const onPause = () => setIsPlaying(false);
     const onVolume = () => setIsMuted(video.muted);
 
@@ -596,7 +636,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       video.removeEventListener('pause', onPause);
       video.removeEventListener('volumechange', onVolume);
     };
-  }, [viewerUrl, viewerType]);
+  }, [viewerVideoUrl, viewerUrl, viewerType]);
 
   useEffect(() => {
     if (viewerType !== 'Video') return;
@@ -609,12 +649,12 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     const video = videoRef.current;
     if (!video) return;
     video.playbackRate = 1;
-  }, [viewerType, viewerUrl]);
+  }, [viewerType, viewerVideoUrl]);
 
   useEffect(() => {
     let isCancelled = false;
     const video = videoRef.current;
-    if (!video || viewerType !== 'Video' || !viewerUrl) return;
+    if (!video || viewerType !== 'Video' || !viewerVideoUrl) return;
 
     const cleanupHls = () => {
       if (hlsRef.current) {
@@ -630,9 +670,24 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     cleanupHls();
     setVideoError(null);
 
-    const isHlsUrl = /\.m3u8($|\?)/i.test(viewerUrl);
+    const tryFallbackSource = () => {
+      if (
+        !viewerVideoFallbackUrl ||
+        viewerVideoFallbackUrl === viewerVideoUrl ||
+        isM3u8Url(viewerVideoFallbackUrl)
+      ) {
+        return false;
+      }
+      cleanupHls();
+      video.src = viewerVideoFallbackUrl;
+      video.load();
+      setVideoError(null);
+      return true;
+    };
+
+    const isHlsUrl = isM3u8Url(viewerVideoUrl);
     if (!isHlsUrl) {
-      video.src = viewerUrl;
+      video.src = viewerVideoUrl;
       video.load();
       return () => {
         cleanupHls();
@@ -642,7 +697,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     const setupHls = async () => {
       try {
         if (video.canPlayType('application/vnd.apple.mpegurl')) {
-          video.src = viewerUrl;
+          video.src = viewerVideoUrl;
           video.load();
           return;
         }
@@ -650,22 +705,28 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
         const { default: Hls } = await import('hls.js');
         if (isCancelled) return;
         if (!Hls.isSupported()) {
-          setVideoError('This stream format is not supported in this browser.');
+          if (!tryFallbackSource()) {
+            setVideoError('This stream format is not supported in this browser.');
+          }
           return;
         }
 
         const hls = new Hls();
         hlsRef.current = hls;
-        hls.loadSource(viewerUrl);
+        hls.loadSource(viewerVideoUrl);
         hls.attachMedia(video);
         hls.on(Hls.Events.ERROR, (_event: any, data: any) => {
           if (data?.fatal && !isCancelled) {
-            setVideoError('Unable to load this video stream.');
+            if (!tryFallbackSource()) {
+              setVideoError('Unable to load this video stream.');
+            }
           }
         });
       } catch {
         if (!isCancelled) {
-          setVideoError('Unable to load this video stream.');
+          if (!tryFallbackSource()) {
+            setVideoError('Unable to load this video stream.');
+          }
         }
       }
     };
@@ -676,7 +737,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       isCancelled = true;
       cleanupHls();
     };
-  }, [viewerType, viewerUrl]);
+  }, [viewerType, viewerVideoFallbackUrl, viewerVideoUrl]);
 
   useEffect(() => {
     if (!isVideoSettingsOpen) return;
@@ -696,7 +757,21 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     const video = videoRef.current;
     if (!video) return;
     if (video.paused) {
-      void video.play().catch(() => {
+      setVideoError(null);
+      void video.play().catch((error: unknown) => {
+        const errorName =
+          typeof error === 'object' && error && 'name' in error
+            ? String((error as { name?: string }).name)
+            : '';
+
+        // Ignore transient promise rejections caused by rapid source/seek updates.
+        if (errorName === 'AbortError') return;
+
+        if (errorName === 'NotSupportedError') {
+          setVideoError('This video format is not supported in this browser.');
+          return;
+        }
+
         setVideoError('Unable to play this video.');
       });
     } else {
@@ -880,9 +955,13 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
   useEffect(() => {
     const handleFullscreenChange = () => {
-      const frame = pdfFrameRef.current;
       const current = document.fullscreenElement;
-      setIsPdfFullscreen(Boolean(frame && current && (current === frame || current.contains(frame))));
+      const pdfFrame = pdfFrameRef.current;
+      const videoFrame = videoFrameRef.current;
+      setIsPdfFullscreen(Boolean(pdfFrame && current && (current === pdfFrame || current.contains(pdfFrame))));
+      setIsVideoFullscreen(
+        Boolean(videoFrame && current && (current === videoFrame || current.contains(videoFrame)))
+      );
     };
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () => {
@@ -1126,9 +1205,14 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                         type="button"
                         onClick={handlePdfFullscreen}
                         className="text-white"
+                        aria-label={isPdfFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
                         title={isPdfFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
                       >
-                        <PresentationIcon />
+                        {isPdfFullscreen ? (
+                          <Minimize className="w-6 h-6" />
+                        ) : (
+                          <Maximize className="w-6 h-6" />
+                        )}
                       </button>
                       <button type="button" onClick={handlePdfRotate} className="text-white">
                         <ResetViewIcon />
@@ -1224,7 +1308,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 ref={videoFrameRef}
                 className="w-full h-[447px] rounded-lg overflow-hidden bg-black relative flex flex-col justify-end fullscreen:h-screen fullscreen:rounded-none"
               >
-                {viewerUrl ? (
+                {viewerVideoUrl ? (
                   <>
                     <video
                       ref={videoRef}
@@ -1264,7 +1348,20 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                           <VideoForward10Icon />
                         </button>
                       </div>
-                      <div ref={videoSettingsRef} className="w-12 h-[22px] flex items-center gap-4 relative">
+                      <div ref={videoSettingsRef} className="h-[22px] flex items-center gap-4 relative">
+                        <button
+                          type="button"
+                          className="text-white"
+                          aria-label={isVideoFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+                          title={isVideoFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+                          onClick={() => void handleVideoFullscreen()}
+                        >
+                          {isVideoFullscreen ? (
+                            <Minimize className="w-5 h-5" />
+                          ) : (
+                            <Maximize className="w-5 h-5" />
+                          )}
+                        </button>
                         <button
                           type="button"
                           className="text-white text-[14px] leading-[22px] font-medium"
@@ -1284,10 +1381,13 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                           <div className="absolute bottom-9 right-0 w-44 rounded-lg border border-[#EAECF0] bg-white shadow-dropdown overflow-hidden">
                             <button
                               type="button"
-                              onClick={handleVideoFullscreen}
+                              onClick={() => {
+                                void handleVideoFullscreen();
+                                setIsVideoSettingsOpen(false);
+                              }}
                               className="w-full text-left px-3 py-2 text-[13px] leading-4 text-[#2B2834] hover:bg-[#F9F9FB]"
                             >
-                              Fullscreen
+                              {isVideoFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
                             </button>
                             {[1, 1.25, 1.5, 2].map((rate) => (
                               <button

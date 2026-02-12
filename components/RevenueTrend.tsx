@@ -60,12 +60,15 @@ const formatTooltipDate = (dateString: string) => {
 
 type RevenueTrendProps = {
   onLoadingChange?: (isLoading: boolean) => void;
+  filter?: RevenueTrendFilter;
+  onFilterChange?: (filter: RevenueTrendFilter) => void;
 };
 
-export default function RevenueTrend({ onLoadingChange }: RevenueTrendProps = {}) {
-  const [selectedFilter, setSelectedFilter] = useState<RevenueTrendFilter>(
+export default function RevenueTrend({ onLoadingChange, filter, onFilterChange }: RevenueTrendProps = {}) {
+  const [internalFilter, setInternalFilter] = useState<RevenueTrendFilter>(
     () => getDashboardUiState('revenueTrendFilter')
   );
+  const selectedFilter = filter ?? internalFilter;
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [revenueData, setRevenueData] = useState<RevenueTrendPoint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -160,7 +163,11 @@ export default function RevenueTrend({ onLoadingChange }: RevenueTrendProps = {}
                       type="button"
                       onClick={() => {
                         setDashboardUiState('revenueTrendFilter', item.value);
-                        setSelectedFilter(item.value);
+                        if (onFilterChange) {
+                          onFilterChange(item.value);
+                        } else {
+                          setInternalFilter(item.value);
+                        }
                         setIsDropdownOpen(false);
                       }}
                       className={cn(

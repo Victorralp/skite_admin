@@ -826,7 +826,7 @@ export default function ProductDetailModal({ product, onClose, onStatusChange }:
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
                                 className={cn(
-                                    "flex-1 flex flex-col items-center pt-2.5 gap-3 h-[38px] font-sans text-body-sm transition-colors",
+                                    "flex-1 h-[38px] flex flex-col items-center justify-between font-sans text-body-sm transition-colors",
                                     activeTab === tab ? "text-text-primary" : "text-text-tertiary"
                                 )}
                             >

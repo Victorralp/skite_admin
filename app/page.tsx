@@ -8,10 +8,15 @@ import RecentTransactionsTable from '@/components/RecentTransactionsTable';
 import RevenueTrend from '@/components/RevenueTrend';
 import TopCreatorsTable from '@/components/TopCreatorsTable';
 import { useState } from 'react';
+import { getDashboardUiState } from '@/lib/dashboardUiState';
+import { type RevenueTrendFilter } from '@/lib/api';
 
 export default function Home() {
   const [isTrendLoading, setIsTrendLoading] = useState(true);
   const [isChartsLoading, setIsChartsLoading] = useState(true);
+  const [sharedRevenueFilter, setSharedRevenueFilter] = useState<RevenueTrendFilter>(
+    () => getDashboardUiState('revenueTrendFilter')
+  );
   const isDashboardLoading = isTrendLoading || isChartsLoading;
 
   return (
@@ -34,8 +39,12 @@ export default function Home() {
 
         {/* Chart Container */}
         <div className="w-full bg-surface-secondary rounded-lg p-1 flex flex-col gap-1 box-border">
-          <RevenueTrend onLoadingChange={setIsTrendLoading} />
-          <ChartsRow onLoadingChange={setIsChartsLoading} />
+          <RevenueTrend
+            onLoadingChange={setIsTrendLoading}
+            filter={sharedRevenueFilter}
+            onFilterChange={setSharedRevenueFilter}
+          />
+          <ChartsRow onLoadingChange={setIsChartsLoading} filter={sharedRevenueFilter} />
         </div>
       </div>
 
