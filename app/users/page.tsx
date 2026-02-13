@@ -3,9 +3,14 @@
 import { useState, useEffect, useRef } from 'react';
 import StatsCard from '@/components/StatsCard';
 import UserDetailModal from '@/components/UserDetailModal';
-import ActionMenu from '@/components/ActionMenu';
 import { MoreVertical } from 'lucide-react';
 import PageContainer from '@/components/layout/PageContainer';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
 import { User } from '@/data/dashboard';
 import { cn } from '@/lib/utils';
 import {
@@ -29,6 +34,17 @@ const SlidersHorizontalIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+type UsersTableUser = User & {
+  apiId?: string;
+  firstName?: string;
+  lastName?: string;
+  dob?: string;
+  gender?: string;
+  joinedAtIso?: string;
+  lastActiveIso?: string;
+  rawStatus?: string;
+};
+
 export default function UsersPage() {
   const [dateJoinedFilterActive, setDateJoinedFilterActive] = useState(false);
   const [purchaseCountFilterActive, setPurchaseCountFilterActive] = useState(false);
@@ -44,10 +60,9 @@ export default function UsersPage() {
   const [spendMaxValue, setSpendMaxValue] = useState('');
   const [appliedSpendMinValue, setAppliedSpendMinValue] = useState('');
   const [appliedSpendMaxValue, setAppliedSpendMaxValue] = useState('');
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UsersTableUser | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<UsersTableUser[]>([]);
   const [isUsersLoading, setIsUsersLoading] = useState(true);
   const [hasUsersError, setHasUsersError] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -70,7 +85,6 @@ export default function UsersPage() {
   const [pendingUserId, setPendingUserId] = useState<string | null>(null);
   const [snackbar, setSnackbar] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const snackbarTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
 
   const dateJoinedFilterRef = useRef<HTMLDivElement>(null);
   const purchaseCountFilterRef = useRef<HTMLDivElement>(null);
@@ -87,9 +101,6 @@ export default function UsersPage() {
       }
       if (spendFilterRef.current && !spendFilterRef.current.contains(event.target as Node)) {
         setSpendFilterActive(false);
-      }
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setOpenMenuId(null);
       }
     };
 
@@ -240,14 +251,48 @@ export default function UsersPage() {
       });
     };
 
-    const mapUser = (entry: AdminUserListingItem, index: number): User => {
+    const normalizePossibleId = (value: unknown): string | null => {
+      if (!value) return null;
+      if (typeof value === 'string') return value;
+      if (typeof value === 'object') {
+        const obj = value as Record<string, unknown>;
+        return (
+          normalizePossibleId(obj._id) ??
+          normalizePossibleId(obj.id) ??
+          normalizePossibleId(obj.userId) ??
+          normalizePossibleId(obj.user_id) ??
+          normalizePossibleId(obj.uid) ??
+          normalizePossibleId(obj.$oid)
+        );
+      }
+      return null;
+    };
+
+    const mapUser = (entry: AdminUserListingItem, index: number): UsersTableUser => {
       const fallbackId = `${entry.name ?? 'user'}-${entry.joined_at ?? index}-${index}`;
+      const entryRecord = entry as Record<string, unknown>;
+      const apiId =
+        normalizePossibleId(entry.id) ??
+        normalizePossibleId(entry._id) ??
+        normalizePossibleId(entryRecord.userId) ??
+        normalizePossibleId(entryRecord.user_id) ??
+        normalizePossibleId(entryRecord.uid);
       return {
-        id: String(entry.id ?? entry._id ?? fallbackId),
+        id: String(apiId ?? fallbackId),
+        apiId: apiId ? String(apiId) : undefined,
         name: entry.name ?? 'Unknown User',
         username: entry.username ?? (entry.email ? `@${entry.email.split('@')[0]}` : '@unknown'),
         email: entry.email ?? '',
         avatar: entry.avatar ?? '',
+        firstName:
+          typeof entryRecord.first_name === 'string' ? entryRecord.first_name : undefined,
+        lastName:
+          typeof entryRecord.last_name === 'string' ? entryRecord.last_name : undefined,
+        dob: typeof entryRecord.dob === 'string' ? entryRecord.dob : undefined,
+        gender: typeof entryRecord.gender === 'string' ? entryRecord.gender : undefined,
+        joinedAtIso: entry.joined_at,
+        lastActiveIso: entry.last_active,
+        rawStatus: entry.status,
         joined: formatDate(entry.joined_at),
         purchases: Number(entry.purchases_count ?? 0),
         spent: Number(entry.total_spent ?? 0),
@@ -319,10 +364,46 @@ export default function UsersPage() {
     statusFilter
   ]);
 
-  const handleViewUserDetails = (user: any) => {
+  const handleViewUserDetails = async (user: UsersTableUser) => {
     setSelectedUser(user);
     setIsModalOpen(true);
-    setOpenMenuId(null);
+
+    if (!user.apiId) return;
+
+    try {
+      const response = await getAdminUsers({
+        userId: user.apiId,
+        page: 1,
+        limit: 1
+      });
+      const detail = response.users[0] as Record<string, unknown> | undefined;
+      if (!detail) return;
+
+      setSelectedUser((previous) => {
+        if (!previous || previous.id !== user.id) return previous;
+        return {
+          ...previous,
+          firstName:
+            typeof detail.first_name === 'string' && detail.first_name.trim().length > 0
+              ? detail.first_name
+              : previous.firstName,
+          lastName:
+            typeof detail.last_name === 'string' && detail.last_name.trim().length > 0
+              ? detail.last_name
+              : previous.lastName,
+          dob:
+            typeof detail.dob === 'string' && detail.dob.trim().length > 0
+              ? detail.dob
+              : previous.dob,
+          gender:
+            typeof detail.gender === 'string' && detail.gender.trim().length > 0
+              ? detail.gender
+              : previous.gender
+        };
+      });
+    } catch {
+      // Keep existing list data when detail fetch fails.
+    }
   };
 
   const handleCloseModal = () => {
@@ -330,8 +411,12 @@ export default function UsersPage() {
     setSelectedUser(null);
   };
 
-  const handleToggleBanUser = async (user: User) => {
+  const handleToggleBanUser = async (user: UsersTableUser) => {
     if (pendingUserId) return;
+    if (!user.apiId) {
+      showSnackbar('error', 'User ID is missing from listing response');
+      return;
+    }
 
     const isInactive = user.status === 'Inactive';
     const isActive = user.status === 'Active';
@@ -341,11 +426,10 @@ export default function UsersPage() {
     }
 
     setPendingUserId(user.id);
-    setOpenMenuId(null);
     try {
       const message = isInactive
-        ? await unbanAdminUser(user.id)
-        : await banAdminUser(user.id);
+        ? await unbanAdminUser(user.apiId)
+        : await banAdminUser(user.apiId);
       const nextStatus = (isInactive ? 'Active' : 'Inactive') as User['status'];
       setUsers((previous) =>
         previous.map((entry) =>
@@ -553,11 +637,8 @@ export default function UsersPage() {
                   key={user.id}
                   user={user}
                   isPending={pendingUserId === user.id}
-                  isMenuOpen={openMenuId === user.id}
-                  onMenuToggle={() => setOpenMenuId(openMenuId === user.id ? null : user.id)}
-                  onViewDetails={() => handleViewUserDetails(user)}
+                  onViewDetails={() => void handleViewUserDetails(user)}
                   onToggleBanUser={() => void handleToggleBanUser(user)}
-                  menuRef={openMenuId === user.id ? menuRef : null}
                 />
               ))}
             </div>
@@ -785,7 +866,7 @@ function SingleValueFilterDropdown({
   );
 }
 
-function UserRow({ user, isPending, isMenuOpen, onMenuToggle, onViewDetails, onToggleBanUser, menuRef }: { user: any; isPending: boolean; isMenuOpen: boolean; onMenuToggle: () => void; onViewDetails: () => void; onToggleBanUser: () => void; menuRef: React.RefObject<HTMLDivElement> | null }) {
+function UserRow({ user, isPending, onViewDetails, onToggleBanUser }: { user: any; isPending: boolean; onViewDetails: () => void; onToggleBanUser: () => void }) {
   const statusConfig = {
     Active: {
       bg: 'bg-surface-success',
@@ -823,10 +904,20 @@ function UserRow({ user, isPending, isMenuOpen, onMenuToggle, onViewDetails, onT
   const status = statusConfig[user.status as keyof typeof statusConfig] || statusConfig.Active;
 
   return (
-    <div className="flex items-center h-[50px] bg-white border-b border-border-primary last:border-0 hover:bg-gray-50/50 transition-colors px-6 gap-4 min-w-[600px]">
+    <div
+      className="flex items-center h-[50px] bg-white border-b border-border-primary last:border-0 hover:bg-gray-50/50 transition-colors px-6 gap-4 min-w-[600px] cursor-pointer"
+      onClick={onViewDetails}
+    >
       {/* User */}
       <div className="flex items-center gap-1.5 w-[200px] sm:w-[240px] lg:w-[266px]">
-        <div className="w-avatar-sm h-avatar-sm rounded-full bg-gray-200 flex-shrink-0" />
+        <img
+          src={user.avatar || '/image.png'}
+          alt={user.name || 'User avatar'}
+          className="w-avatar-sm h-avatar-sm rounded-full object-cover flex-shrink-0 bg-gray-200"
+          onError={(event) => {
+            event.currentTarget.src = '/image.png';
+          }}
+        />
         <div className="flex flex-col flex-1 overflow-hidden">
           <span className="text-body-sm font-medium text-text-primary leading-4 truncate">{user.name}</span>
           <span className="text-caption-lg text-text-secondary leading-[14px] truncate">{user.username}</span>
@@ -851,7 +942,7 @@ function UserRow({ user, isPending, isMenuOpen, onMenuToggle, onViewDetails, onT
       {/* Status */}
       <div className="w-[50px]">
         <span className={cn(
-          "inline-flex items-center gap-0.5 px-[6px] py-[1px] pl-[3px] rounded text-caption-sm h-[14px] w-fit",
+          "inline-flex items-center justify-center gap-0.5 px-[6px] py-[1px] pl-[3px] rounded-[4px] h-[14px] w-fit text-[10px] leading-3 font-medium font-sans no-underline",
           status.bg,
           status.color
         )}>
@@ -861,26 +952,42 @@ function UserRow({ user, isPending, isMenuOpen, onMenuToggle, onViewDetails, onT
       </div>
 
       {/* Actions */}
-      <div className="relative flex-1 min-w-[18px] flex justify-end items-center" ref={menuRef}>
-        <button
-          onClick={onMenuToggle}
-          className="w-[18px] h-[18px] flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <MoreVertical className="h-[18px] w-[18px] text-text-secondary" />
-        </button>
-
-        {isMenuOpen && (
-          <ActionMenu
-            simpleMode
-            option1Label="View User Details"
-            option2Label={user.status === 'Inactive' ? 'Unban User' : 'Ban User'}
-            onOption1={onViewDetails}
-            onOption2={() => {
-              if (isPending) return;
-              onToggleBanUser();
-            }}
-          />
-        )}
+      <div
+        className="relative flex-1 min-w-[18px] flex justify-end items-center"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="w-[18px] h-[18px] flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors"
+              aria-label={`Open actions for ${user.name}`}
+            >
+              <MoreVertical className="h-[18px] w-[18px] text-text-secondary" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            sideOffset={8}
+            className="w-40 rounded-xl border border-border-primary bg-white p-0 shadow-dropdown z-[120]"
+          >
+            <DropdownMenuItem
+              onSelect={onViewDetails}
+              className="w-40 h-menu-item px-4 py-2.5 text-body-sm font-medium text-text-primary leading-4 rounded-none border-b border-border-primary focus:bg-gray-50"
+            >
+              View User Details
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={isPending}
+              onSelect={() => {
+                if (!isPending) onToggleBanUser();
+              }}
+              className="w-40 h-menu-item px-4 py-2.5 text-body-sm font-medium text-text-danger leading-4 rounded-none focus:bg-gray-50 data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed"
+            >
+              {user.status === 'Inactive' ? 'Unban User' : 'Ban User'}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );

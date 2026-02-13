@@ -11,6 +11,7 @@ type ActionMenuProps = {
     suspendLabel?: string;
     // Simple mode with just 2 options
     simpleMode?: boolean;
+    openUpward?: boolean;
     option1Label?: string;
     option2Label?: string;
     onOption1?: () => void;
@@ -27,6 +28,7 @@ export default function ActionMenu({
     messageLabel,
     suspendLabel,
     simpleMode = false,
+    openUpward = false,
     option1Label,
     option2Label,
     onOption1,
@@ -35,7 +37,7 @@ export default function ActionMenu({
     // Simple mode with just 2 options
     if (simpleMode && onOption1 && onOption2) {
         return (
-            <div className="absolute right-0 top-8 w-40 bg-white border border-border-primary rounded-xl flex flex-col items-center p-0 overflow-hidden shadow-dropdown z-50">
+            <div className={`absolute right-0 ${openUpward ? 'bottom-8' : 'top-8'} w-40 bg-white border border-border-primary rounded-xl flex flex-col items-center p-0 overflow-hidden shadow-dropdown z-50`}>
                 <button
                     onClick={(event) => {
                         event.stopPropagation();

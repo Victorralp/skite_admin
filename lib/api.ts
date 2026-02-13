@@ -136,6 +136,7 @@ export type AdminUserListingParams = {
   minSpend?: number;
   maxSpend?: number;
   status?: string;
+  userId?: string;
 };
 
 export type AdminUserListingItem = {
@@ -166,6 +167,63 @@ export type AdminUserListingResponse = {
   message?: string;
   users: AdminUserListingItem[];
   pagination: AdminUserListingPagination;
+};
+
+export type UserLogItem = {
+  _id: string;
+  activity: string;
+  createdAt: string;
+  user?: {
+    _id?: string;
+    email?: string;
+    first_name?: string;
+    last_name?: string;
+    role?: string;
+  };
+};
+
+export type UserLogsMeta = {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
+
+export type UserLogsResponse = {
+  message?: string;
+  data: UserLogItem[];
+  meta: UserLogsMeta;
+};
+
+export type AdminUserTransactionItem = {
+  _id: string;
+  amount: number;
+  currency: string;
+  status: string;
+  payment_provider?: string;
+  provider_txn_id?: string;
+  txn_url?: string;
+  transactionDate: string;
+  narration?: string;
+  user?: {
+    _id?: string;
+    email?: string;
+    first_name?: string;
+    last_name?: string;
+    status?: string;
+  };
+  customer_email?: string;
+  customer_first_name?: string;
+  customer_last_name?: string;
+};
+
+export type AdminUserTransactionsPagination = {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
 };
 
 export async function banAdminProduct(productId: string) {
@@ -774,6 +832,7 @@ export async function getAdminUsers(params: AdminUserListingParams = {}) {
     if (params.minSpend !== undefined) searchParams.set('minSpend', String(params.minSpend));
     if (params.maxSpend !== undefined) searchParams.set('maxSpend', String(params.maxSpend));
     if (params.status) searchParams.set('status', params.status);
+    if (params.userId) searchParams.set('userId', params.userId);
 
     const queryString = searchParams.toString();
     const response = await fetch(`${baseUrl()}/admin-user/list-users${queryString ? `?${queryString}` : ''}`, {
@@ -818,6 +877,137 @@ export async function getAdminUsers(params: AdminUserListingParams = {}) {
       }
     };
   });
+}
+
+export async function getUserLogs(params: {
+  user?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+} = {}) {
+  let idToken: string | null = null;
+  try {
+    idToken = (await auth.currentUser?.getIdToken()) ?? null;
+  } catch {
+    idToken = null;
+  }
+
+  const headers: HeadersInit = {};
+  if (idToken) {
+    headers.authorization = `Bearer ${idToken}`;
+  }
+
+  const searchParams = new URLSearchParams();
+  if (params.user) searchParams.set('user', params.user);
+  if (params.search) searchParams.set('search', params.search);
+  if (params.page !== undefined) searchParams.set('page', String(params.page));
+  if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
+
+  const queryString = searchParams.toString();
+  const response = await fetch(`${baseUrl()}/user-logs${queryString ? `?${queryString}` : ''}`, {
+    method: 'GET',
+    credentials: 'include',
+    cache: 'no-store',
+    headers
+  });
+
+  const json = (await response
+    .json()
+    .catch(() => null)) as
+    | UserLogsResponse
+    | { message?: string; error?: string; data?: UserLogItem[]; meta?: Partial<UserLogsMeta> }
+    | null;
+
+  if (!response.ok) {
+    const errorPayload = json as { message?: string; error?: string } | null;
+    const message = errorPayload?.message ?? errorPayload?.error ?? 'USER_LOGS_FAILED';
+    throw new Error(message);
+  }
+
+  if (!json || typeof json !== 'object') {
+    throw new Error('USER_LOGS_INVALID_RESPONSE');
+  }
+
+  return {
+    data: Array.isArray(json.data) ? json.data : [],
+    meta: {
+      total: Number(json.meta?.total ?? 0),
+      page: Number(json.meta?.page ?? params.page ?? 1),
+      limit: Number(json.meta?.limit ?? params.limit ?? 10),
+      totalPages: Number(json.meta?.totalPages ?? 1)
+    }
+  };
+}
+
+export async function getAdminUserTransactions(params: {
+  page?: number;
+  limit?: number;
+  customerId?: string;
+  email?: string;
+  status?: string;
+  startDate?: string;
+  endDate?: string;
+  minAmount?: number;
+  maxAmount?: number;
+} = {}) {
+  let idToken: string | null = null;
+  try {
+    idToken = (await auth.currentUser?.getIdToken()) ?? null;
+  } catch {
+    idToken = null;
+  }
+
+  const headers: HeadersInit = {};
+  if (idToken) {
+    headers.authorization = `Bearer ${idToken}`;
+  }
+
+  const searchParams = new URLSearchParams();
+  if (params.page !== undefined) searchParams.set('page', String(params.page));
+  if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
+  if (params.customerId) searchParams.set('customerId', params.customerId);
+  if (params.email) searchParams.set('email', params.email);
+  if (params.status) searchParams.set('status', params.status);
+  if (params.startDate) searchParams.set('startDate', params.startDate);
+  if (params.endDate) searchParams.set('endDate', params.endDate);
+  if (params.minAmount !== undefined) searchParams.set('minAmount', String(params.minAmount));
+  if (params.maxAmount !== undefined) searchParams.set('maxAmount', String(params.maxAmount));
+
+  const queryString = searchParams.toString();
+  const response = await fetch(`${baseUrl()}/admin-user/transactions${queryString ? `?${queryString}` : ''}`, {
+    method: 'GET',
+    credentials: 'include',
+    cache: 'no-store',
+    headers
+  });
+
+  const json = (await response
+    .json()
+    .catch(() => null)) as
+    | {
+        transactions?: AdminUserTransactionItem[];
+        pagination?: Partial<AdminUserTransactionsPagination>;
+        message?: string;
+        error?: string;
+      }
+    | null;
+
+  if (!response.ok) {
+    const message = json?.message ?? json?.error ?? 'USER_TRANSACTIONS_FAILED';
+    throw new Error(message);
+  }
+
+  return {
+    transactions: Array.isArray(json?.transactions) ? json.transactions : [],
+    pagination: {
+      total: Number(json?.pagination?.total ?? 0),
+      page: Number(json?.pagination?.page ?? params.page ?? 1),
+      limit: Number(json?.pagination?.limit ?? params.limit ?? 20),
+      totalPages: Number(json?.pagination?.totalPages ?? 1),
+      hasNext: Boolean(json?.pagination?.hasNext),
+      hasPrev: Boolean(json?.pagination?.hasPrev)
+    }
+  };
 }
 
 export async function getAdminProductListing(
