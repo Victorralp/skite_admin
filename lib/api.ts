@@ -215,6 +215,7 @@ export type AdminUserTransactionItem = {
   customer_email?: string;
   customer_first_name?: string;
   customer_last_name?: string;
+  hub_name?: string;
 };
 
 export type AdminUserTransactionsPagination = {

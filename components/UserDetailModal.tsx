@@ -550,7 +550,12 @@ export default function UserDetailModal({ user, isOpen, onClose }: UserDetailMod
                     .filter(Boolean)
                     .join(' ')
                     .trim();
-                  const displayName = creatorName || fallbackName || transaction.customer_email || '—';
+                  const displayName =
+                    transaction.hub_name ||
+                    creatorName ||
+                    fallbackName ||
+                    transaction.customer_email ||
+                    '—';
                   const currency = (transaction.currency || 'NGN').toUpperCase();
                   const amount = new Intl.NumberFormat('en-NG', {
                     style: 'currency',
@@ -648,7 +653,12 @@ export default function UserDetailModal({ user, isOpen, onClose }: UserDetailMod
                     .filter(Boolean)
                     .join(' ')
                     .trim();
-                  const displayName = creatorName || fallbackName || transaction.customer_email || '—';
+                  const displayName =
+                    transaction.hub_name ||
+                    creatorName ||
+                    fallbackName ||
+                    transaction.customer_email ||
+                    '—';
                   const currency = (transaction.currency || 'NGN').toUpperCase();
                   const amount = new Intl.NumberFormat('en-NG', {
                     style: 'currency',
