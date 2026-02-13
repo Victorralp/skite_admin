@@ -6,8 +6,16 @@ import UserDetailModal from '@/components/UserDetailModal';
 import ActionMenu from '@/components/ActionMenu';
 import { MoreVertical } from 'lucide-react';
 import PageContainer from '@/components/layout/PageContainer';
-import { allUsers, User } from '@/data/dashboard';
+import { User } from '@/data/dashboard';
 import { cn } from '@/lib/utils';
+import {
+  banAdminUser,
+  getAdminUserMetrics,
+  getAdminUsers,
+  unbanAdminUser,
+  type AdminUserListingItem,
+  type AdminUserMetricsData
+} from '@/lib/api';
 
 const FilterPlusIcon = ({ className }: { className?: string }) => (
   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
@@ -26,9 +34,42 @@ export default function UsersPage() {
   const [purchaseCountFilterActive, setPurchaseCountFilterActive] = useState(false);
   const [spendFilterActive, setSpendFilterActive] = useState(false);
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive' | 'pending'>('all');
+  const [dateJoinedFrom, setDateJoinedFrom] = useState('');
+  const [dateJoinedTo, setDateJoinedTo] = useState('');
+  const [appliedDateJoinedFrom, setAppliedDateJoinedFrom] = useState('');
+  const [appliedDateJoinedTo, setAppliedDateJoinedTo] = useState('');
+  const [purchaseCountValue, setPurchaseCountValue] = useState('');
+  const [appliedPurchaseCountValue, setAppliedPurchaseCountValue] = useState('');
+  const [spendMinValue, setSpendMinValue] = useState('');
+  const [spendMaxValue, setSpendMaxValue] = useState('');
+  const [appliedSpendMinValue, setAppliedSpendMinValue] = useState('');
+  const [appliedSpendMaxValue, setAppliedSpendMaxValue] = useState('');
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
+  const [isUsersLoading, setIsUsersLoading] = useState(true);
+  const [hasUsersError, setHasUsersError] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    total: 0,
+    page: 1,
+    limit: 10,
+    totalPages: 1,
+    hasNext: false,
+    hasPrev: false
+  });
+  const [stats, setStats] = useState<Array<{
+    title: string;
+    value: string;
+    trend: string;
+    trendDirection: 'up' | 'down' | 'neutral';
+  }>>([]);
+  const [isMetricsLoading, setIsMetricsLoading] = useState(true);
+  const [hasMetricsError, setHasMetricsError] = useState(false);
+  const [pendingUserId, setPendingUserId] = useState<string | null>(null);
+  const [snackbar, setSnackbar] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const snackbarTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const dateJoinedFilterRef = useRef<HTMLDivElement>(null);
@@ -58,21 +99,225 @@ export default function UsersPage() {
     };
   }, []);
 
-  const stats = [
-    { title: 'Total Users', value: '129,813', trend: '+12.3% from last month', trendDirection: 'up' as const },
-    { title: 'Active Users (Last 30 Days)', value: '98,328', trend: '+12.3% from last month', trendDirection: 'up' as const },
-    { title: 'Paying Users', value: '41,382', trend: '+12.3% from last month', trendDirection: 'up' as const },
-    { title: 'Flagged Users', value: '223', trend: '+2 today', trendDirection: 'down' as const },
-  ];
+  useEffect(() => {
+    let isMounted = true;
 
-  // Use centralized user data and filter by status
-  const filteredUsers = allUsers.filter(user => {
-    if (statusFilter === 'all') return true;
-    if (statusFilter === 'active') return user.status === 'Active';
-    if (statusFilter === 'inactive') return user.status === 'Inactive';
-    if (statusFilter === 'pending') return user.status === 'Pending';
-    return true;
-  });
+    const formatCount = (value: number) =>
+      new Intl.NumberFormat('en-NG').format(Number.isFinite(value) ? value : 0);
+
+    const resolveDirection = (value: number): 'up' | 'down' | 'neutral' => {
+      if (value > 0) return 'up';
+      if (value < 0) return 'down';
+      return 'neutral';
+    };
+
+    const formatPercentTrend = (value: number, suffix: string) => {
+      const normalized = Number.isFinite(value) ? value : 0;
+      const prefix = normalized > 0 ? '+' : '';
+      return `${prefix}${normalized}% ${suffix}`;
+    };
+
+    const mapMetrics = (data: AdminUserMetricsData) => [
+      {
+        title: 'Total Users',
+        value: formatCount(data.total_users?.count ?? 0),
+        trend: formatPercentTrend(data.total_users?.percentage_change ?? 0, 'from last month'),
+        trendDirection: resolveDirection(data.total_users?.percentage_change ?? 0)
+      },
+      {
+        title: 'Active Users (Last 30 Days)',
+        value: formatCount(data.active_users_30_days?.count ?? 0),
+        trend: formatPercentTrend(
+          data.active_users_30_days?.percentage_change ?? 0,
+          'from previous 30 days'
+        ),
+        trendDirection: resolveDirection(data.active_users_30_days?.percentage_change ?? 0)
+      },
+      {
+        title: 'Paying Users',
+        value: formatCount(data.paying_users?.count ?? 0),
+        trend: formatPercentTrend(data.paying_users?.percentage_change ?? 0, 'from last month'),
+        trendDirection: resolveDirection(data.paying_users?.percentage_change ?? 0)
+      },
+      {
+        title: 'Flagged Users',
+        value: formatCount(data.flagged_users?.total_inactive ?? 0),
+        trend: `+${Number(data.flagged_users?.flagged_today ?? 0)} today`,
+        trendDirection: 'down' as const
+      },
+      {
+        title: 'Yet To Signup Users',
+        value: formatCount(data.yet_to_signup_users?.count ?? 0),
+        trend: formatPercentTrend(
+          data.yet_to_signup_users?.percentage_change_vs_yesterday ?? 0,
+          'vs yesterday'
+        ),
+        trendDirection: resolveDirection(
+          data.yet_to_signup_users?.percentage_change_vs_yesterday ?? 0
+        )
+      }
+    ];
+
+    const fetchMetrics = async () => {
+      try {
+        const response = await getAdminUserMetrics();
+        if (!isMounted) return;
+        setStats(mapMetrics(response));
+        setHasMetricsError(false);
+      } catch {
+        if (!isMounted) return;
+        setStats([]);
+        setHasMetricsError(true);
+      } finally {
+        if (isMounted) {
+          setIsMetricsLoading(false);
+        }
+      }
+    };
+
+    fetchMetrics();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const showSnackbar = (type: 'success' | 'error', message: string) => {
+    setSnackbar({ type, message });
+    if (snackbarTimeoutRef.current) {
+      clearTimeout(snackbarTimeoutRef.current);
+    }
+    snackbarTimeoutRef.current = setTimeout(() => {
+      setSnackbar(null);
+      snackbarTimeoutRef.current = null;
+    }, 4000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (snackbarTimeoutRef.current) {
+        clearTimeout(snackbarTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const parseNumber = (value: string) => {
+      const trimmed = value.trim();
+      if (!trimmed) return undefined;
+      const parsed = Number(trimmed);
+      return Number.isFinite(parsed) ? parsed : undefined;
+    };
+
+    const normalizeStatus = (value?: string): User['status'] => {
+      const normalized = String(value ?? '').trim().toLowerCase();
+      if (normalized === 'inactive' || normalized === 'banned' || normalized === 'suspended') {
+        return 'Inactive';
+      }
+      if (normalized === 'pending') return 'Pending';
+      return 'Active';
+    };
+
+    const formatDate = (value?: string) => {
+      if (!value) return '—';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '—';
+      return date.toLocaleDateString('en-NG');
+    };
+
+    const formatDateTime = (value?: string) => {
+      if (!value) return '—';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '—';
+      return date.toLocaleString('en-NG', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    };
+
+    const mapUser = (entry: AdminUserListingItem, index: number): User => {
+      const fallbackId = `${entry.name ?? 'user'}-${entry.joined_at ?? index}-${index}`;
+      return {
+        id: String(entry.id ?? entry._id ?? fallbackId),
+        name: entry.name ?? 'Unknown User',
+        username: entry.username ?? (entry.email ? `@${entry.email.split('@')[0]}` : '@unknown'),
+        email: entry.email ?? '',
+        avatar: entry.avatar ?? '',
+        joined: formatDate(entry.joined_at),
+        purchases: Number(entry.purchases_count ?? 0),
+        spent: Number(entry.total_spent ?? 0),
+        subscriptions: Number(entry.subscriptions_count ?? 0),
+        lastActive: formatDateTime(entry.last_active),
+        status: normalizeStatus(entry.status)
+      };
+    };
+
+    const fetchUsers = async () => {
+      setIsUsersLoading(true);
+      try {
+        const response = await getAdminUsers({
+          page: currentPage,
+          limit: 10,
+          startDate: appliedDateJoinedFrom || undefined,
+          endDate: appliedDateJoinedTo || undefined,
+          purchases: parseNumber(appliedPurchaseCountValue),
+          minSpend: parseNumber(appliedSpendMinValue),
+          maxSpend: parseNumber(appliedSpendMaxValue),
+          status: statusFilter === 'all' ? undefined : statusFilter
+        });
+        if (!isMounted) return;
+        setUsers(response.users.map(mapUser));
+        setPagination(response.pagination);
+        setHasUsersError(false);
+      } catch {
+        if (!isMounted) return;
+        setUsers([]);
+        setPagination({
+          total: 0,
+          page: currentPage,
+          limit: 10,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: currentPage > 1
+        });
+        setHasUsersError(true);
+      } finally {
+        if (isMounted) {
+          setIsUsersLoading(false);
+        }
+      }
+    };
+
+    void fetchUsers();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [
+    appliedDateJoinedFrom,
+    appliedDateJoinedTo,
+    appliedPurchaseCountValue,
+    appliedSpendMaxValue,
+    appliedSpendMinValue,
+    currentPage,
+    statusFilter
+  ]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    appliedDateJoinedFrom,
+    appliedDateJoinedTo,
+    appliedPurchaseCountValue,
+    appliedSpendMaxValue,
+    appliedSpendMinValue,
+    statusFilter
+  ]);
 
   const handleViewUserDetails = (user: any) => {
     setSelectedUser(user);
@@ -85,20 +330,76 @@ export default function UsersPage() {
     setSelectedUser(null);
   };
 
+  const handleToggleBanUser = async (user: User) => {
+    if (pendingUserId) return;
+
+    const isInactive = user.status === 'Inactive';
+    const isActive = user.status === 'Active';
+    if (!isInactive && !isActive) {
+      showSnackbar('error', 'Only active users can be banned');
+      return;
+    }
+
+    setPendingUserId(user.id);
+    setOpenMenuId(null);
+    try {
+      const message = isInactive
+        ? await unbanAdminUser(user.id)
+        : await banAdminUser(user.id);
+      const nextStatus = (isInactive ? 'Active' : 'Inactive') as User['status'];
+      setUsers((previous) =>
+        previous.map((entry) =>
+          entry.id === user.id ? { ...entry, status: nextStatus } : entry
+        )
+      );
+      setSelectedUser((previous) =>
+        previous && previous.id === user.id ? { ...previous, status: nextStatus } : previous
+      );
+      showSnackbar('success', message);
+    } catch (error) {
+      const fallback = isInactive ? 'Unable to unban user right now' : 'Unable to ban user right now';
+      const message =
+        error instanceof Error && error.message.trim().length > 0
+          ? error.message
+          : fallback;
+      showSnackbar('error', message);
+    } finally {
+      setPendingUserId(null);
+    }
+  };
+
   return (
     <>
       <PageContainer>
+        {(isUsersLoading || isMetricsLoading) && (
+          <div className="fixed inset-0 z-[80] bg-white/75 backdrop-blur-sm flex items-center justify-center">
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-8 h-8 rounded-full border-2 border-border-primary border-t-transparent animate-spin" />
+              <span className="font-sans text-caption-lg text-text-secondary">Loading users...</span>
+            </div>
+          </div>
+        )}
         {/* Stats Section */}
         <div className="flex flex-col items-start gap-2 w-full">
-          <h1 className="m-0 text-heading-lg-bold text-text-primary">
-            Users
-          </h1>
+          <div className="flex items-center justify-between w-full">
+            <h1 className="m-0 text-heading-lg-bold text-text-primary">Users</h1>
+            {(isMetricsLoading || hasMetricsError) && (
+              <span className="text-caption-sm text-text-secondary">
+                {isMetricsLoading ? 'Loading user metrics…' : 'Metrics unavailable'}
+              </span>
+            )}
+          </div>
 
           {/* Cards stretch to available width; wrap on smaller screens. */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 w-full">
             {stats.map((stat, index) => (
               <StatsCard key={index} {...stat} />
             ))}
+            {!isMetricsLoading && stats.length === 0 && (
+              <div className="text-caption-sm text-text-secondary px-2 py-3">
+                No user metrics to display.
+              </div>
+            )}
           </div>
         </div>
 
@@ -110,7 +411,7 @@ export default function UsersPage() {
               <div className="relative overflow-visible" ref={dateJoinedFilterRef}>
                 <FilterPill
                   label="Date Joined"
-                  active={dateJoinedFilterActive}
+                  active={dateJoinedFilterActive || appliedDateJoinedFrom.length > 0 || appliedDateJoinedTo.length > 0}
                   onClick={() => {
                     setDateJoinedFilterActive(!dateJoinedFilterActive);
                     setPurchaseCountFilterActive(false);
@@ -121,7 +422,19 @@ export default function UsersPage() {
                   <FilterDropdown
                     title="Filter by: Date Joined"
                     showCalendar={true}
-                    onApply={() => setDateJoinedFilterActive(false)}
+                    fromValue={dateJoinedFrom}
+                    toValue={dateJoinedTo}
+                    onFromChange={setDateJoinedFrom}
+                    onToChange={setDateJoinedTo}
+                    onApply={() => {
+                      setAppliedDateJoinedFrom(dateJoinedFrom);
+                      setAppliedDateJoinedTo(dateJoinedTo);
+                      setDateJoinedFilterActive(false);
+                    }}
+                    onClear={() => {
+                      setDateJoinedFrom('');
+                      setDateJoinedTo('');
+                    }}
                   />
                 )}
               </div>
@@ -129,7 +442,7 @@ export default function UsersPage() {
               <div className="relative overflow-visible" ref={purchaseCountFilterRef}>
                 <FilterPill
                   label="Purchase Count"
-                  active={purchaseCountFilterActive}
+                  active={purchaseCountFilterActive || appliedPurchaseCountValue.length > 0}
                   onClick={() => {
                     setPurchaseCountFilterActive(!purchaseCountFilterActive);
                     setDateJoinedFilterActive(false);
@@ -137,10 +450,17 @@ export default function UsersPage() {
                   }}
                 />
                 {purchaseCountFilterActive && (
-                  <FilterDropdown
+                  <SingleValueFilterDropdown
                     title="Filter by: Purchase Count"
-                    showCalendar={false}
-                    onApply={() => setPurchaseCountFilterActive(false)}
+                    value={purchaseCountValue}
+                    onChange={setPurchaseCountValue}
+                    onApply={() => {
+                      setAppliedPurchaseCountValue(purchaseCountValue);
+                      setPurchaseCountFilterActive(false);
+                    }}
+                    onClear={() => {
+                      setPurchaseCountValue('');
+                    }}
                   />
                 )}
               </div>
@@ -148,7 +468,7 @@ export default function UsersPage() {
               <div className="relative overflow-visible" ref={spendFilterRef}>
                 <FilterPill
                   label="Spend"
-                  active={spendFilterActive}
+                  active={spendFilterActive || appliedSpendMinValue.length > 0 || appliedSpendMaxValue.length > 0}
                   onClick={() => {
                     setSpendFilterActive(!spendFilterActive);
                     setDateJoinedFilterActive(false);
@@ -159,7 +479,19 @@ export default function UsersPage() {
                   <FilterDropdown
                     title="Filter by: Spend"
                     showCurrency={true}
-                    onApply={() => setSpendFilterActive(false)}
+                    fromValue={spendMinValue}
+                    toValue={spendMaxValue}
+                    onFromChange={setSpendMinValue}
+                    onToChange={setSpendMaxValue}
+                    onApply={() => {
+                      setAppliedSpendMinValue(spendMinValue);
+                      setAppliedSpendMaxValue(spendMaxValue);
+                      setSpendFilterActive(false);
+                    }}
+                    onClear={() => {
+                      setSpendMinValue('');
+                      setSpendMaxValue('');
+                    }}
                   />
                 )}
               </div>
@@ -207,13 +539,24 @@ export default function UsersPage() {
 
             {/* Table Body */}
             <div className="bg-white border border-border-primary rounded-lg overflow-hidden">
-              {filteredUsers.map((user) => (
+              {isUsersLoading && (
+                <div className="p-4 text-caption-sm text-text-secondary">Loading users…</div>
+              )}
+              {hasUsersError && !isUsersLoading && (
+                <div className="p-4 text-caption-sm text-text-secondary">Unable to load users.</div>
+              )}
+              {!isUsersLoading && !hasUsersError && users.length === 0 && (
+                <div className="p-4 text-caption-sm text-text-secondary">No users found.</div>
+              )}
+              {!isUsersLoading && !hasUsersError && users.map((user) => (
                 <UserRow
                   key={user.id}
                   user={user}
+                  isPending={pendingUserId === user.id}
                   isMenuOpen={openMenuId === user.id}
                   onMenuToggle={() => setOpenMenuId(openMenuId === user.id ? null : user.id)}
                   onViewDetails={() => handleViewUserDetails(user)}
+                  onToggleBanUser={() => void handleToggleBanUser(user)}
                   menuRef={openMenuId === user.id ? menuRef : null}
                 />
               ))}
@@ -221,18 +564,39 @@ export default function UsersPage() {
 
             {/* Pagination */}
             <div className="flex justify-between items-center pl-6 h-8">
-              <span className="text-caption-lg text-text-tertiary">Showing 1 to {filteredUsers.length} of {filteredUsers.length} results</span>
+              <span className="text-caption-lg text-text-tertiary">
+                {pagination.total === 0
+                  ? 'Showing 0 results'
+                  : `Showing ${(pagination.page - 1) * pagination.limit + 1} to ${Math.min(
+                      pagination.page * pagination.limit,
+                      pagination.total
+                    )} of ${pagination.total} results`}
+              </span>
               <div className="flex gap-2">
-                <div className="w-[87.5px] h-8 bg-surface-secondary rounded-md shadow-button p-0.5 opacity-30">
+                <button
+                  type="button"
+                  className={cn(
+                    "w-[87.5px] h-8 bg-surface-secondary rounded-md shadow-button p-0.5",
+                    pagination.hasPrev ? 'cursor-pointer hover:opacity-90 transition-opacity' : 'opacity-30'
+                  )}
+                  onClick={pagination.hasPrev ? () => setCurrentPage((prev) => Math.max(1, prev - 1)) : undefined}
+                >
                   <div className="flex items-center justify-center bg-white rounded shadow-button-inset h-7 px-3.5">
                     <span className="text-caption-md font-medium text-text-secondary">Previous</span>
                   </div>
-                </div>
-                <div className="w-[87.5px] h-8 bg-surface-secondary rounded-md shadow-button p-0.5 cursor-pointer hover:opacity-90 transition-opacity">
+                </button>
+                <button
+                  type="button"
+                  className={cn(
+                    "w-[87.5px] h-8 bg-surface-secondary rounded-md shadow-button p-0.5",
+                    pagination.hasNext ? 'cursor-pointer hover:opacity-90 transition-opacity' : 'opacity-30'
+                  )}
+                  onClick={pagination.hasNext ? () => setCurrentPage((prev) => prev + 1) : undefined}
+                >
                   <div className="flex items-center justify-center bg-white rounded shadow-button-inset h-7 px-3.5">
                     <span className="text-caption-md font-medium text-text-secondary">Next</span>
                   </div>
-                </div>
+                </button>
               </div>
             </div>
           </div>
@@ -246,6 +610,22 @@ export default function UsersPage() {
           isOpen={isModalOpen}
           onClose={handleCloseModal}
         />
+      )}
+      {snackbar && (
+        <div className="fixed bottom-4 right-4 z-[120]">
+          <div
+            className={cn(
+              "min-w-[260px] max-w-[360px] rounded-lg border px-4 py-3 shadow-lg",
+              snackbar.type === 'success'
+                ? "border-[#C7E8DA] bg-[#EAF8F1] text-[#1F7A5A]"
+                : "border-[#F2C3C1] bg-[#FCEDEC] text-[#A42520]"
+            )}
+            role="status"
+            aria-live="polite"
+          >
+            <p className="text-[13px] leading-5 font-medium">{snackbar.message}</p>
+          </div>
+        </div>
       )}
     </>
   );
@@ -266,10 +646,27 @@ function FilterPill({ label, active, onClick }: { label: string; active: boolean
   );
 }
 
-function FilterDropdown({ title, showCalendar, showCurrency, onApply }: { title: string; showCalendar?: boolean; showCurrency?: boolean; onApply: () => void }) {
-  const [fromValue, setFromValue] = useState('');
-  const [toValue, setToValue] = useState('');
-
+function FilterDropdown({
+  title,
+  showCalendar,
+  showCurrency,
+  fromValue,
+  toValue,
+  onFromChange,
+  onToChange,
+  onApply,
+  onClear
+}: {
+  title: string;
+  showCalendar?: boolean;
+  showCurrency?: boolean;
+  fromValue: string;
+  toValue: string;
+  onFromChange: (value: string) => void;
+  onToChange: (value: string) => void;
+  onApply: () => void;
+  onClear: () => void;
+}) {
   return (
     <div
       className="absolute left-[-0.75px] top-[27px] w-[185px] h-[154px] bg-white border border-brand-primary rounded-[16px] flex flex-col justify-center items-start p-3 gap-[10px] shadow-dropdown z-50"
@@ -290,7 +687,7 @@ function FilterDropdown({ title, showCalendar, showCurrency, onApply }: { title:
             <input
               type={showCalendar ? "date" : "number"}
               value={fromValue}
-              onChange={(e) => setFromValue(e.target.value)}
+              onChange={(e) => onFromChange(e.target.value)}
               className="w-full bg-transparent text-[12px] font-medium text-text-primary leading-[14px] font-sans outline-none border-none text-right"
               placeholder=""
             />
@@ -309,7 +706,7 @@ function FilterDropdown({ title, showCalendar, showCurrency, onApply }: { title:
             <input
               type={showCalendar ? "date" : "number"}
               value={toValue}
-              onChange={(e) => setToValue(e.target.value)}
+              onChange={(e) => onToChange(e.target.value)}
               className="w-full bg-transparent text-[12px] font-medium text-text-primary leading-[14px] font-sans outline-none border-none text-right"
               placeholder=""
             />
@@ -320,20 +717,75 @@ function FilterDropdown({ title, showCalendar, showCurrency, onApply }: { title:
         </div>
       </div>
 
-      {/* Apply Button */}
-      <button
-        onClick={onApply}
-        className="w-[161px] h-8 flex items-center justify-center px-6 py-[14px] rounded-[9px] bg-gradient-to-b from-brand-primary to-brand-purple shadow-button-inset"
-      >
-        <span className="text-[13.5px] font-medium text-white leading-4 font-sans">
-          Apply
-        </span>
-      </button>
+      <div className="w-[161px] flex items-center gap-2">
+        <button
+          onClick={onClear}
+          className="w-full h-8 flex items-center justify-center rounded-[9px] border border-border-primary bg-white"
+        >
+          <span className="text-[13px] font-medium text-text-secondary leading-4 font-sans">Clear</span>
+        </button>
+        <button
+          onClick={onApply}
+          className="w-full h-8 flex items-center justify-center rounded-[9px] bg-gradient-to-b from-brand-primary to-brand-purple shadow-button-inset"
+        >
+          <span className="text-[13px] font-medium text-white leading-4 font-sans">
+            Apply
+          </span>
+        </button>
+      </div>
     </div>
   );
 }
 
-function UserRow({ user, isMenuOpen, onMenuToggle, onViewDetails, menuRef }: { user: any; isMenuOpen: boolean; onMenuToggle: () => void; onViewDetails: () => void; menuRef: React.RefObject<HTMLDivElement> | null }) {
+function SingleValueFilterDropdown({
+  title,
+  value,
+  onChange,
+  onApply,
+  onClear
+}: {
+  title: string;
+  value: string;
+  onChange: (value: string) => void;
+  onApply: () => void;
+  onClear: () => void;
+}) {
+  return (
+    <div className="absolute left-[-0.75px] top-[27px] w-[185px] bg-white border border-brand-primary rounded-[16px] flex flex-col justify-center items-start p-3 gap-[10px] shadow-dropdown z-50">
+      <span className="text-[12px] font-medium text-text-primary leading-[14px] font-sans">
+        {title}
+      </span>
+
+      <div className="w-full h-[30px] bg-surface-secondary border border-border-primary rounded-[6px] flex items-center px-2 overflow-hidden">
+        <input
+          type="number"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full bg-transparent text-[12px] font-medium text-text-primary leading-[14px] font-sans outline-none border-none"
+        />
+      </div>
+
+      <div className="w-full flex items-center gap-2">
+        <button
+          onClick={onClear}
+          className="w-full h-8 flex items-center justify-center rounded-[9px] border border-border-primary bg-white"
+        >
+          <span className="text-[13px] font-medium text-text-secondary leading-4 font-sans">Clear</span>
+        </button>
+        <button
+          onClick={onApply}
+          className="w-full h-8 flex items-center justify-center rounded-[9px] bg-gradient-to-b from-brand-primary to-brand-purple shadow-button-inset"
+        >
+          <span className="text-[13px] font-medium text-white leading-4 font-sans">
+            Apply
+          </span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function UserRow({ user, isPending, isMenuOpen, onMenuToggle, onViewDetails, onToggleBanUser, menuRef }: { user: any; isPending: boolean; isMenuOpen: boolean; onMenuToggle: () => void; onViewDetails: () => void; onToggleBanUser: () => void; menuRef: React.RefObject<HTMLDivElement> | null }) {
   const statusConfig = {
     Active: {
       bg: 'bg-surface-success',
@@ -419,19 +871,13 @@ function UserRow({ user, isMenuOpen, onMenuToggle, onViewDetails, menuRef }: { u
 
         {isMenuOpen && (
           <ActionMenu
-            status="Active"
-            showViewOption={true}
-            viewLabel="View User Details"
-            messageLabel="Suspend User"
-            suspendLabel="Ban User"
-            onView={onViewDetails}
-            onMessage={() => {
-              console.log('Suspend user');
-              onMenuToggle();
-            }}
-            onSuspend={() => {
-              console.log('Ban user');
-              onMenuToggle();
+            simpleMode
+            option1Label="View User Details"
+            option2Label={user.status === 'Inactive' ? 'Unban User' : 'Ban User'}
+            onOption1={onViewDetails}
+            onOption2={() => {
+              if (isPending) return;
+              onToggleBanUser();
             }}
           />
         )}

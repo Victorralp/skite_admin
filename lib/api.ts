@@ -69,6 +69,34 @@ export type AdminProductMetricsResponse = {
   rejectedToday: number;
 };
 
+export type AdminUserMetricValue = {
+  count: number;
+  percentage_change: number;
+};
+
+export type AdminUserFlaggedUsersMetric = {
+  total_inactive: number;
+  flagged_today: number;
+};
+
+export type AdminUserYetToSignupMetric = {
+  count: number;
+  percentage_change_vs_yesterday: number;
+};
+
+export type AdminUserMetricsData = {
+  total_users: AdminUserMetricValue;
+  active_users_30_days: AdminUserMetricValue;
+  paying_users: AdminUserMetricValue;
+  flagged_users: AdminUserFlaggedUsersMetric;
+  yet_to_signup_users: AdminUserYetToSignupMetric;
+};
+
+export type AdminUserMetricsResponse = {
+  message?: string;
+  data: AdminUserMetricsData;
+};
+
 export type AdminProductListingItem = {
   _id?: string;
   id?: string;
@@ -97,6 +125,47 @@ export type AdminProductListingParams = {
   maxRevenue?: number;
   page?: number;
   limit?: number;
+};
+
+export type AdminUserListingParams = {
+  page?: number;
+  limit?: number;
+  startDate?: string;
+  endDate?: string;
+  purchases?: number;
+  minSpend?: number;
+  maxSpend?: number;
+  status?: string;
+};
+
+export type AdminUserListingItem = {
+  _id?: string;
+  id?: string;
+  name?: string;
+  username?: string;
+  email?: string;
+  avatar?: string;
+  joined_at?: string;
+  purchases_count?: number;
+  total_spent?: number;
+  status?: string;
+  last_active?: string;
+  subscriptions_count?: number;
+};
+
+export type AdminUserListingPagination = {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+};
+
+export type AdminUserListingResponse = {
+  message?: string;
+  users: AdminUserListingItem[];
+  pagination: AdminUserListingPagination;
 };
 
 export async function banAdminProduct(productId: string) {
@@ -138,6 +207,44 @@ export async function banAdminProduct(productId: string) {
   return json?.message ?? 'Product banned successfully';
 }
 
+export async function banAdminUser(userId: string) {
+  if (!userId) {
+    throw new Error('USER_ID_REQUIRED');
+  }
+
+  let idToken: string | null = null;
+  try {
+    idToken = (await auth.currentUser?.getIdToken()) ?? null;
+  } catch {
+    idToken = null;
+  }
+
+  const headers: HeadersInit = { 'content-type': 'application/json' };
+  if (idToken) {
+    headers.authorization = `Bearer ${idToken}`;
+  }
+
+  const response = await fetch(`${baseUrl()}/admin-user/${userId}/ban`, {
+    method: 'PATCH',
+    credentials: 'include',
+    cache: 'no-store',
+    headers
+  });
+
+  const json = (await response
+    .json()
+    .catch(() => null)) as { message?: string; error?: string } | null;
+
+  if (!response.ok) {
+    const message = json?.message ?? json?.error ?? 'USER_BAN_FAILED';
+    throw new Error(message);
+  }
+
+  clearAdminDashboardSessionCache();
+
+  return json?.message ?? 'User banned successfully';
+}
+
 export async function unbanAdminProduct(productId: string) {
   if (!productId) {
     throw new Error('PRODUCT_ID_REQUIRED');
@@ -174,6 +281,44 @@ export async function unbanAdminProduct(productId: string) {
   clearAdminDashboardSessionCache();
 
   return json?.message ?? 'Product unbanned successfully';
+}
+
+export async function unbanAdminUser(userId: string) {
+  if (!userId) {
+    throw new Error('USER_ID_REQUIRED');
+  }
+
+  let idToken: string | null = null;
+  try {
+    idToken = (await auth.currentUser?.getIdToken()) ?? null;
+  } catch {
+    idToken = null;
+  }
+
+  const headers: HeadersInit = { 'content-type': 'application/json' };
+  if (idToken) {
+    headers.authorization = `Bearer ${idToken}`;
+  }
+
+  const response = await fetch(`${baseUrl()}/admin-user/${userId}/unban`, {
+    method: 'PATCH',
+    credentials: 'include',
+    cache: 'no-store',
+    headers
+  });
+
+  const json = (await response
+    .json()
+    .catch(() => null)) as { message?: string; error?: string } | null;
+
+  if (!response.ok) {
+    const message = json?.message ?? json?.error ?? 'USER_UNBAN_FAILED';
+    throw new Error(message);
+  }
+
+  clearAdminDashboardSessionCache();
+
+  return json?.message ?? 'User unbanned successfully';
 }
 
 export type ProductReviewItem = {
@@ -554,6 +699,124 @@ export async function getAdminProductMetrics() {
     }
 
     return json as AdminProductMetricsResponse;
+  });
+}
+
+export async function getAdminUserMetrics() {
+  const cacheKey = getDashboardCacheKey('user-metrics');
+  return withAdminDashboardSessionCache(cacheKey, async () => {
+    let idToken: string | null = null;
+    try {
+      idToken = (await auth.currentUser?.getIdToken()) ?? null;
+    } catch {
+      idToken = null;
+    }
+
+    const headers: HeadersInit = {};
+    if (idToken) {
+      headers.authorization = `Bearer ${idToken}`;
+    }
+
+    const response = await fetch(`${baseUrl()}/admin-user/metric`, {
+      method: 'GET',
+      credentials: 'include',
+      cache: 'no-store',
+      headers
+    });
+
+    const json = (await response
+      .json()
+      .catch(() => null)) as
+      | AdminUserMetricsResponse
+      | AdminUserMetricsData
+      | { message?: string; error?: string; data?: AdminUserMetricsData }
+      | null;
+
+    if (!response.ok) {
+      const errorPayload = json as { message?: string; error?: string } | null;
+      const message = errorPayload?.message ?? errorPayload?.error ?? 'USER_METRICS_FAILED';
+      throw new Error(message);
+    }
+
+    if (!json || typeof json !== 'object') {
+      throw new Error('USER_METRICS_INVALID_RESPONSE');
+    }
+
+    if ('data' in json && json.data && typeof json.data === 'object') {
+      return json.data as AdminUserMetricsData;
+    }
+
+    return json as AdminUserMetricsData;
+  });
+}
+
+export async function getAdminUsers(params: AdminUserListingParams = {}) {
+  const cacheKey = getDashboardCacheKey(`users:${JSON.stringify(params)}`);
+  return withAdminDashboardSessionCache(cacheKey, async () => {
+    let idToken: string | null = null;
+    try {
+      idToken = (await auth.currentUser?.getIdToken()) ?? null;
+    } catch {
+      idToken = null;
+    }
+
+    const headers: HeadersInit = {};
+    if (idToken) {
+      headers.authorization = `Bearer ${idToken}`;
+    }
+
+    const searchParams = new URLSearchParams();
+    if (params.page !== undefined) searchParams.set('page', String(params.page));
+    if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
+    if (params.startDate) searchParams.set('startDate', params.startDate);
+    if (params.endDate) searchParams.set('endDate', params.endDate);
+    if (params.purchases !== undefined) searchParams.set('purchases', String(params.purchases));
+    if (params.minSpend !== undefined) searchParams.set('minSpend', String(params.minSpend));
+    if (params.maxSpend !== undefined) searchParams.set('maxSpend', String(params.maxSpend));
+    if (params.status) searchParams.set('status', params.status);
+
+    const queryString = searchParams.toString();
+    const response = await fetch(`${baseUrl()}/admin-user/list-users${queryString ? `?${queryString}` : ''}`, {
+      method: 'GET',
+      credentials: 'include',
+      cache: 'no-store',
+      headers
+    });
+
+    const json = (await response
+      .json()
+      .catch(() => null)) as
+      | AdminUserListingResponse
+      | { message?: string; error?: string; users?: AdminUserListingItem[]; pagination?: AdminUserListingPagination }
+      | null;
+
+    if (!response.ok) {
+      const errorPayload = json as { message?: string; error?: string } | null;
+      const message = errorPayload?.message ?? errorPayload?.error ?? 'USER_LISTING_FAILED';
+      throw new Error(message);
+    }
+
+    if (!json || typeof json !== 'object') {
+      throw new Error('USER_LISTING_INVALID_RESPONSE');
+    }
+
+    const users = Array.isArray(json.users) ? json.users : [];
+    const pagination = json.pagination;
+    if (!pagination || typeof pagination !== 'object') {
+      throw new Error('USER_LISTING_PAGINATION_MISSING');
+    }
+
+    return {
+      users,
+      pagination: {
+        total: Number((pagination as AdminUserListingPagination).total ?? 0),
+        page: Number((pagination as AdminUserListingPagination).page ?? params.page ?? 1),
+        limit: Number((pagination as AdminUserListingPagination).limit ?? params.limit ?? 10),
+        totalPages: Number((pagination as AdminUserListingPagination).totalPages ?? 1),
+        hasNext: Boolean((pagination as AdminUserListingPagination).hasNext),
+        hasPrev: Boolean((pagination as AdminUserListingPagination).hasPrev)
+      }
+    };
   });
 }
 
