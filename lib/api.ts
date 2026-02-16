@@ -537,6 +537,18 @@ export function clearAdminDashboardSessionCache() {
   productReviewsInFlightRequests.clear();
 }
 
+export function clearProductDetailCache(id?: string, currency?: 'NGN' | 'USD') {
+  if (id && currency) {
+    const key = `${id}:${currency}`;
+    productDetailSessionCache.delete(key);
+    productDetailInFlightRequests.delete(key);
+    return;
+  }
+
+  productDetailSessionCache.clear();
+  productDetailInFlightRequests.clear();
+}
+
 function baseUrl() {
   // In client bundles, Next.js only inlines statically referenced NEXT_PUBLIC_* env vars.
   const value = process.env.NEXT_PUBLIC_BASE_URL;
@@ -1202,9 +1214,15 @@ export async function getProductById(id: string, currency: 'NGN' | 'USD' = 'NGN'
     throw new Error('PRODUCT_ID_REQUIRED');
   }
 
+  const hasExpandedProductContent = (payload: ProductDetailResponse) =>
+    (Array.isArray(payload.sections) && payload.sections.length > 0) ||
+    (Array.isArray(payload.contents) && payload.contents.length > 0) ||
+    (Array.isArray(payload.product_media) && payload.product_media.length > 0);
+
   const inFlightKey = `${id}:${currency}`;
   const cachedResponse = productDetailSessionCache.get(inFlightKey);
-  if (cachedResponse) {
+  // Revalidate sparse cached payloads to avoid sticking on a limited response shape.
+  if (cachedResponse && hasExpandedProductContent(cachedResponse)) {
     return cachedResponse;
   }
 
@@ -1227,29 +1245,54 @@ export async function getProductById(id: string, currency: 'NGN' | 'USD' = 'NGN'
   }
 
   const query = new URLSearchParams({ currency }).toString();
-  const response = await fetch(`${baseUrl()}/hub/product/${id}?${query}`, {
-    method: 'GET',
-    credentials: 'include',
-    cache: 'no-store',
-    headers
-  });
+  const endpoints = [
+    `${baseUrl()}/admin-product/${id}?${query}`,
+    `${baseUrl()}/hub/product/${id}?${query}`,
+    `${baseUrl()}/product/${id}?${query}`
+  ];
 
-  const json = (await response.json().catch(() => null)) as
-    | ProductDetailResponse
-    | { message?: string; error?: string }
-    | null;
+  let successfulPayload: ProductDetailResponse | null = null;
+  let lastErrorPayload: { message?: string; error?: string } | null = null;
 
-  if (!response.ok) {
-    const errorPayload = json as { message?: string; error?: string } | null;
-    const message = errorPayload?.message ?? errorPayload?.error ?? 'PRODUCT_FETCH_FAILED';
+  for (const endpoint of endpoints) {
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      credentials: 'include',
+      cache: 'no-store',
+      headers
+    });
+
+    const json = (await response.json().catch(() => null)) as
+      | ProductDetailResponse
+      | { message?: string; error?: string }
+      | null;
+
+    if (response.ok) {
+      if (!json || typeof json !== 'object') {
+        throw new Error('PRODUCT_FETCH_INVALID_RESPONSE');
+      }
+      const payload = json as ProductDetailResponse;
+      successfulPayload = payload;
+      if (hasExpandedProductContent(payload)) {
+        break;
+      }
+      continue;
+    }
+
+    lastErrorPayload = json as { message?: string; error?: string } | null;
+    if (response.status === 400 || response.status === 401 || response.status === 403 || response.status === 404 || response.status === 422) {
+      continue;
+    }
+    const message = lastErrorPayload?.message ?? lastErrorPayload?.error ?? 'PRODUCT_FETCH_FAILED';
     throw new Error(message);
   }
 
-  if (!json || typeof json !== 'object') {
-    throw new Error('PRODUCT_FETCH_INVALID_RESPONSE');
+  if (!successfulPayload) {
+    const message = lastErrorPayload?.message ?? lastErrorPayload?.error ?? 'PRODUCT_FETCH_FAILED';
+    throw new Error(message);
   }
 
-  const payload = json as ProductDetailResponse;
+  const payload = successfulPayload;
   productDetailSessionCache.set(inFlightKey, payload);
   return payload;
   })();

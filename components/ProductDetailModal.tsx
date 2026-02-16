@@ -123,6 +123,17 @@ const pickPreferredContentUrl = ({
     return firstValidUrl(topLevelOriginal, fileOriginal, fileMp4, fileM3u8, bodyUrl);
 };
 
+const productDetailModalCache = new Map<string, ProductDetailResponse>();
+const productReviewsModalCache = new Map<
+    string,
+    {
+        reviews: ProductReviewItem[];
+        averageRating: number | null;
+        distribution: Record<number, number>;
+        totalReviews: number;
+    }
+>();
+
 export default function ProductDetailModal({ product, onClose, onStatusChange }: ProductDetailModalProps) {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState('Overview');
@@ -154,6 +165,12 @@ export default function ProductDetailModal({ product, onClose, onStatusChange }:
         typeof productRecord?.product_description === 'string' ||
         typeof productRecord?.product_cover === 'string' ||
         rowHasEmbeddedContent;
+    const inlineDetailSignature = [
+        typeof productRecord?.product_name === 'string' ? productRecord.product_name : '',
+        typeof productRecord?.product_description === 'string' ? productRecord.product_description : '',
+        typeof productRecord?.product_cover === 'string' ? productRecord.product_cover : '',
+        rowHasEmbeddedContent ? '1' : '0'
+    ].join('|');
     const shouldShowLoadingOverlay =
         (isObjectId(detailId) && !rowHasInlineDetailShape && (isProductLoading || !productDetail)) &&
         !hasProductError;
@@ -184,12 +201,28 @@ export default function ProductDetailModal({ product, onClose, onStatusChange }:
             rowHasEmbeddedContent;
 
         if (hasInlineDetailShape) {
-            setProductDetail(productRecord as unknown as ProductDetailResponse);
+            const inlineDetail = productRecord as unknown as ProductDetailResponse;
+            setProductDetail(inlineDetail);
+            if (detailId && isObjectId(detailId)) {
+                productDetailModalCache.set(`${detailId}:NGN`, inlineDetail);
+            }
         } else {
             setProductDetail(null);
         }
 
         if (!detailId || !isObjectId(detailId)) {
+            setHasProductError(false);
+            setIsProductLoading(false);
+            return;
+        }
+
+        const cacheKey = `${detailId}:NGN`;
+        const cachedDetail = productDetailModalCache.get(cacheKey);
+        if (cachedDetail) {
+            setProductDetail((previous) => ({
+                ...(previous ?? {}),
+                ...cachedDetail
+            }));
             setHasProductError(false);
             setIsProductLoading(false);
             return;
@@ -201,6 +234,7 @@ export default function ProductDetailModal({ product, onClose, onStatusChange }:
             try {
                 const response = await getProductById(detailId, 'NGN');
                 if (!isMounted) return;
+                productDetailModalCache.set(cacheKey, response);
                 setProductDetail((previous) => ({
                     ...(previous ?? {}),
                     ...response
@@ -221,7 +255,7 @@ export default function ProductDetailModal({ product, onClose, onStatusChange }:
         return () => {
             isMounted = false;
         };
-    }, [detailId, product, rowHasEmbeddedContent]);
+    }, [detailId, inlineDetailSignature, product?.id, productRecord, rowHasEmbeddedContent]);
 
     useEffect(() => {
         setOpenContentMenuId(null);
@@ -249,6 +283,18 @@ export default function ProductDetailModal({ product, onClose, onStatusChange }:
             return;
         }
 
+        const reviewsCacheKey = `${detailId}:1:5`;
+        const cachedReviews = productReviewsModalCache.get(reviewsCacheKey);
+        if (cachedReviews) {
+            setReviews(cachedReviews.reviews);
+            setAverageRating(cachedReviews.averageRating);
+            setDistribution(cachedReviews.distribution);
+            setTotalReviews(cachedReviews.totalReviews);
+            setHasReviewsError(false);
+            setIsReviewsLoading(false);
+            return;
+        }
+
         let isMounted = true;
         const fetchReviews = async () => {
             setIsReviewsLoading(true);
@@ -269,8 +315,15 @@ export default function ProductDetailModal({ product, onClose, onStatusChange }:
                         dist[n as 1 | 2 | 3 | 4 | 5] = Number(value ?? 0);
                     }
                 });
+                const computedTotalReviews = response.pagination?.total ?? response.items?.length ?? 0;
+                productReviewsModalCache.set(reviewsCacheKey, {
+                    reviews: response.items ?? [],
+                    averageRating: response.averageRating ?? null,
+                    distribution: dist,
+                    totalReviews: computedTotalReviews
+                });
                 setDistribution(dist);
-                setTotalReviews(response.pagination?.total ?? response.items?.length ?? 0);
+                setTotalReviews(computedTotalReviews);
                 setHasReviewsError(false);
             } catch {
                 if (!isMounted) return;
@@ -597,10 +650,12 @@ export default function ProductDetailModal({ product, onClose, onStatusChange }:
                 : await banAdminProduct(productId);
             setProductDetail((previous) => {
                 if (!previous) return previous;
-                return {
+                const updatedDetail = {
                     ...previous,
                     status: isBanned ? 'PUBLISHED' : 'BANNED'
                 };
+                productDetailModalCache.set(`${productId}:NGN`, updatedDetail);
+                return updatedDetail;
             });
             onStatusChange?.(product.id, isBanned ? 'active' : 'rejected');
             showStatusMessage('success', message || (isBanned ? 'Product unbanned successfully' : 'Product banned successfully'));

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   getAdminUserTransactions,
   getUserLogs,
@@ -51,6 +51,47 @@ export default function UserDetailModal({ user, isOpen, onClose }: UserDetailMod
   });
   const [isSubscriptionsLoading, setIsSubscriptionsLoading] = useState(false);
   const [subscriptionsError, setSubscriptionsError] = useState<string | null>(null);
+  const activityCacheRef = useRef<
+    Map<
+      string,
+      {
+        data: UserLogItem[];
+        meta: { total: number; page: number; limit: number; totalPages: number };
+      }
+    >
+  >(new Map());
+  const purchasesCacheRef = useRef<
+    Map<
+      string,
+      {
+        data: AdminUserTransactionItem[];
+        meta: {
+          total: number;
+          page: number;
+          limit: number;
+          totalPages: number;
+          hasNext: boolean;
+          hasPrev: boolean;
+        };
+      }
+    >
+  >(new Map());
+  const subscriptionsCacheRef = useRef<
+    Map<
+      string,
+      {
+        data: AdminUserTransactionItem[];
+        meta: {
+          total: number;
+          page: number;
+          limit: number;
+          totalPages: number;
+          hasNext: boolean;
+          hasPrev: boolean;
+        };
+      }
+    >
+  >(new Map());
   const statusValue = String(user?.status ?? '').toLowerCase();
   const statusLabel =
     statusValue === 'inactive'
@@ -85,6 +126,46 @@ export default function UserDetailModal({ user, isOpen, onClose }: UserDetailMod
     });
   };
 
+  const formatRelativeTime = (value?: string) => {
+    if (!value) return '—';
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return '—';
+
+    const diffMs = Date.now() - parsed.getTime();
+    if (diffMs < 0) return 'Just now';
+
+    const minute = 60 * 1000;
+    const hour = 60 * minute;
+    const day = 24 * hour;
+    const week = 7 * day;
+    const month = 30 * day;
+    const year = 365 * day;
+
+    if (diffMs < minute) return 'Just now';
+    if (diffMs < hour) {
+      const mins = Math.floor(diffMs / minute);
+      return `${mins}min ago`;
+    }
+    if (diffMs < day) {
+      const hours = Math.floor(diffMs / hour);
+      return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
+    }
+    if (diffMs < week) {
+      const days = Math.floor(diffMs / day);
+      return `${days} ${days === 1 ? 'day' : 'days'} ago`;
+    }
+    if (diffMs < month) {
+      const weeks = Math.floor(diffMs / week);
+      return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
+    }
+    if (diffMs < year) {
+      const months = Math.floor(diffMs / month);
+      return `${months} ${months === 1 ? 'month' : 'months'} ago`;
+    }
+    const years = Math.floor(diffMs / year);
+    return `${years} ${years === 1 ? 'year' : 'years'} ago`;
+  };
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -100,6 +181,15 @@ export default function UserDetailModal({ user, isOpen, onClose }: UserDetailMod
     if (!isOpen || activeTab !== 'activity') return;
     if (!user?.apiId) return;
 
+    const cacheKey = `${user.apiId}:${activitySearch.trim().toLowerCase()}:${activityPage}`;
+    const cached = activityCacheRef.current.get(cacheKey);
+    if (cached) {
+      setActivityLogs(cached.data);
+      setActivityMeta(cached.meta);
+      setActivityError(null);
+      return;
+    }
+
     let isMounted = true;
     const fetchLogs = async () => {
       setIsActivityLoading(true);
@@ -113,6 +203,7 @@ export default function UserDetailModal({ user, isOpen, onClose }: UserDetailMod
         if (!isMounted) return;
         setActivityLogs(response.data);
         setActivityMeta(response.meta);
+        activityCacheRef.current.set(cacheKey, { data: response.data, meta: response.meta });
         setActivityError(null);
       } catch (error) {
         if (!isMounted) return;
@@ -140,6 +231,15 @@ export default function UserDetailModal({ user, isOpen, onClose }: UserDetailMod
     if (!isOpen || activeTab !== 'purchases') return;
     if (!user?.apiId) return;
 
+    const cacheKey = `${user.apiId}:${transactionPage}`;
+    const cached = purchasesCacheRef.current.get(cacheKey);
+    if (cached) {
+      setTransactions(cached.data);
+      setTransactionMeta(cached.meta);
+      setTransactionsError(null);
+      return;
+    }
+
     let isMounted = true;
     const fetchTransactions = async () => {
       setIsTransactionsLoading(true);
@@ -152,6 +252,10 @@ export default function UserDetailModal({ user, isOpen, onClose }: UserDetailMod
         if (!isMounted) return;
         setTransactions(response.transactions);
         setTransactionMeta(response.pagination);
+        purchasesCacheRef.current.set(cacheKey, {
+          data: response.transactions,
+          meta: response.pagination
+        });
         setTransactionsError(null);
       } catch (error) {
         if (!isMounted) return;
@@ -179,6 +283,15 @@ export default function UserDetailModal({ user, isOpen, onClose }: UserDetailMod
     if (!isOpen || activeTab !== 'subscriptions') return;
     if (!user?.apiId) return;
 
+    const cacheKey = `${user.apiId}:${subscriptionsPage}`;
+    const cached = subscriptionsCacheRef.current.get(cacheKey);
+    if (cached) {
+      setSubscriptions(cached.data);
+      setSubscriptionsMeta(cached.meta);
+      setSubscriptionsError(null);
+      return;
+    }
+
     let isMounted = true;
     const fetchSubscriptions = async () => {
       setIsSubscriptionsLoading(true);
@@ -191,6 +304,10 @@ export default function UserDetailModal({ user, isOpen, onClose }: UserDetailMod
         if (!isMounted) return;
         setSubscriptions(response.transactions);
         setSubscriptionsMeta(response.pagination);
+        subscriptionsCacheRef.current.set(cacheKey, {
+          data: response.transactions,
+          meta: response.pagination
+        });
         setSubscriptionsError(null);
       } catch (error) {
         if (!isMounted) return;
@@ -248,6 +365,9 @@ export default function UserDetailModal({ user, isOpen, onClose }: UserDetailMod
       hasNext: false,
       hasPrev: false
     });
+    activityCacheRef.current.clear();
+    purchasesCacheRef.current.clear();
+    subscriptionsCacheRef.current.clear();
     setActiveTab('profile');
   }, [isOpen, user?.id]);
 
@@ -428,18 +548,6 @@ export default function UserDetailModal({ user, isOpen, onClose }: UserDetailMod
 
           {activeTab === 'activity' && (
             <div className="flex flex-col px-6 pt-4 pb-6 gap-1 bg-surface-secondary flex-1">
-              <div className="mb-2">
-                <input
-                  type="text"
-                  value={activitySearch}
-                  onChange={(event) => {
-                    setActivitySearch(event.target.value);
-                    setActivityPage(1);
-                  }}
-                  placeholder="Search activity"
-                  className="w-full h-8 px-3 rounded-md border border-border-primary bg-white text-body-sm text-text-primary placeholder:text-text-tertiary outline-none"
-                />
-              </div>
               {/* Table Header */}
               <div className="flex items-center px-4 gap-6 h-8 relative z-10">
                 <span className="text-body-sm text-text-secondary w-36">Timestamp</span>
@@ -565,7 +673,7 @@ export default function UserDetailModal({ user, isOpen, onClose }: UserDetailMod
                   return (
                     <PurchaseRow
                       key={transaction._id}
-                      date={formatIsoDateTime(transaction.transactionDate)}
+                      date={formatRelativeTime(transaction.transactionDate)}
                       product={transaction.narration || 'Transaction'}
                       creator={displayName}
                       amount={amount}
@@ -668,7 +776,7 @@ export default function UserDetailModal({ user, isOpen, onClose }: UserDetailMod
                   return (
                     <PurchaseRow
                       key={transaction._id}
-                      date={formatIsoDateTime(transaction.transactionDate)}
+                      date={formatRelativeTime(transaction.transactionDate)}
                       product={transaction.narration || 'Subscription'}
                       creator={displayName}
                       amount={amount}

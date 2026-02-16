@@ -475,7 +475,7 @@ export default function UsersPage() {
           </div>
 
           {/* Cards stretch to available width; wrap on smaller screens. */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-2 w-full [&>*]:min-w-0">
             {stats.map((stat, index) => (
               <StatsCard key={index} {...stat} />
             ))}
