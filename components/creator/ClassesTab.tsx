@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import { ChevronDown } from 'lucide-react';
+import DataTableShell from '@/components/layout/DataTableShell';
 
 export default function ClassesTab() {
     return (
@@ -8,11 +9,11 @@ export default function ClassesTab() {
 
             {/* Metrics Section */}
             <div className="flex flex-col gap-2 w-full">
-                <div className="flex items-center justify-between w-full h-[30px]">
+                <div className="flex w-full items-center justify-between">
                     <h3 className="font-sans text-heading-sm text-text-primary">
                         Metrics
                     </h3>
-                    <div className="flex items-center px-[10px] py-[5px] gap-2 bg-white border border-border-primary rounded-lg shadow-button-soft h-[30px] cursor-pointer">
+                    <div className="flex h-8 cursor-pointer items-center gap-2 rounded-lg border border-border-primary bg-white px-[10px] py-[5px] shadow-button-soft">
                         <span className="font-sans text-caption-lg-regular text-text-secondary">
                             Last 30 days
                         </span>
@@ -20,9 +21,9 @@ export default function ClassesTab() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-4 gap-2 w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2 w-full">
                     {/* Live Sessions */}
-                    <div className="flex flex-col p-4 gap-3 bg-white border border-border-primary rounded-lg h-[96px]">
+                    <div className="flex min-h-[96px] flex-col gap-3 rounded-lg border border-border-primary bg-white p-4">
                         <div className="flex flex-col gap-1">
                             <span className="font-sans text-caption-lg-regular text-text-secondary">
                                 Live Sessions
@@ -37,7 +38,7 @@ export default function ClassesTab() {
                     </div>
 
                     {/* 1-1 Calls */}
-                    <div className="flex flex-col p-4 gap-3 bg-white border border-border-primary rounded-lg h-[96px]">
+                    <div className="flex min-h-[96px] flex-col gap-3 rounded-lg border border-border-primary bg-white p-4">
                         <div className="flex flex-col gap-1">
                             <span className="font-sans text-caption-lg-regular text-text-secondary">
                                 1-1 Calls
@@ -52,7 +53,7 @@ export default function ClassesTab() {
                     </div>
 
                     {/* Revenue */}
-                    <div className="flex flex-col p-4 gap-3 bg-white border border-border-primary rounded-lg h-[96px]">
+                    <div className="flex min-h-[96px] flex-col gap-3 rounded-lg border border-border-primary bg-white p-4">
                         <div className="flex flex-col gap-1">
                             <span className="font-sans text-caption-lg-regular text-text-secondary">
                                 Revenue
@@ -67,7 +68,7 @@ export default function ClassesTab() {
                     </div>
 
                     {/* Total Hours */}
-                    <div className="flex flex-col p-4 gap-3 bg-white border border-border-primary rounded-lg h-[96px]">
+                    <div className="flex min-h-[96px] flex-col gap-3 rounded-lg border border-border-primary bg-white p-4">
                         <div className="flex flex-col gap-1">
                             <span className="font-sans text-caption-lg-regular text-text-secondary">
                                 Total Hours
@@ -82,7 +83,7 @@ export default function ClassesTab() {
                     </div>
                 </div>
             </div>
-            <div className="flex gap-2 w-full">
+            <div className="flex flex-col xl:flex-row gap-2 w-full">
                 {/* Live Now */}
                 <div className="flex-1 flex flex-col gap-2">
                     <h3 className="font-sans text-heading-sm text-text-primary">
@@ -93,7 +94,12 @@ export default function ClassesTab() {
                             {/* Live Session Card */}
                             <div className="flex flex-col p-4 gap-4">
                                 <div className="flex flex-col gap-3">
-                                    <div className="relative w-[325px] h-[207px] rounded bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=400&h=300&fit=crop)' }}>
+                                    <div className="relative h-[207px] w-full overflow-hidden rounded">
+                                        <img
+                                            src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=400&h=300&fit=crop"
+                                            alt="Live class"
+                                            className="h-full w-full object-cover"
+                                        />
                                         <div className="absolute top-2 left-2 flex items-center gap-0.5 px-1.5 py-1 bg-white/70 rounded-full">
                                             <div className="w-[6.26px] h-[6.26px] rounded-full bg-[#CD110A]" />
                                             <span className="font-sans text-caption-lg text-text-danger">Live</span>
@@ -102,14 +108,14 @@ export default function ClassesTab() {
                                     <h4 className="font-sans text-heading-sm text-text-primary">
                                         Skit Production Masterclass
                                     </h4>
-                                    <div className="flex items-center gap-1">
-                                        <button className="px-4 py-3.5 bg-white border border-border-primary rounded-[9px] shadow-button-inset font-sans text-body-sm text-[#353A44] h-[28px] flex items-center justify-center">
+                                    <div className="flex flex-wrap items-center gap-1">
+                                        <button className="flex h-7 items-center justify-center rounded-[9px] border border-border-primary bg-white px-4 py-2 font-sans text-body-sm text-[#353A44] shadow-button-inset">
                                             Monitor Session
                                         </button>
-                                        <button className="px-4 py-3.5 bg-white border border-border-primary rounded-[9px] shadow-button-inset font-sans text-body-sm text-[#353A44] h-[28px] flex items-center justify-center">
+                                        <button className="flex h-7 items-center justify-center rounded-[9px] border border-border-primary bg-white px-4 py-2 font-sans text-body-sm text-[#353A44] shadow-button-inset">
                                             View Chat
                                         </button>
-                                        <button className="px-4 py-3.5 bg-[#CD110A] border border-[rgba(251,236,235,0.2)] rounded-[9px] shadow-button-inset font-sans text-body-sm text-white h-[28px] flex items-center justify-center">
+                                        <button className="flex h-7 items-center justify-center rounded-[9px] border border-[rgba(251,236,235,0.2)] bg-[#CD110A] px-4 py-2 font-sans text-body-sm text-white shadow-button-inset">
                                             End Session
                                         </button>
                                     </div>
@@ -147,7 +153,7 @@ export default function ClassesTab() {
                         Upcoming
                     </h3>
                     <div className="p-1 bg-surface-secondary">
-                        <div className="bg-white border border-border-primary rounded-xl p-4 h-[379px] overflow-y-auto no-scrollbar">
+                        <div className="max-h-[379px] min-h-[320px] overflow-y-auto rounded-xl border border-border-primary bg-white p-4 no-scrollbar">
                             <div className="flex flex-col gap-1">
                                 {[1, 2, 3, 4].map((item) => (
                                     <div key={item} className="flex flex-col p-4 gap-3 bg-white border border-border-primary rounded-lg">
@@ -213,40 +219,44 @@ export default function ClassesTab() {
                 <h3 className="font-sans text-heading-sm text-text-primary">
                     Session History
                 </h3>
-                <div className="flex flex-col p-1 bg-surface-secondary rounded-xl gap-1">
-                    <div className="flex items-center px-4 py-2 gap-6">
-                        <span className="w-[135.32px] font-sans text-body-sm text-text-secondary">Date</span>
-                        <span className="flex-1 font-sans text-body-sm text-text-secondary">Title</span>
-                        <span className="w-[159.07px] font-sans text-body-sm text-text-secondary">Duration</span>
-                        <span className="w-[137.65px] font-sans text-body-sm text-text-secondary">Viewers</span>
-                        <span className="w-[152.77px] font-sans text-body-sm text-text-secondary">Revenue</span>
-                        <span className="w-[70.71px] font-sans text-body-sm text-text-secondary">Status</span>
-                    </div>
-                    <div className="bg-white border border-border-primary rounded-lg overflow-hidden flex flex-col">
-                        {[
-                            { date: '11/21/2019', revenue: '₦540,000' },
-                            { date: '09/16/2019', revenue: '₦650,000' },
-                            { date: '11/21/2019', revenue: '₦540,000' },
-                            { date: '10/19/2019', revenue: '₦650,000' },
-                            { date: '09/16/2019', revenue: '₦720,000' },
-                            { date: '10/19/2019', revenue: '₦320,000' },
-                            { date: '10/19/2019', revenue: '₦320,000' },
-                            { date: '10/19/2019', revenue: '₦320,000' }
-                        ].map((session, index) => (
-                            <div key={index} className={cn("flex items-center px-4 py-3.5 gap-6 h-[44px]", index !== 7 && "border-b border-border-primary")}>
-                                <span className="w-[135.32px] font-sans text-body-sm text-text-primary truncate">{session.date}</span>
-                                <span className="flex-1 font-sans text-body-sm text-text-primary truncate">Skit Production Live</span>
-                                <span className="w-[159.07px] font-sans text-body-sm text-text-primary truncate">45min</span>
-                                <span className="w-[137.65px] font-sans text-body-sm text-text-primary truncate">323</span>
-                                <span className="w-[152.77px] font-sans text-body-sm text-text-primary truncate">{session.revenue}</span>
-                                <div className="w-[70.71px] flex items-center">
-                                    <div className="flex items-center justify-center px-[6px] py-[1px] pl-[3px] bg-surface-success rounded-[4px] h-[14px] w-fit">
-                                        <span className="font-sans text-caption-sm text-text-success">Completed</span>
-                                    </div>
-                                </div>
+                <div className="rounded-xl bg-surface-secondary p-1">
+                    <DataTableShell>
+                        <div className="min-w-[760px]">
+                            <div className="flex items-center gap-6 px-4 py-2">
+                                <span className="basis-[18%] font-sans text-body-sm text-text-secondary">Date</span>
+                                <span className="flex-1 font-sans text-body-sm text-text-secondary">Title</span>
+                                <span className="basis-[16%] font-sans text-body-sm text-text-secondary">Duration</span>
+                                <span className="basis-[14%] font-sans text-body-sm text-text-secondary">Viewers</span>
+                                <span className="basis-[16%] font-sans text-body-sm text-text-secondary">Revenue</span>
+                                <span className="basis-[12%] font-sans text-body-sm text-text-secondary">Status</span>
                             </div>
-                        ))}
-                    </div>
+                            <div className="flex flex-col overflow-hidden rounded-lg border border-border-primary bg-white">
+                                {[
+                                    { date: '11/21/2019', revenue: '₦540,000' },
+                                    { date: '09/16/2019', revenue: '₦650,000' },
+                                    { date: '11/21/2019', revenue: '₦540,000' },
+                                    { date: '10/19/2019', revenue: '₦650,000' },
+                                    { date: '09/16/2019', revenue: '₦720,000' },
+                                    { date: '10/19/2019', revenue: '₦320,000' },
+                                    { date: '10/19/2019', revenue: '₦320,000' },
+                                    { date: '10/19/2019', revenue: '₦320,000' }
+                                ].map((session, index) => (
+                                    <div key={index} className={cn("flex h-[44px] items-center gap-6 px-4 py-3.5", index !== 7 && "border-b border-border-primary")}>
+                                        <span className="basis-[18%] truncate font-sans text-body-sm text-text-primary">{session.date}</span>
+                                        <span className="flex-1 truncate font-sans text-body-sm text-text-primary">Skit Production Live</span>
+                                        <span className="basis-[16%] truncate font-sans text-body-sm text-text-primary">45min</span>
+                                        <span className="basis-[14%] truncate font-sans text-body-sm text-text-primary">323</span>
+                                        <span className="basis-[16%] truncate font-sans text-body-sm text-text-primary">{session.revenue}</span>
+                                        <div className="flex basis-[12%] items-center">
+                                            <div className="flex h-[14px] w-fit items-center justify-center rounded-[4px] bg-surface-success px-[6px] py-[1px] pl-[3px]">
+                                                <span className="font-sans text-caption-sm text-text-success">Completed</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </DataTableShell>
                 </div>
             </div>
         </div>

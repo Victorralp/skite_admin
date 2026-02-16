@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
+import DataTableShell from '@/components/layout/DataTableShell';
 
 type LogCategory = 'Admin Actions' | 'System Events' | 'Authentication Logs';
 
@@ -318,7 +319,8 @@ export default function LogsTable({ category }: LogsTableProps) {
   // Render different table layouts based on category
   if (category === 'System Events') {
     return (
-      <div className="flex flex-col items-start p-1 gap-1 w-full bg-surface-secondary rounded-lg">
+      <DataTableShell className="flex flex-col items-start p-1 gap-1 w-full bg-surface-secondary">
+        <div className="w-full min-w-[860px]">
         {/* Table Header */}
         <div className="flex items-center px-6 py-2 gap-4 w-full h-[30px]">
           <span className="font-sans font-medium text-xs leading-[14px] text-text-primary w-[140px]">
@@ -372,14 +374,16 @@ export default function LogsTable({ category }: LogsTableProps) {
             </div>
           ))}
         </div>
-      </div>
+        </div>
+      </DataTableShell>
     );
   }
 
   // Admin Actions and Authentication Logs use different layouts
   if (category === 'Authentication Logs') {
     return (
-      <div className="flex flex-col items-start p-1 gap-1 w-full bg-surface-secondary rounded-lg">
+      <DataTableShell className="flex flex-col items-start p-1 gap-1 w-full bg-surface-secondary">
+        <div className="w-full min-w-[960px]">
         {/* Table Header */}
         <div className="flex items-center px-6 py-2 gap-4 w-full h-[30px]">
           <span className="font-sans font-medium text-xs leading-[14px] text-text-primary w-[140px]">
@@ -447,7 +451,8 @@ export default function LogsTable({ category }: LogsTableProps) {
             ))
           )}
         </div>
-      </div>
+        </div>
+      </DataTableShell>
     );
   }
 
@@ -455,7 +460,8 @@ export default function LogsTable({ category }: LogsTableProps) {
   const logs = adminActionsLogs;
 
   return (
-    <div className="flex flex-col items-start p-1 gap-1 w-full bg-surface-secondary rounded-lg">
+    <DataTableShell className="flex flex-col items-start p-1 gap-1 w-full bg-surface-secondary">
+      <div className="w-full min-w-[920px]">
       {/* Table Header */}
       <div className="flex items-center px-6 py-2 gap-4 w-full h-[30px]">
         <span className="font-sans font-medium text-xs leading-[14px] text-text-primary w-[140px]">
@@ -515,6 +521,7 @@ export default function LogsTable({ category }: LogsTableProps) {
           </div>
         ))}
       </div>
-    </div>
+      </div>
+    </DataTableShell>
   );
 }

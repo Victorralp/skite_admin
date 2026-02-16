@@ -33,21 +33,21 @@ export default function TabHeader({
     onAction
 }: TabHeaderProps) {
     return (
-        <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-                <div className="relative">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <div className="relative w-full sm:w-[300px]">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
                     <input
                         type="text"
                         placeholder={searchPlaceholder}
-                        className="pl-9 pr-4 py-2 w-[300px] h-[36px] bg-white border border-border-primary rounded-lg text-[13.5px] placeholder-[#A5A1AF] focus:outline-none focus:border-border-brand"
+                        className="h-9 w-full rounded-lg border border-border-primary bg-white py-2 pl-9 pr-4 text-[13.5px] placeholder-[#A5A1AF] focus:border-border-brand focus:outline-none"
                         onChange={(e) => onSearch?.(e.target.value)}
                     />
                 </div>
                 {showFilterButton && (
                     <button
                         onClick={onFilter}
-                        className="flex items-center gap-2 px-3 py-2 h-[36px] bg-white border border-border-primary rounded-lg text-[13.5px] font-medium text-text-primary hover:bg-gray-50"
+                        className="flex h-9 items-center gap-2 rounded-lg border border-border-primary bg-white px-3 py-2 text-[13.5px] font-medium text-text-primary hover:bg-gray-50"
                     >
                         <Filter className="w-4 h-4" />
                         Filter
@@ -60,7 +60,7 @@ export default function TabHeader({
                     />
                 )}
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
                 {statusOptions && statusDropdownPosition === 'right' && (
                     <CustomDropdown
                         options={statusOptions}
@@ -70,7 +70,7 @@ export default function TabHeader({
                 <button
                     onClick={onAction}
                     className={cn(
-                        "flex items-center gap-2 px-4 py-2 h-[36px] rounded-lg text-[13.5px] font-medium transition-colors",
+                        "flex h-9 items-center gap-2 rounded-lg px-4 py-2 text-[13.5px] font-medium transition-colors",
                         ActionIcon ? "bg-white border border-border-primary text-text-primary hover:bg-gray-50" : "bg-[#2B2834] text-white hover:bg-[#1a191f]"
                     )}
                 >

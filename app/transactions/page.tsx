@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import PageContainer from '@/components/layout/PageContainer';
+import DataTableShell from '@/components/layout/DataTableShell';
 
 const mockTransactions = [
     {
@@ -101,7 +102,8 @@ export default function TransactionsPage() {
                 </div>
 
                 {/* Transactions Table */}
-                <div className="bg-white border border-border-primary rounded-lg">
+                <DataTableShell className="bg-white">
+                    <div className="min-w-[980px]">
                     {/* Table Header */}
                     <div className="flex items-center px-6 py-4 gap-4 w-full border-b border-border-primary bg-surface-secondary">
                         <span className="w-[10%] font-sans text-body-sm text-text-secondary">Timestamp</span>
@@ -183,7 +185,8 @@ export default function TransactionsPage() {
                             </div>
                         ))}
                     </div>
-                </div>
+                    </div>
+                </DataTableShell>
             </div>
         </PageContainer>
     );

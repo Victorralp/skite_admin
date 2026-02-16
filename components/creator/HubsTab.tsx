@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Eye, AlertTriangle } from 'lucide-react';
 import { useState } from 'react';
 import HubDetailModal from '@/components/HubDetailModal';
+import DataTableShell from '@/components/layout/DataTableShell';
 
 const CheckIcon = () => (
     <svg width="10" height="10" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -31,77 +32,71 @@ const StatusBadge = ({ status }: { status: string }) => {
 };
 
 export default function HubsTab() {
-    const [selectedHub, setSelectedHub] = useState<any | null>(null);
+    const [selectedHub, setSelectedHub] = useState<(typeof creatorHubs)[number] | null>(null);
 
     return (
         <>
             <div className="flex flex-col w-full bg-surface-secondary rounded-b-[36px] p-6 gap-6">
-            {/* Title */}
-            <h3 className="font-sans text-heading-sm text-text-primary">Managed Hubs</h3>
+                <h3 className="font-sans text-heading-sm text-text-primary">Managed Hubs</h3>
 
-            {/* Table Container */}
-            <div className="w-full bg-surface-secondary rounded-xl p-1 flex flex-col">
-                {/* Header Row */}
-                <div className="flex items-center px-4 py-2 gap-6 h-[32px]">
-                    <div className="flex-1 font-sans text-body-sm text-text-secondary">Hub name</div>
-                    <div className="flex-1 font-sans text-body-sm text-text-secondary">No. of members</div>
-                    <div className="flex-1 font-sans text-body-sm text-text-secondary">Posts today</div>
-                    <div className="flex-1 font-sans text-body-sm text-text-secondary">Status</div>
-                    <div className="w-[18px]"></div>
-                </div>
-
-                {/* Table Body */}
-                <div className="bg-white border border-border-primary rounded-lg overflow-hidden">
-                    {/* Rows */}
-                    {creatorHubs.map((hub, index) => (
-                        <div
-                            key={hub.id}
-                            className={cn(
-                                "flex items-center px-4 py-3 gap-6 h-[48px] bg-white",
-                                index !== creatorHubs.length - 1 && "border-b border-border-primary"
-                            )}
-                        >
-                            {/* Hub name with avatar */}
-                            <div className="flex-1 flex items-center gap-2">
-                                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex-shrink-0" />
-                                <span className="font-sans text-body-sm text-text-primary truncate">
-                                    {hub.name}
-                                </span>
+                <div className="w-full rounded-xl bg-surface-secondary p-1">
+                    <DataTableShell>
+                        <div className="min-w-[720px]">
+                            <div className="flex items-center gap-6 px-4 py-2">
+                                <div className="flex-1 font-sans text-body-sm text-text-secondary">Hub name</div>
+                                <div className="flex-1 font-sans text-body-sm text-text-secondary">No. of members</div>
+                                <div className="flex-1 font-sans text-body-sm text-text-secondary">Posts today</div>
+                                <div className="flex-1 font-sans text-body-sm text-text-secondary">Status</div>
+                                <div className="w-[18px]" />
                             </div>
 
-                            {/* No. of members */}
-                            <div className="flex-1 font-sans text-body-sm text-text-primary">
-                                {hub.members.toLocaleString()}
-                            </div>
+                            <div className="overflow-hidden rounded-lg border border-border-primary bg-white">
+                                {creatorHubs.map((hub, index) => (
+                                    <div
+                                        key={hub.id}
+                                        className={cn(
+                                            "flex items-center gap-6 bg-white px-4 py-3",
+                                            index !== creatorHubs.length - 1 && "border-b border-border-primary"
+                                        )}
+                                    >
+                                        <div className="flex flex-1 items-center gap-2">
+                                            <div className="h-6 w-6 shrink-0 rounded-full bg-gradient-to-br from-blue-400 to-purple-500" />
+                                            <span className="truncate font-sans text-body-sm text-text-primary">
+                                                {hub.name}
+                                            </span>
+                                        </div>
 
-                            {/* Posts today */}
-                            <div className="flex-1 font-sans text-body-sm text-text-primary">
-                                {hub.posts}
-                            </div>
+                                        <div className="flex-1 font-sans text-body-sm text-text-primary">
+                                            {hub.members.toLocaleString()}
+                                        </div>
 
-                            {/* Status */}
-                            <div className="flex-1">
-                                <StatusBadge status={hub.status} />
-                            </div>
+                                        <div className="flex-1 font-sans text-body-sm text-text-primary">
+                                            {hub.posts}
+                                        </div>
 
-                            {/* Eye icon */}
-                            <div className="w-[18px]">
-                                <button 
-                                    className="p-0 hover:opacity-70 transition-opacity"
-                                    onClick={() => setSelectedHub(hub)}
-                                >
-                                    <Eye className="w-[18px] h-[18px] text-text-secondary" />
-                                </button>
+                                        <div className="flex-1">
+                                            <StatusBadge status={hub.status} />
+                                        </div>
+
+                                        <div className="w-[18px]">
+                                            <button
+                                                className="p-0 transition-opacity hover:opacity-70"
+                                                onClick={() => setSelectedHub(hub)}
+                                            >
+                                                <Eye className="h-[18px] w-[18px] text-text-secondary" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
-                    ))}
+                    </DataTableShell>
                 </div>
             </div>
-        </div>
 
-            <HubDetailModal 
-                hub={selectedHub} 
-                onClose={() => setSelectedHub(null)} 
+            <HubDetailModal
+                hub={selectedHub}
+                onClose={() => setSelectedHub(null)}
             />
         </>
     );

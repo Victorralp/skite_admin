@@ -601,9 +601,15 @@ export default function ProductDetailModal({ product, onClose, onStatusChange }:
     };
 
     const openContentInApp = (item: { url: string; type: string; label: string }) => {
+        const canonicalDetailId =
+            (typeof detailId === 'string' && detailId.length > 0 && isObjectId(detailId)
+                ? detailId
+                : '') ||
+            (typeof productDetail?._id === 'string' && isObjectId(productDetail._id)
+                ? productDetail._id
+                : '');
         const targetId =
-            (typeof detailId === 'string' && detailId.length > 0 ? detailId : '') ||
-            (typeof product.id === 'string' && product.id.length > 0 ? product.id : '');
+            canonicalDetailId;
         if (!targetId) {
             return;
         }

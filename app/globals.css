@@ -57,6 +57,29 @@
     --success: 152 69% 40%;
     --warning: 38 92% 50%;
     --danger: 0 84% 60%;
+
+    /* Layout system tokens */
+    --layout-content-max: 1600px;
+    --layout-gutter-mobile: 1rem;
+    --layout-gutter-tablet: 2rem;
+    --layout-gutter-desktop: 3rem;
+    --layout-page-y: 1.5rem;
+    --layout-section-gap: 1.5rem;
+    --layout-stack-gap: 2rem;
+    --layout-panel-radius: 0.5rem;
+    --layout-panel-padding: 1rem;
+    --layout-2pane-main-min: 772px;
+    --layout-2pane-side: 306px;
+    --layout-2pane-gap: 1.5rem;
+
+    /* Media/viewer tokens */
+    --media-frame-height-min: 447px;
+    --media-frame-height-default: 518px;
+    --media-frame-height-max: 80vh;
+    --media-frame-aspect-ratio: 16 / 9;
+    --pdf-reading-max-width: 1100px;
+    --pdf-zoom-min: 50;
+    --pdf-zoom-max: 250;
   }
 
   .dark {
@@ -116,6 +139,26 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: "Neue Montreal";
+  }
+}
+
+/* Layout utilities */
+.layout-gutter {
+  padding-left: var(--layout-gutter-mobile);
+  padding-right: var(--layout-gutter-mobile);
+}
+
+@media (min-width: 640px) {
+  .layout-gutter {
+    padding-left: var(--layout-gutter-tablet);
+    padding-right: var(--layout-gutter-tablet);
+  }
+}
+
+@media (min-width: 768px) {
+  .layout-gutter {
+    padding-left: var(--layout-gutter-desktop);
+    padding-right: var(--layout-gutter-desktop);
   }
 }
 

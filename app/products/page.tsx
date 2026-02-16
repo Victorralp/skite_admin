@@ -5,6 +5,7 @@ import StatsCard from '@/components/StatsCard';
 import ProductDetailModal from '@/components/ProductDetailModal';
 import { MoreVertical } from 'lucide-react';
 import PageContainer from '@/components/layout/PageContainer';
+import DataTableShell from '@/components/layout/DataTableShell';
 import { Product } from '@/data/dashboard';
 import { cn } from '@/lib/utils';
 import {
@@ -523,6 +524,8 @@ export default function ProductsPage() {
                     }}
                     onClear={() => {
                       setCreatorFilterValue('');
+                      setAppliedCreatorFilterValue('');
+                      setCreatorFilterActive(false);
                     }}
                   />
                 )}
@@ -558,6 +561,8 @@ export default function ProductsPage() {
                     }}
                     onClear={() => {
                       setStatusFilter('all');
+                      setAppliedStatusFilter('all');
+                      setStatusFilterActive(false);
                     }}
                   />
                 )}
@@ -587,6 +592,8 @@ export default function ProductsPage() {
                     }}
                     onClear={() => {
                       setTypeFilterValue('');
+                      setAppliedTypeFilterValue('');
+                      setTypeFilterActive(false);
                     }}
                   />
                 )}
@@ -624,6 +631,9 @@ export default function ProductsPage() {
                     onClear={() => {
                       setPriceMinValue('');
                       setPriceMaxValue('');
+                      setAppliedPriceMinValue('');
+                      setAppliedPriceMaxValue('');
+                      setPriceFilterActive(false);
                     }}
                   />
                 )}
@@ -661,6 +671,9 @@ export default function ProductsPage() {
                     onClear={() => {
                       setRevenueMinValue('');
                       setRevenueMaxValue('');
+                      setAppliedRevenueMinValue('');
+                      setAppliedRevenueMaxValue('');
+                      setRevenueFilterActive(false);
                     }}
                   />
                 )}
@@ -673,7 +686,7 @@ export default function ProductsPage() {
           </div>
 
           {/* Table */}
-          <div className="rounded-lg border border-border-primary flex flex-col w-full shadow-none p-1 gap-1" style={{ backgroundColor: '#F9F9FB' }}>
+          <DataTableShell className="flex flex-col w-full shadow-none p-1 gap-1 bg-surface-secondary">
             {/* Table Header */}
             <div
               className="grid grid-cols-[repeat(7,minmax(0,1fr))_24px] items-center h-[30px] shrink-0 gap-4"
@@ -745,7 +758,7 @@ export default function ProductsPage() {
                 </button>
               </div>
             </div>
-          </div>
+          </DataTableShell>
         </div>
       </PageContainer>
 

@@ -5,6 +5,7 @@ import StatsCard from '@/components/StatsCard';
 import UserDetailModal from '@/components/UserDetailModal';
 import { MoreVertical } from 'lucide-react';
 import PageContainer from '@/components/layout/PageContainer';
+import DataTableShell from '@/components/layout/DataTableShell';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,11 +46,15 @@ type UsersTableUser = User & {
   rawStatus?: string;
 };
 
+const USER_STATUS_OPTIONS = ['active', 'inactive', 'pending'] as const;
+
 export default function UsersPage() {
   const [dateJoinedFilterActive, setDateJoinedFilterActive] = useState(false);
   const [purchaseCountFilterActive, setPurchaseCountFilterActive] = useState(false);
   const [spendFilterActive, setSpendFilterActive] = useState(false);
+  const [statusFilterActive, setStatusFilterActive] = useState(false);
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive' | 'pending'>('all');
+  const [appliedStatusFilter, setAppliedStatusFilter] = useState<'all' | 'active' | 'inactive' | 'pending'>('all');
   const [dateJoinedFrom, setDateJoinedFrom] = useState('');
   const [dateJoinedTo, setDateJoinedTo] = useState('');
   const [appliedDateJoinedFrom, setAppliedDateJoinedFrom] = useState('');
@@ -89,6 +94,7 @@ export default function UsersPage() {
   const dateJoinedFilterRef = useRef<HTMLDivElement>(null);
   const purchaseCountFilterRef = useRef<HTMLDivElement>(null);
   const spendFilterRef = useRef<HTMLDivElement>(null);
+  const statusFilterRef = useRef<HTMLDivElement>(null);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -101,6 +107,9 @@ export default function UsersPage() {
       }
       if (spendFilterRef.current && !spendFilterRef.current.contains(event.target as Node)) {
         setSpendFilterActive(false);
+      }
+      if (statusFilterRef.current && !statusFilterRef.current.contains(event.target as Node)) {
+        setStatusFilterActive(false);
       }
     };
 
@@ -313,7 +322,7 @@ export default function UsersPage() {
           purchases: parseNumber(appliedPurchaseCountValue),
           minSpend: parseNumber(appliedSpendMinValue),
           maxSpend: parseNumber(appliedSpendMaxValue),
-          status: statusFilter === 'all' ? undefined : statusFilter
+          status: appliedStatusFilter === 'all' ? undefined : appliedStatusFilter
         });
         if (!isMounted) return;
         setUsers(response.users.map(mapUser));
@@ -350,7 +359,7 @@ export default function UsersPage() {
     appliedSpendMaxValue,
     appliedSpendMinValue,
     currentPage,
-    statusFilter
+    appliedStatusFilter
   ]);
 
   useEffect(() => {
@@ -361,7 +370,7 @@ export default function UsersPage() {
     appliedPurchaseCountValue,
     appliedSpendMaxValue,
     appliedSpendMinValue,
-    statusFilter
+    appliedStatusFilter
   ]);
 
   const handleViewUserDetails = async (user: UsersTableUser) => {
@@ -500,6 +509,7 @@ export default function UsersPage() {
                     setDateJoinedFilterActive(!dateJoinedFilterActive);
                     setPurchaseCountFilterActive(false);
                     setSpendFilterActive(false);
+                    setStatusFilterActive(false);
                   }}
                 />
                 {dateJoinedFilterActive && (
@@ -518,6 +528,9 @@ export default function UsersPage() {
                     onClear={() => {
                       setDateJoinedFrom('');
                       setDateJoinedTo('');
+                      setAppliedDateJoinedFrom('');
+                      setAppliedDateJoinedTo('');
+                      setDateJoinedFilterActive(false);
                     }}
                   />
                 )}
@@ -531,6 +544,7 @@ export default function UsersPage() {
                     setPurchaseCountFilterActive(!purchaseCountFilterActive);
                     setDateJoinedFilterActive(false);
                     setSpendFilterActive(false);
+                    setStatusFilterActive(false);
                   }}
                 />
                 {purchaseCountFilterActive && (
@@ -544,6 +558,8 @@ export default function UsersPage() {
                     }}
                     onClear={() => {
                       setPurchaseCountValue('');
+                      setAppliedPurchaseCountValue('');
+                      setPurchaseCountFilterActive(false);
                     }}
                   />
                 )}
@@ -557,6 +573,7 @@ export default function UsersPage() {
                     setSpendFilterActive(!spendFilterActive);
                     setDateJoinedFilterActive(false);
                     setPurchaseCountFilterActive(false);
+                    setStatusFilterActive(false);
                   }}
                 />
                 {spendFilterActive && (
@@ -575,31 +592,48 @@ export default function UsersPage() {
                     onClear={() => {
                       setSpendMinValue('');
                       setSpendMaxValue('');
+                      setAppliedSpendMinValue('');
+                      setAppliedSpendMaxValue('');
+                      setSpendFilterActive(false);
                     }}
                   />
                 )}
               </div>
 
-              <button
-                onClick={() => {
-                  setStatusFilter(
-                    statusFilter === 'all' ? 'active' :
-                      statusFilter === 'active' ? 'inactive' :
-                        statusFilter === 'inactive' ? 'pending' : 'all'
-                  );
-                }}
-                className={cn(
-                  "flex items-center gap-1.5 pl-2.5 pr-3 h-5 rounded-full border border-dashed transition-colors box-border",
-                  statusFilter !== 'all' ? "border-brand-primary" : "border-border-primary hover:bg-gray-50"
+              <div className="relative overflow-visible" ref={statusFilterRef}>
+                <FilterPill
+                  label={
+                    appliedStatusFilter === 'all'
+                      ? 'Status'
+                      : appliedStatusFilter.charAt(0).toUpperCase() + appliedStatusFilter.slice(1)
+                  }
+                  active={statusFilterActive || appliedStatusFilter !== 'all'}
+                  onClick={() => {
+                    setStatusFilterActive(!statusFilterActive);
+                    setDateJoinedFilterActive(false);
+                    setPurchaseCountFilterActive(false);
+                    setSpendFilterActive(false);
+                  }}
+                />
+                {statusFilterActive && (
+                  <StatusFilterDropdown
+                    options={[...USER_STATUS_OPTIONS]}
+                    selected={statusFilter}
+                    onSelect={(value) =>
+                      setStatusFilter(value as 'all' | 'active' | 'inactive' | 'pending')
+                    }
+                    onApply={() => {
+                      setAppliedStatusFilter(statusFilter);
+                      setStatusFilterActive(false);
+                    }}
+                    onClear={() => {
+                      setStatusFilter('all');
+                      setAppliedStatusFilter('all');
+                      setStatusFilterActive(false);
+                    }}
+                  />
                 )}
-              >
-                <FilterPlusIcon className={cn("w-2.5 h-2.5", statusFilter !== 'all' ? "text-brand-primary" : "text-text-secondary")} />
-                <span className={cn("text-[11px] leading-[13px] font-sans", statusFilter !== 'all' ? "text-brand-primary" : "text-text-secondary")}>
-                  {statusFilter === 'all' ? 'Status' :
-                    statusFilter === 'active' ? 'Active' :
-                      statusFilter === 'inactive' ? 'Inactive' : 'Pending'}
-                </span>
-              </button>
+              </div>
             </div>
             <button className="flex items-center gap-[2px] pl-[7px] pr-[10px] py-[5px] h-[24px] bg-white border border-border-primary rounded-lg shadow-button hover:bg-gray-50 transition-colors box-border">
               <SlidersHorizontalIcon className="h-[14px] w-[14px] text-text-secondary" />
@@ -608,17 +642,17 @@ export default function UsersPage() {
           </div>
 
           {/* Table */}
-          <div className="rounded-lg border border-border-primary flex flex-col w-full shadow-none p-1 gap-1 bg-surface-secondary overflow-x-auto">
+          <DataTableShell className="flex flex-col w-full shadow-none p-1 gap-1 bg-surface-secondary">
             {/* Table Header */}
             <div className="flex items-center h-8 shrink-0 px-6 gap-4 min-w-[600px]">
-              <div className="w-[200px] sm:w-[240px] lg:w-[266px] text-caption-lg font-medium text-text-primary">User</div>
-              <div className="hidden sm:block w-[80px] md:w-[100px] lg:w-[120px] text-caption-lg font-medium text-text-primary">Joined</div>
-              <div className="w-[70px] sm:w-[80px] md:w-[100px] lg:w-[120px] text-caption-lg font-medium text-text-primary">Purchases</div>
-              <div className="w-[80px] sm:w-[100px] lg:w-[120px] text-caption-lg font-medium text-text-primary">Total Spent</div>
-              <div className="hidden md:block w-[100px] lg:w-[120px] text-caption-lg font-medium text-text-primary">Subscriptions</div>
-              <div className="hidden lg:block w-[120px] text-caption-lg font-medium text-text-primary">Last Active</div>
-              <div className="w-[50px] text-caption-lg font-medium text-text-primary">Status</div>
-              <div className="flex-1 min-w-[18px] flex justify-end opacity-0">•</div>
+              <div className="flex-[2.4] min-w-0 text-caption-lg font-medium text-text-primary">User</div>
+              <div className="hidden sm:block sm:flex-1 min-w-0 text-caption-lg font-medium text-text-primary">Joined</div>
+              <div className="flex-1 min-w-0 text-caption-lg font-medium text-text-primary">Purchases</div>
+              <div className="flex-1 min-w-0 text-caption-lg font-medium text-text-primary">Total Spent</div>
+              <div className="hidden md:block md:flex-1 min-w-0 text-caption-lg font-medium text-text-primary">Subscriptions</div>
+              <div className="hidden lg:block lg:flex-1 min-w-0 text-caption-lg font-medium text-text-primary">Last Active</div>
+              <div className="flex-[0.9] min-w-0 text-caption-lg font-medium text-text-primary">Status</div>
+              <div className="w-[18px] flex-none opacity-0">•</div>
             </div>
 
             {/* Table Body */}
@@ -680,7 +714,7 @@ export default function UsersPage() {
                 </button>
               </div>
             </div>
-          </div>
+          </DataTableShell>
         </div>
       </PageContainer>
 
@@ -748,6 +782,15 @@ function FilterDropdown({
   onApply: () => void;
   onClear: () => void;
 }) {
+  const openNativeDatePicker = (input: HTMLInputElement & { showPicker?: () => void }) => {
+    if (!showCalendar || typeof input.showPicker !== 'function') return;
+    try {
+      input.showPicker();
+    } catch {
+      // Ignore browsers/contexts that reject picker opening outside strict gestures.
+    }
+  };
+
   return (
     <div
       className="absolute left-[-0.75px] top-[27px] w-[185px] h-[154px] bg-white border border-brand-primary rounded-[16px] flex flex-col justify-center items-start p-3 gap-[10px] shadow-dropdown z-50"
@@ -769,6 +812,13 @@ function FilterDropdown({
               type={showCalendar ? "date" : "number"}
               value={fromValue}
               onChange={(e) => onFromChange(e.target.value)}
+              onClick={(event) => openNativeDatePicker(event.currentTarget)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ' || event.key === 'ArrowDown') {
+                  event.preventDefault();
+                  openNativeDatePicker(event.currentTarget);
+                }
+              }}
               className="w-full bg-transparent text-[12px] font-medium text-text-primary leading-[14px] font-sans outline-none border-none text-right"
               placeholder=""
             />
@@ -788,6 +838,13 @@ function FilterDropdown({
               type={showCalendar ? "date" : "number"}
               value={toValue}
               onChange={(e) => onToChange(e.target.value)}
+              onClick={(event) => openNativeDatePicker(event.currentTarget)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ' || event.key === 'ArrowDown') {
+                  event.preventDefault();
+                  openNativeDatePicker(event.currentTarget);
+                }
+              }}
               className="w-full bg-transparent text-[12px] font-medium text-text-primary leading-[14px] font-sans outline-none border-none text-right"
               placeholder=""
             />
@@ -866,6 +923,78 @@ function SingleValueFilterDropdown({
   );
 }
 
+function StatusFilterDropdown({
+  options,
+  selected,
+  onSelect,
+  onApply,
+  onClear
+}: {
+  options: string[];
+  selected: string;
+  onSelect: (value: string) => void;
+  onApply: () => void;
+  onClear: () => void;
+}) {
+  const normalizedOptions = options.length > 0 ? options : ['active', 'inactive', 'pending'];
+  const formatLabel = (value: string) =>
+    value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+
+  return (
+    <div
+      className="absolute left-[-0.75px] top-[27px] w-[180px] bg-white border border-border-brand rounded-[16px] flex flex-col items-start p-2 gap-1"
+      style={{
+        boxShadow: '0px 116px 46px rgba(0, 0, 0, 0.01), 0px 65px 39px rgba(0, 0, 0, 0.05), 0px 29px 29px rgba(0, 0, 0, 0.09), 0px 7px 16px rgba(0, 0, 0, 0.1)',
+        zIndex: 50
+      }}
+    >
+      <button
+        type="button"
+        onClick={() => onSelect('all')}
+        className={cn(
+          "w-full h-8 px-2 rounded-md text-left text-[12px] leading-[14px] font-sans",
+          selected === 'all' ? "text-text-brand bg-surface-secondary" : "text-text-secondary hover:bg-surface-secondary"
+        )}
+      >
+        All
+      </button>
+      {normalizedOptions.map((status) => (
+        <button
+          key={status}
+          type="button"
+          onClick={() => onSelect(status)}
+          className={cn(
+            "w-full h-8 px-2 rounded-md text-left text-[12px] leading-[14px] font-sans",
+            selected === status ? "text-text-brand bg-surface-secondary" : "text-text-secondary hover:bg-surface-secondary"
+          )}
+        >
+          {formatLabel(status)}
+        </button>
+      ))}
+      <div className="w-full pt-1 flex items-center gap-2">
+        <button
+          type="button"
+          onClick={onClear}
+          className="w-full h-8 rounded-[9px] border border-border-primary bg-white text-[13px] font-medium text-text-secondary leading-4 font-sans"
+        >
+          Clear
+        </button>
+        <button
+          type="button"
+          onClick={onApply}
+          className="w-full h-8 rounded-[9px] text-[13px] font-medium text-white leading-4 font-sans"
+          style={{
+            background: 'linear-gradient(180deg, #5F2EFC 22.58%, #4E18FC 100%)',
+            boxShadow: 'inset 0px 1.5px 1px rgba(255, 255, 255, 0.11)'
+          }}
+        >
+          Apply
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function UserRow({ user, isPending, onViewDetails, onToggleBanUser }: { user: any; isPending: boolean; onViewDetails: () => void; onToggleBanUser: () => void }) {
   const statusConfig = {
     Active: {
@@ -909,7 +1038,7 @@ function UserRow({ user, isPending, onViewDetails, onToggleBanUser }: { user: an
       onClick={onViewDetails}
     >
       {/* User */}
-      <div className="flex items-center gap-1.5 w-[200px] sm:w-[240px] lg:w-[266px]">
+      <div className="flex items-center gap-1.5 flex-[2.4] min-w-0">
         <img
           src={user.avatar || '/image.png'}
           alt={user.name || 'User avatar'}
@@ -925,22 +1054,22 @@ function UserRow({ user, isPending, onViewDetails, onToggleBanUser }: { user: an
       </div>
 
       {/* Joined - Hidden on mobile */}
-      <div className="hidden sm:block w-[80px] md:w-[100px] lg:w-[120px] text-body-sm text-text-primary leading-4 truncate">{user.joined}</div>
+      <div className="hidden sm:block sm:flex-1 min-w-0 text-body-sm text-text-primary leading-4 truncate">{user.joined}</div>
 
       {/* Purchases */}
-      <div className="w-[70px] sm:w-[80px] md:w-[100px] lg:w-[120px] text-body-sm text-text-primary leading-4 truncate">{user.purchases}</div>
+      <div className="flex-1 min-w-0 text-body-sm text-text-primary leading-4 truncate">{user.purchases}</div>
 
       {/* Total Spent */}
-      <div className="w-[80px] sm:w-[100px] lg:w-[120px] text-body-sm text-text-primary leading-4 truncate">₦{user.spent.toLocaleString()}</div>
+      <div className="flex-1 min-w-0 text-body-sm text-text-primary leading-4 truncate">₦{user.spent.toLocaleString()}</div>
 
       {/* Subscriptions - Hidden on mobile and small tablets */}
-      <div className="hidden md:block w-[100px] lg:w-[120px] text-body-sm text-text-primary leading-4 truncate">{user.subscriptions}</div>
+      <div className="hidden md:block md:flex-1 min-w-0 text-body-sm text-text-primary leading-4 truncate">{user.subscriptions}</div>
 
       {/* Last Active - Hidden on mobile and tablets */}
-      <div className="hidden lg:block w-[120px] text-caption-lg text-text-secondary leading-[14px] truncate">{user.lastActive}</div>
+      <div className="hidden lg:block lg:flex-1 min-w-0 text-caption-lg text-text-secondary leading-[14px] truncate">{user.lastActive}</div>
 
       {/* Status */}
-      <div className="w-[50px]">
+      <div className="flex-[0.9] min-w-0">
         <span className={cn(
           "inline-flex items-center justify-center gap-0.5 px-[6px] py-[1px] pl-[3px] rounded-[4px] h-[14px] w-fit text-[10px] leading-3 font-medium font-sans no-underline",
           status.bg,
@@ -953,7 +1082,7 @@ function UserRow({ user, isPending, onViewDetails, onToggleBanUser }: { user: an
 
       {/* Actions */}
       <div
-        className="relative flex-1 min-w-[18px] flex justify-end items-center"
+        className="relative w-[18px] flex-none flex justify-end items-center"
         onClick={(event) => event.stopPropagation()}
       >
         <DropdownMenu>

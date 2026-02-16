@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import DataTableShell from '@/components/layout/DataTableShell';
 
 const personalInfo = [
     { label: 'Full Name', value: 'Mfonobong Essien', status: 'verified' },
@@ -47,11 +48,11 @@ export default function ComplianceTab() {
         <div className="flex flex-col w-full bg-surface-secondary rounded-b-[36px] p-6 gap-6">
             <div className="flex flex-col gap-2">
                 {/* Toggle Tabs */}
-                <div className="flex items-center p-1 gap-[3px] w-[295px] bg-surface-secondary border border-border-primary rounded-lg">
+                <div className="inline-flex items-center p-1 gap-[3px] bg-surface-secondary border border-border-primary rounded-lg">
                     <button
                         onClick={() => setActiveTab('Verification')}
                         className={cn(
-                            "flex items-center justify-center px-4 py-[7px] rounded-md font-sans text-body-sm transition-all w-[99px] h-[30px]",
+                            "flex h-8 items-center justify-center rounded-md px-4 py-[7px] font-sans text-body-sm transition-all",
                             activeTab === 'Verification'
                                 ? "bg-white text-text-primary shadow-tab-soft"
                                 : "bg-surface-secondary text-text-tertiary"
@@ -62,7 +63,7 @@ export default function ComplianceTab() {
                     <button
                         onClick={() => setActiveTab('Restrictions')}
                         className={cn(
-                            "flex items-center justify-center px-4 py-[7px] rounded-md font-sans text-body-sm transition-all w-[103px] h-[30px]",
+                            "flex h-8 items-center justify-center rounded-md px-4 py-[7px] font-sans text-body-sm transition-all",
                             activeTab === 'Restrictions'
                                 ? "bg-white text-text-primary shadow-tab-soft"
                                 : "bg-surface-secondary text-text-tertiary"
@@ -73,7 +74,7 @@ export default function ComplianceTab() {
                     <button
                         onClick={() => setActiveTab('Reports')}
                         className={cn(
-                            "flex items-center justify-center px-4 py-[7px] rounded-md font-sans text-body-sm transition-all w-[79px] h-[30px]",
+                            "flex h-8 items-center justify-center rounded-md px-4 py-[7px] font-sans text-body-sm transition-all",
                             activeTab === 'Reports'
                                 ? "bg-white text-text-primary shadow-tab-soft"
                                 : "bg-surface-secondary text-text-tertiary"
@@ -91,11 +92,11 @@ export default function ComplianceTab() {
                             <h3 className="font-sans text-heading-sm text-text-primary">
                                 Personal Info
                             </h3>
-                            <div className="flex flex-wrap gap-2">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2">
                                 {personalInfo.map((info, index) => (
                                     <div
                                         key={index}
-                                        className="flex flex-col justify-center p-4 gap-[6px] w-[259px] bg-surface-secondary border border-border-primary rounded-lg"
+                                        className="flex flex-col justify-center p-4 gap-[6px] min-w-0 bg-surface-secondary border border-border-primary rounded-lg"
                                     >
                                         <div className="flex items-center justify-between gap-1">
                                             <span className="font-sans font-normal text-[13px] leading-[16px] text-text-secondary">
@@ -137,21 +138,22 @@ export default function ComplianceTab() {
                             <h3 className="font-sans text-heading-sm text-text-primary">
                                 Documents
                             </h3>
-                            <div className="flex items-center gap-2">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2">
                                 {documents.map((doc, index) => (
                                     <div
                                         key={index}
-                                        className="flex flex-col w-[210px] min-w-[200px] border border-border-secondary rounded-lg overflow-hidden"
+                                        className="flex flex-col min-w-0 border border-border-secondary rounded-lg overflow-hidden"
                                     >
                                         {/* Document Preview */}
-                                        <div
-                                            className="relative w-full h-[109px] bg-cover bg-center p-2"
-                                            style={{
-                                                backgroundImage: `linear-gradient(0deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)), url(${doc.image})`
-                                            }}
-                                        >
+                                        <div className="relative h-[109px] w-full overflow-hidden p-2">
+                                            <img
+                                                src={doc.image}
+                                                alt={doc.name}
+                                                className="absolute inset-0 h-full w-full object-cover"
+                                            />
+                                            <div className="absolute inset-0 bg-black/5" />
                                             {doc.verified && (
-                                                <div className="flex items-center justify-center gap-0.5 px-2 py-1 pl-1 bg-white rounded-full w-fit">
+                                                <div className="relative z-[1] flex w-fit items-center justify-center gap-0.5 rounded-full bg-white px-2 py-1 pl-1">
                                                     <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                         <circle cx="6.5" cy="6.5" r="5.5" stroke="#239B73" strokeWidth="1"/>
                                                         <path d="M4.5 6.5L6 8L8.5 5.5" stroke="#239B73" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
@@ -223,17 +225,18 @@ export default function ComplianceTab() {
                 )}
 
                 {activeTab === 'Reports' && (
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-2 xl:flex-row">
                         {/* Reports Table */}
-                        <div className="flex-1 flex flex-col p-1 gap-1 bg-surface-secondary rounded-xl">
+                        <DataTableShell className="flex flex-1 flex-col gap-1 rounded-xl bg-surface-secondary p-1">
+                            <div className="min-w-[720px]">
                             {/* Table Header */}
-                            <div className="flex items-center px-4 py-2 gap-4">
-                                <span className="w-[85px] font-sans text-body-sm text-text-secondary">Date</span>
+                            <div className="flex items-center gap-4 px-4 py-2">
+                                <span className="basis-[14%] font-sans text-body-sm text-text-secondary">Date</span>
                                 <span className="flex-1 font-sans text-body-sm text-text-secondary">Reporter</span>
-                                <span className="w-[72px] font-sans text-body-sm text-text-secondary">Type</span>
-                                <span className="w-[169px] font-sans text-body-sm text-text-secondary">Reason</span>
-                                <span className="w-[76px] font-sans text-body-sm text-text-secondary">Status</span>
-                                <span className="w-[78px] font-sans text-body-sm text-text-secondary">Action Taken</span>
+                                <span className="basis-[12%] font-sans text-body-sm text-text-secondary">Type</span>
+                                <span className="basis-[24%] font-sans text-body-sm text-text-secondary">Reason</span>
+                                <span className="basis-[14%] font-sans text-body-sm text-text-secondary">Status</span>
+                                <span className="basis-[16%] font-sans text-body-sm text-text-secondary">Action Taken</span>
                             </div>
 
                             {/* Table Body */}
@@ -246,19 +249,19 @@ export default function ComplianceTab() {
                                             index !== reports.length - 1 && "border-b border-border-primary"
                                         )}
                                     >
-                                        <span className="w-[85px] font-sans text-body-sm text-text-primary">
+                                        <span className="basis-[14%] font-sans text-body-sm text-text-primary">
                                             {report.date}
                                         </span>
                                         <span className="flex-1 font-sans text-body-sm text-text-primary">
                                             {report.reporter}
                                         </span>
-                                        <span className="w-[72px] font-sans text-body-sm text-text-primary">
+                                        <span className="basis-[12%] font-sans text-body-sm text-text-primary">
                                             {report.type}
                                         </span>
-                                        <span className="w-[169px] font-sans text-body-sm text-text-primary">
+                                        <span className="basis-[24%] font-sans text-body-sm text-text-primary">
                                             {report.reason}
                                         </span>
-                                        <div className="w-[76px]">
+                                        <div className="basis-[14%]">
                                             {report.status === 'Resolved' ? (
                                                 <div className="flex items-center justify-center gap-0.5 px-[6px] py-[1px] pl-[3px] bg-surface-success rounded h-[14px] w-fit">
                                                     <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -282,26 +285,27 @@ export default function ComplianceTab() {
                                                 </div>
                                             )}
                                         </div>
-                                        <span className="w-[78px] font-sans text-body-sm text-text-primary">
+                                        <span className="basis-[16%] font-sans text-body-sm text-text-primary">
                                             {report.action}
                                         </span>
                                     </div>
                                 ))}
                             </div>
-                        </div>
+                            </div>
+                        </DataTableShell>
 
                         {/* Divider */}
-                        <div className="w-px bg-[#EBEBEB]" />
+                        <div className="hidden w-px bg-[#EBEBEB] xl:block" />
 
                         {/* Report Trends */}
-                        <div className="flex flex-col p-1 gap-1 w-[256px]">
+                        <div className="flex w-full flex-col gap-1 p-1 xl:w-[256px]">
                             <h3 className="font-sans text-heading-sm text-text-primary py-2">
                                 Report Trends
                             </h3>
                             <div className="flex flex-col items-center p-6 gap-4 bg-white border border-border-primary rounded-lg flex-1 justify-center">
                                 {/* Pie Chart */}
-                                <div className="relative w-[170px] h-[170px]">
-                                    <svg width="170" height="170" viewBox="0 0 170 170">
+                                <div className="relative aspect-square w-full max-w-[170px]">
+                                    <svg viewBox="0 0 170 170" className="h-full w-full">
                                         {/* Spam - 50% (Red) - Right half */}
                                         <path
                                             d="M 85,85 L 85,0 A 85,85 0 0,1 170,85 A 85,85 0 0,1 85,170 Z"
@@ -326,7 +330,7 @@ export default function ComplianceTab() {
                                     </svg>
                                     {/* Center white circle */}
                                     <div className="absolute inset-0 flex items-center justify-center">
-                                        <div className="w-[40px] h-[40px] bg-white rounded-full" />
+                                        <div className="h-[40px] w-[40px] rounded-full bg-white" />
                                     </div>
                                 </div>
 

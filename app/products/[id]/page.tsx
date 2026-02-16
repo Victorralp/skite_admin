@@ -19,6 +19,8 @@ import {
 } from 'lucide-react';
 import PageContainer from '@/components/layout/PageContainer';
 import ContentViewer from '@/components/ContentViewer';
+import TwoPaneLayout from '@/components/layout/TwoPaneLayout';
+import MediaFrame from '@/components/layout/MediaFrame';
 import { getProductById, type ProductDetailResponse } from '@/lib/api';
 
 type CourseContentItem = {
@@ -43,19 +45,68 @@ type CourseSection = {
 const isUrl = (value?: string) =>
   typeof value === 'string' && /^https?:\/\//i.test(value.trim());
 
+const normalizeString = (value: unknown) =>
+  typeof value === 'string' ? value : undefined;
+
+const trimToNonEmptyString = (value: unknown) => {
+  const normalized = normalizeString(value)?.trim();
+  return normalized && normalized.length > 0 ? normalized : undefined;
+};
+
+const pathTail = (value: unknown) => {
+  const normalized = trimToNonEmptyString(value);
+  if (!normalized) return undefined;
+  const segments = normalized.split('/').filter(Boolean);
+  return segments.length > 0 ? segments[segments.length - 1] : undefined;
+};
+
+const normalizePreviewUrl = (value: string | null) => {
+  if (typeof value !== 'string') return null;
+  let current = value.trim();
+  if (!current) return null;
+  if (isUrl(current)) return current;
+
+  for (let i = 0; i < 2; i += 1) {
+    try {
+      current = decodeURIComponent(current);
+      if (isUrl(current)) return current;
+    } catch {
+      break;
+    }
+  }
+
+  return null;
+};
+
+const normalizeUrlForComparison = (value?: string | null) => {
+  if (typeof value !== 'string') return null;
+  let current = value.trim();
+  if (!current) return null;
+  for (let i = 0; i < 2; i += 1) {
+    try {
+      const decoded = decodeURIComponent(current);
+      if (decoded === current) break;
+      current = decoded;
+    } catch {
+      break;
+    }
+  }
+  return current;
+};
+
 const isImageUrl = (value?: string) =>
   typeof value === 'string' && /\.(jpg|jpeg|png|gif|webp|bmp|svg|avif)(\?|$)/i.test(value.toLowerCase());
 
 const resolveContentType = (rawType?: string, url?: string): 'Reading' | 'Video' | 'Image' => {
-  const type = (rawType ?? '').toLowerCase();
-  const normalizedUrl = (url ?? '').toLowerCase();
+  const type = typeof rawType === 'string' ? rawType.toLowerCase() : '';
+  const normalizedUrl = typeof url === 'string' ? url.toLowerCase() : '';
   if (type.includes('image') || isImageUrl(normalizedUrl)) {
     return 'Image';
   }
   if (
     type.includes('video') ||
-    normalizedUrl.endsWith('.mp4') ||
-    normalizedUrl.endsWith('.m3u8')
+    /\.mp4($|\?)/i.test(normalizedUrl) ||
+    /\.m3u8($|\?)/i.test(normalizedUrl)
   ) {
     return 'Video';
   }
@@ -102,7 +153,7 @@ const normalizeSectionName = (value?: string, fallback = 'Content') => {
 };
 
 const stripHtml = (value?: string) => {
-  if (!value) return '';
+  if (typeof value !== 'string' || value.length === 0) return '';
   return value
     .replace(/<[^>]*>/g, ' ')
     .replace(/&nbsp;/gi, ' ')
@@ -276,20 +327,16 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   const [isVideoSettingsOpen, setIsVideoSettingsOpen] = useState(false);
   const [videoError, setVideoError] = useState<string | null>(null);
 
-  const previewContentUrl = searchParams?.get('contentUrl') ?? null;
+  const rawPreviewContentUrl = searchParams?.get('contentUrl') ?? null;
+  const previewContentUrl = useMemo(
+    () => normalizePreviewUrl(rawPreviewContentUrl),
+    [rawPreviewContentUrl]
+  );
   const previewContentTypeParam = searchParams?.get('contentType') ?? null;
   const previewContentLabel = searchParams?.get('contentLabel') ?? null;
   const previewContentType = resolveContentType(previewContentTypeParam ?? '', previewContentUrl ?? '');
 
   useEffect(() => {
-    const isObjectId = /^[0-9a-fA-F]{24}$/.test(params.id);
-    if (!isObjectId) {
-      setProduct(null);
-      setHasError(false);
-      setIsLoading(false);
-      return;
-    }
-
     let isMounted = true;
     const fetchProduct = async () => {
       setIsLoading(true);
@@ -314,62 +361,167 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   }, [params.id]);
 
   const courseSections = useMemo<CourseSection[]>(() => {
-    const builtSections: CourseSection[] = [];
+    try {
+      const builtSections: CourseSection[] = [];
 
-    const ensureSection = (name?: string, fallback = 'Content') => {
-      const normalized = normalizeSectionName(name, fallback);
-      let section = builtSections.find((entry) => entry.name === normalized);
-      if (section) return section;
-      section = {
-        id: `section-${builtSections.length + 1}-${normalized}`,
-        label: `${String(builtSections.length + 1).padStart(2, '0')} ${normalized}`,
-        name: normalized,
-        items: []
+      const ensureSection = (name?: string, fallback = 'Content') => {
+        const normalized = normalizeSectionName(name, fallback);
+        let section = builtSections.find((entry) => entry.name === normalized);
+        if (section) return section;
+        section = {
+          id: `section-${builtSections.length + 1}-${normalized}`,
+          label: `${String(builtSections.length + 1).padStart(2, '0')} ${normalized}`,
+          name: normalized,
+          items: []
+        };
+        builtSections.push(section);
+        return section;
       };
-      builtSections.push(section);
-      return section;
-    };
 
-    if (Array.isArray(product?.sections)) {
-      product.sections.forEach((section, sectionIndex) => {
-        const targetSection = ensureSection(section.name, `Section ${sectionIndex + 1}`);
-        if (!Array.isArray(section.contents)) return;
+      if (Array.isArray(product?.sections)) {
+        product.sections.forEach((section, sectionIndex) => {
+          const targetSection = ensureSection(section.name, `Section ${sectionIndex + 1}`);
+          if (!Array.isArray(section.contents)) return;
 
-        section.contents.forEach((entry, itemIndex) => {
-          const fileData = entry.fileData ?? entry.file_data;
-          const fileRecord = fileData as Record<string, unknown> | undefined;
+          section.contents.forEach((entry, itemIndex) => {
+            const fileData = entry.fileData ?? entry.file_data;
+            const fileRecord = fileData as Record<string, unknown> | undefined;
+            const hlsUrl = firstValidUrl(
+              fileData?.m3u8,
+              readOptionalString(fileRecord, 'm3u8Url'),
+              readOptionalString(fileRecord, 'm3u8_url'),
+              readOptionalString(fileRecord, 'hls')
+            );
+            const fallbackVideoUrl = firstValidUrl(
+              fileData?.mp4,
+              fileData?.original,
+              isUrl(entry.body) ? entry.body : undefined
+            );
+            const url = pickPreferredContentUrl({
+              rawType: fileData?.type ?? entry.type,
+              fileOriginal: fileData?.original,
+              fileMp4: fileData?.mp4,
+              fileM3u8: hlsUrl,
+              bodyUrl: isUrl(entry.body) ? entry.body : undefined
+            });
+
+            if (!url) return;
+
+            const type = resolveContentType(fileData?.type ?? entry.type, url);
+            const title =
+              trimToNonEmptyString(entry.title) ||
+              pathTail(fileData?.key) ||
+              `Content ${itemIndex + 1}`;
+            const description =
+              typeof entry.body === 'string' && !isUrl(entry.body)
+                ? entry.body.trim()
+                : undefined;
+            const metaPieces: string[] = [type];
+            const status = trimToNonEmptyString(fileData?.status);
+            if (status) metaPieces.push(status);
+
+            targetSection.items.push({
+              id: `${targetSection.id}-item-${itemIndex + 1}-${title}`,
+              title,
+              url,
+              hlsUrl,
+              fallbackVideoUrl,
+              type,
+              description,
+              meta: metaPieces.join(' • '),
+              sectionId: targetSection.id
+            });
+          });
+        });
+      }
+
+      if (
+        builtSections.every((entry) => entry.items.length === 0) &&
+        Array.isArray(product?.contents)
+      ) {
+        const targetSection = ensureSection('Content');
+        product.contents.forEach((item, itemIndex) => {
+          if (!item) return;
+          if (typeof item === 'string') {
+            const type = resolveContentType(undefined, item);
+            targetSection.items.push({
+              id: `${targetSection.id}-item-${itemIndex + 1}`,
+              title: `Content ${itemIndex + 1}`,
+              url: item,
+              type,
+              meta: type,
+              sectionId: targetSection.id
+            });
+            return;
+          }
+
+          const maybeObject = item as {
+            original?: string;
+            type?: string;
+            key?: string;
+            status?: string;
+            body?: string;
+            title?: string;
+            fileData?: {
+              original?: string;
+              mp4?: string;
+              m3u8?: string;
+              type?: string;
+              key?: string;
+              status?: string;
+            };
+            file_data?: {
+              original?: string;
+              mp4?: string;
+              m3u8?: string;
+              type?: string;
+              key?: string;
+              status?: string;
+            };
+          };
+
+          const nestedFile = maybeObject.fileData ?? maybeObject.file_data;
+          const nestedFileRecord = nestedFile as Record<string, unknown> | undefined;
+          const maybeRecord = maybeObject as Record<string, unknown>;
           const hlsUrl = firstValidUrl(
-            fileData?.m3u8,
-            readOptionalString(fileRecord, 'm3u8Url'),
-            readOptionalString(fileRecord, 'm3u8_url'),
-            readOptionalString(fileRecord, 'hls')
+            nestedFile?.m3u8,
+            readOptionalString(maybeRecord, 'm3u8'),
+            readOptionalString(maybeRecord, 'm3u8Url'),
+            readOptionalString(maybeRecord, 'm3u8_url'),
+            readOptionalString(nestedFileRecord, 'm3u8Url'),
+            readOptionalString(nestedFileRecord, 'm3u8_url'),
+            readOptionalString(nestedFileRecord, 'hls')
           );
           const fallbackVideoUrl = firstValidUrl(
-            fileData?.mp4,
-            fileData?.original,
-            isUrl(entry.body) ? entry.body : undefined
+            nestedFile?.mp4,
+            nestedFile?.original,
+            maybeObject.original,
+            isUrl(maybeObject.body) ? maybeObject.body : undefined
           );
           const url = pickPreferredContentUrl({
-            rawType: fileData?.type ?? entry.type,
-            fileOriginal: fileData?.original,
-            fileMp4: fileData?.mp4,
+            rawType: maybeObject.type ?? nestedFile?.type,
+            topLevelOriginal: maybeObject.original,
+            fileOriginal: nestedFile?.original,
+            fileMp4: nestedFile?.mp4,
             fileM3u8: hlsUrl,
-            bodyUrl: isUrl(entry.body) ? entry.body : undefined
+            bodyUrl: isUrl(maybeObject.body) ? maybeObject.body : undefined
           });
 
           if (!url) return;
 
-          const type = resolveContentType(fileData?.type ?? entry.type, url);
+          const type = resolveContentType(maybeObject.type ?? nestedFile?.type, url);
           const title =
-            entry.title?.trim() ||
-            fileData?.key?.split('/').pop() ||
+            trimToNonEmptyString(maybeObject.title) ||
+            pathTail(maybeObject.key) ||
+            pathTail(nestedFile?.key) ||
             `Content ${itemIndex + 1}`;
           const description =
-            typeof entry.body === 'string' && !isUrl(entry.body)
-              ? entry.body.trim()
+            typeof maybeObject.body === 'string' && !isUrl(maybeObject.body)
+              ? maybeObject.body.trim()
               : undefined;
+          const status = trimToNonEmptyString(maybeObject.status ?? nestedFile?.status);
           const metaPieces: string[] = [type];
-          if (fileData?.status) metaPieces.push(fileData.status);
+          if (status) metaPieces.push(status);
 
           targetSection.items.push({
             id: `${targetSection.id}-item-${itemIndex + 1}-${title}`,
@@ -383,143 +535,73 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
             sectionId: targetSection.id
           });
         });
-      });
-    }
+      }
 
-    if (
-      builtSections.every((entry) => entry.items.length === 0) &&
-      Array.isArray(product?.contents)
-    ) {
-      const targetSection = ensureSection('Content');
-      product.contents.forEach((item, itemIndex) => {
-        if (!item) return;
-        if (typeof item === 'string') {
-          const type = resolveContentType(undefined, item);
+      if (
+        builtSections.every((entry) => entry.items.length === 0) &&
+        Array.isArray(product?.product_media)
+      ) {
+        const targetSection = ensureSection('Media');
+        product.product_media.forEach((mediaValue, itemIndex) => {
+          const mediaUrl = normalizePreviewUrl(trimToNonEmptyString(mediaValue) ?? null);
+          if (!mediaUrl) return;
+          const type = resolveContentType(undefined, mediaUrl);
           targetSection.items.push({
             id: `${targetSection.id}-item-${itemIndex + 1}`,
-            title: `Content ${itemIndex + 1}`,
-            url: item,
+            title: `Media ${itemIndex + 1}`,
+            url: mediaUrl,
             type,
             meta: type,
             sectionId: targetSection.id
           });
-          return;
+        });
+      }
+
+      if (previewContentUrl) {
+        const comparablePreviewUrl = normalizeUrlForComparison(previewContentUrl);
+        const alreadyPresent = builtSections.some((section) =>
+          section.items.some(
+            (item) =>
+              normalizeUrlForComparison(item.url) === comparablePreviewUrl
+          )
+        );
+        if (!alreadyPresent) {
+          const targetSection = ensureSection('Content');
+          targetSection.items.unshift({
+            id: `${targetSection.id}-preview`,
+            title: previewContentLabel ?? 'Selected Content',
+            url: previewContentUrl,
+            type: previewContentType,
+            meta: previewContentType,
+            sectionId: targetSection.id
+          });
         }
+      }
 
-        const maybeObject = item as {
-          original?: string;
-          type?: string;
-          key?: string;
-          status?: string;
-          body?: string;
-          title?: string;
-          fileData?: {
-            original?: string;
-            mp4?: string;
-            m3u8?: string;
-            type?: string;
-            key?: string;
-            status?: string;
-          };
-          file_data?: {
-            original?: string;
-            mp4?: string;
-            m3u8?: string;
-            type?: string;
-            key?: string;
-            status?: string;
-          };
-        };
-
-        const nestedFile = maybeObject.fileData ?? maybeObject.file_data;
-        const nestedFileRecord = nestedFile as Record<string, unknown> | undefined;
-        const maybeRecord = maybeObject as Record<string, unknown>;
-        const hlsUrl = firstValidUrl(
-          nestedFile?.m3u8,
-          readOptionalString(maybeRecord, 'm3u8'),
-          readOptionalString(maybeRecord, 'm3u8Url'),
-          readOptionalString(maybeRecord, 'm3u8_url'),
-          readOptionalString(nestedFileRecord, 'm3u8Url'),
-          readOptionalString(nestedFileRecord, 'm3u8_url'),
-          readOptionalString(nestedFileRecord, 'hls')
-        );
-        const fallbackVideoUrl = firstValidUrl(
-          nestedFile?.mp4,
-          nestedFile?.original,
-          maybeObject.original,
-          isUrl(maybeObject.body) ? maybeObject.body : undefined
-        );
-        const url = pickPreferredContentUrl({
-          rawType: maybeObject.type ?? nestedFile?.type,
-          topLevelOriginal: maybeObject.original,
-          fileOriginal: nestedFile?.original,
-          fileMp4: nestedFile?.mp4,
-          fileM3u8: hlsUrl,
-          bodyUrl: isUrl(maybeObject.body) ? maybeObject.body : undefined
-        });
-
-        if (!url) return;
-
-        const type = resolveContentType(maybeObject.type ?? nestedFile?.type, url);
-        const title =
-          maybeObject.title?.trim() ||
-          maybeObject.key?.split('/').pop() ||
-          nestedFile?.key?.split('/').pop() ||
-          `Content ${itemIndex + 1}`;
-        const description =
-          typeof maybeObject.body === 'string' && !isUrl(maybeObject.body)
-            ? maybeObject.body.trim()
-            : undefined;
-        const status = maybeObject.status ?? nestedFile?.status;
-        const metaPieces: string[] = [type];
-        if (status) metaPieces.push(status);
-
-        targetSection.items.push({
-          id: `${targetSection.id}-item-${itemIndex + 1}-${title}`,
-          title,
-          url,
-          hlsUrl,
-          fallbackVideoUrl,
-          type,
-          description,
-          meta: metaPieces.join(' • '),
-          sectionId: targetSection.id
-        });
-      });
+      return builtSections.filter((entry) => entry.items.length > 0);
+    } catch (error) {
+      console.error('Failed to build course content sections', error);
+      if (!previewContentUrl) {
+        return [];
+      }
+      return [
+        {
+          id: 'section-1-Content',
+          label: '01 Content',
+          name: 'Content',
+          items: [
+            {
+              id: 'section-1-Content-preview',
+              title: previewContentLabel ?? 'Selected Content',
+              url: previewContentUrl,
+              type: previewContentType,
+              meta: previewContentType,
+              sectionId: 'section-1-Content'
+            }
+          ]
+        }
+      ];
     }
-
-    if (
-      builtSections.every((entry) => entry.items.length === 0) &&
-      Array.isArray(product?.product_media)
-    ) {
-      const targetSection = ensureSection('Media');
-      product.product_media.forEach((url, itemIndex) => {
-        if (!url) return;
-        const type = resolveContentType(undefined, url);
-        targetSection.items.push({
-          id: `${targetSection.id}-item-${itemIndex + 1}`,
-          title: `Media ${itemIndex + 1}`,
-          url,
-          type,
-          meta: type,
-          sectionId: targetSection.id
-        });
-      });
-    }
-
-    if (builtSections.every((entry) => entry.items.length === 0) && previewContentUrl) {
-      const targetSection = ensureSection('Content');
-      targetSection.items.push({
-        id: `${targetSection.id}-preview`,
-        title: previewContentLabel ?? 'Selected Content',
-        url: previewContentUrl,
-        type: previewContentType,
-        meta: previewContentType,
-        sectionId: targetSection.id
-      });
-    }
-
-    return builtSections.filter((entry) => entry.items.length > 0);
   }, [previewContentLabel, previewContentType, previewContentUrl, product]);
 
   useEffect(() => {
@@ -530,8 +612,12 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     }
 
     const allItems = courseSections.flatMap((section) => section.items);
+    const comparablePreviewUrl = normalizeUrlForComparison(previewContentUrl);
     const byUrl = previewContentUrl
-      ? allItems.find((item) => item.url === previewContentUrl)
+      ? allItems.find(
+          (item) =>
+            normalizeUrlForComparison(item.url) === comparablePreviewUrl
+        )
       : undefined;
     const byLabel =
       !byUrl && previewContentLabel
@@ -540,6 +626,11 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
           )
         : undefined;
     const preferred = byUrl ?? byLabel ?? allItems[0];
+    if (!preferred) {
+      setSelectedItemId(null);
+      setExpandedSectionId(null);
+      return;
+    }
 
     setSelectedItemId((current) => {
       if (current && allItems.some((item) => item.id === current) && !previewContentUrl) {
@@ -567,10 +658,17 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     return null;
   }, [courseSections, selectedItemId]);
 
+  const firstProductMediaUrl =
+    Array.isArray(product?.product_media)
+      ? product.product_media
+          .map((mediaValue) => normalizePreviewUrl(trimToNonEmptyString(mediaValue) ?? null))
+          .find((mediaUrl): mediaUrl is string => Boolean(mediaUrl)) ?? null
+      : null;
+
   const viewerUrl =
     selectedItem?.url ??
     previewContentUrl ??
-    product?.product_media?.[0] ??
+    firstProductMediaUrl ??
     null;
 
   const viewerType =
@@ -586,17 +684,18 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     viewerType === 'Video'
       ? selectedItem?.fallbackVideoUrl
       : null;
+  const productName = trimToNonEmptyString(product?.product_name);
   const contentTitle =
     selectedItem?.title ??
     previewContentLabel ??
-    product?.product_name ??
+    productName ??
     'Course Content';
 
+  const productDescription = stripHtml(product?.product_description);
   const contentDescription =
     selectedItem?.description ??
-    stripHtml(product?.product_description) ??
-    'No description available.';
-  const normalizedPageTitle = (product?.product_name ?? '').trim().toLowerCase();
+    (productDescription || 'No description available.');
+  const normalizedPageTitle = (productName ?? '').toLowerCase();
   const normalizedContentTitle = contentTitle.trim().toLowerCase();
   const shouldShowContentHeading =
     Boolean(selectedItem) || normalizedContentTitle !== normalizedPageTitle;
@@ -1124,7 +1223,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
   return (
     <PageContainer className="gap-6">
-      {hasError && !previewContentUrl && (
+      {hasError && (
         <div className="w-full rounded-md border border-border-danger bg-red-50 text-text-danger px-3 py-2 text-sm">
           Unable to load product. Please try again.
         </div>
@@ -1140,17 +1239,25 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
         </span>
       </button>
 
-      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,772px)_306px] gap-6 items-start">
+      <TwoPaneLayout
+        mainMin="1fr"
+        sideWidth="clamp(280px,24vw,420px)"
+        gap="clamp(0.75rem,1.5vw,1.5rem)"
+      >
         <div className="flex flex-col gap-6 w-full">
           <h1 className="font-sans text-heading-lg-bold text-text-primary line-clamp-2 h-6">
-            {product?.product_name ?? 'Course Content'}
+            {productName ?? 'Course Content'}
           </h1>
 
           <div className="flex flex-col gap-4 w-full">
             {viewerType === 'Reading' ? (
-              <div
+              <MediaFrame
                 ref={pdfFrameRef}
-                className="w-full h-[518px] rounded-lg bg-[#525659] overflow-hidden flex flex-col fullscreen:h-screen fullscreen:rounded-none"
+                minHeight="460px"
+                defaultHeight="min(56vw,72vh)"
+                maxHeight="86vh"
+                aspectRatio="auto"
+                className="bg-[#525659] flex flex-col fullscreen:h-screen fullscreen:rounded-none"
               >
                 <div className="h-[56px] bg-[#323639] shadow-viewer-header px-4 flex items-center justify-between relative">
                   <div className="flex items-center gap-2">
@@ -1302,17 +1409,21 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                     </div>
                   )}
                 </div>
-              </div>
+              </MediaFrame>
             ) : viewerType === 'Video' ? (
-              <div
+              <MediaFrame
                 ref={videoFrameRef}
-                className="w-full h-[447px] rounded-lg overflow-hidden bg-black relative flex flex-col justify-end fullscreen:h-screen fullscreen:rounded-none"
+                minHeight="360px"
+                defaultHeight="min(42vw,66vh)"
+                maxHeight="78vh"
+                aspectRatio="16 / 9"
+                className="bg-black relative flex flex-col justify-end fullscreen:h-screen fullscreen:rounded-none"
               >
                 {viewerVideoUrl ? (
                   <>
                     <video
                       ref={videoRef}
-                      className="absolute inset-0 w-full h-full object-cover"
+                      className="absolute inset-0 w-full h-full object-contain"
                       playsInline
                       onClick={togglePlayback}
                       onError={() => setVideoError('Unable to load this video.')}
@@ -1414,9 +1525,15 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 ) : (
                   <ContentViewer type="Video" />
                 )}
-              </div>
+              </MediaFrame>
             ) : (
-              <div className="w-full h-[447px] rounded-lg overflow-hidden bg-[#F9F9FB] border border-[#EBEBEB] flex items-center justify-center">
+              <MediaFrame
+                minHeight="360px"
+                defaultHeight="min(42vw,66vh)"
+                maxHeight="78vh"
+                aspectRatio="16 / 9"
+                className="bg-[#F9F9FB] border border-[#EBEBEB] flex items-center justify-center"
+              >
                 {viewerUrl ? (
                   <img
                     src={viewerUrl}
@@ -1426,7 +1543,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 ) : (
                   <ContentViewer type="Reading" />
                 )}
-              </div>
+              </MediaFrame>
             )}
 
           <div className="flex flex-col gap-[14px]">
@@ -1486,12 +1603,12 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
           </div>
         </div>
 
-        <aside className="w-full xl:w-[306px] self-stretch flex flex-col gap-6">
+        <aside className="w-full self-stretch flex flex-col gap-6">
           <h2 className="w-full h-6 font-sans text-[16px] leading-[19px] font-medium text-[#5F5971]">
             Course Content
           </h2>
 
-          <div className="box-border w-full h-[805px] border border-[#EBEBEB] rounded-[8px] bg-white px-4 pt-4 pb-2 overflow-auto">
+          <div className="box-border w-full h-[clamp(32rem,72vh,50rem)] border border-[#EBEBEB] rounded-[8px] bg-white px-4 pt-4 pb-2 overflow-auto">
             {isLoading && courseSections.length === 0 && (
               <span className="font-sans text-body-sm-regular text-text-secondary">
                 Loading content...
@@ -1575,7 +1692,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
             })}
           </div>
         </aside>
-      </div>
+      </TwoPaneLayout>
     </PageContainer>
   );
 }

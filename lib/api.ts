@@ -97,6 +97,82 @@ export type AdminUserMetricsResponse = {
   data: AdminUserMetricsData;
 };
 
+export type AdminCreatorMetricValue = {
+  value: number;
+  percentage_change?: number;
+};
+
+export type AdminCreatorFlaggedMetric = {
+  value: number;
+  flagged_today: number;
+};
+
+export type AdminCreatorPendingVerificationMetric = {
+  value: number;
+  created_today: number;
+};
+
+export type AdminCreatorMetricsData = {
+  total_creators: AdminCreatorMetricValue;
+  active_creators: AdminCreatorMetricValue;
+  flagged_creators: AdminCreatorFlaggedMetric;
+  pending_verifications: AdminCreatorPendingVerificationMetric;
+};
+
+export type AdminCreatorMetricsResponse = {
+  message?: string;
+  data?: AdminCreatorMetricsData;
+};
+
+export type AdminCreatorListingParams = {
+  page?: number;
+  limit?: number;
+  minRevenue?: number;
+  maxRevenue?: number;
+  dateFrom?: string;
+  dateTo?: string;
+  hubStatus?: string;
+  hubId?: string;
+};
+
+export type AdminCreatorListingItem = {
+  _id?: string;
+  id?: string;
+  hub?: string | { _id?: string; id?: string; hubId?: string; hub_id?: string };
+  hubId?: string;
+  hub_id?: string;
+  creatorId?: string;
+  creator_id?: string;
+  name?: string;
+  avatar?: string;
+  hub_name?: string;
+  revenue_generated?: number;
+  total_sales_count?: number;
+  total_hub_participants?: number;
+  hub_views?: number;
+  last_active?: string;
+  createdAt?: string;
+  total_transaction_count?: number;
+  active_products_count?: number;
+  total_sessions?: number;
+  hub_status?: string;
+  status?: string;
+  email?: string;
+};
+
+export type AdminCreatorListingPagination = {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
+
+export type AdminCreatorListingResponse = {
+  data: AdminCreatorListingItem[];
+  pagination: AdminCreatorListingPagination;
+  message?: string;
+};
+
 export type AdminProductListingItem = {
   _id?: string;
   id?: string;
@@ -378,6 +454,88 @@ export async function unbanAdminUser(userId: string) {
   clearAdminDashboardSessionCache();
 
   return json?.message ?? 'User unbanned successfully';
+}
+
+export async function banAdminCreatorHub(hubId: string, reason: string) {
+  if (!hubId) {
+    throw new Error('HUB_ID_REQUIRED');
+  }
+
+  if (!reason || reason.trim().length === 0) {
+    throw new Error('BAN_REASON_REQUIRED');
+  }
+
+  let idToken: string | null = null;
+  try {
+    idToken = (await auth.currentUser?.getIdToken()) ?? null;
+  } catch {
+    idToken = null;
+  }
+
+  const headers: HeadersInit = { 'content-type': 'application/json' };
+  if (idToken) {
+    headers.authorization = `Bearer ${idToken}`;
+  }
+
+  const response = await fetch(`${baseUrl()}/admin-creator/ban`, {
+    method: 'POST',
+    credentials: 'include',
+    cache: 'no-store',
+    headers,
+    body: JSON.stringify({ hubId, reason: reason.trim() })
+  });
+
+  const json = (await response
+    .json()
+    .catch(() => null)) as { success?: boolean; message?: string; error?: string } | null;
+
+  if (!response.ok || json?.success === false) {
+    const message = json?.message ?? json?.error ?? 'HUB_BAN_FAILED';
+    throw new Error(message);
+  }
+
+  clearAdminDashboardSessionCache();
+
+  return json?.message ?? 'Hub banned successfully';
+}
+
+export async function unbanAdminCreatorHub(hubId: string) {
+  if (!hubId) {
+    throw new Error('HUB_ID_REQUIRED');
+  }
+
+  let idToken: string | null = null;
+  try {
+    idToken = (await auth.currentUser?.getIdToken()) ?? null;
+  } catch {
+    idToken = null;
+  }
+
+  const headers: HeadersInit = { 'content-type': 'application/json' };
+  if (idToken) {
+    headers.authorization = `Bearer ${idToken}`;
+  }
+
+  const response = await fetch(`${baseUrl()}/admin-creator/unban`, {
+    method: 'POST',
+    credentials: 'include',
+    cache: 'no-store',
+    headers,
+    body: JSON.stringify({ hubId })
+  });
+
+  const json = (await response
+    .json()
+    .catch(() => null)) as { success?: boolean; message?: string; error?: string } | null;
+
+  if (!response.ok || json?.success === false) {
+    const message = json?.message ?? json?.error ?? 'HUB_UNBAN_FAILED';
+    throw new Error(message);
+  }
+
+  clearAdminDashboardSessionCache();
+
+  return json?.message ?? 'Hub unbanned successfully';
 }
 
 export type ProductReviewItem = {
@@ -818,6 +976,124 @@ export async function getAdminUserMetrics() {
     }
 
     return json as AdminUserMetricsData;
+  });
+}
+
+export async function getAdminCreatorMetrics() {
+  const cacheKey = getDashboardCacheKey('creator-metrics');
+  return withAdminDashboardSessionCache(cacheKey, async () => {
+    let idToken: string | null = null;
+    try {
+      idToken = (await auth.currentUser?.getIdToken()) ?? null;
+    } catch {
+      idToken = null;
+    }
+
+    const headers: HeadersInit = {};
+    if (idToken) {
+      headers.authorization = `Bearer ${idToken}`;
+    }
+
+    const response = await fetch(`${baseUrl()}/admin-creator/creators/metrics`, {
+      method: 'GET',
+      credentials: 'include',
+      cache: 'no-store',
+      headers
+    });
+
+    const json = (await response
+      .json()
+      .catch(() => null)) as
+      | AdminCreatorMetricsResponse
+      | AdminCreatorMetricsData
+      | { message?: string; error?: string; data?: AdminCreatorMetricsData }
+      | null;
+
+    if (!response.ok) {
+      const errorPayload = json as { message?: string; error?: string } | null;
+      const message = errorPayload?.message ?? errorPayload?.error ?? 'CREATOR_METRICS_FAILED';
+      throw new Error(message);
+    }
+
+    if (!json || typeof json !== 'object') {
+      throw new Error('CREATOR_METRICS_INVALID_RESPONSE');
+    }
+
+    if ('data' in json && json.data && typeof json.data === 'object') {
+      return json.data as AdminCreatorMetricsData;
+    }
+
+    return json as AdminCreatorMetricsData;
+  });
+}
+
+export async function getAdminCreators(params: AdminCreatorListingParams = {}) {
+  const cacheKey = getDashboardCacheKey(`creators:${JSON.stringify(params)}`);
+  return withAdminDashboardSessionCache(cacheKey, async () => {
+    let idToken: string | null = null;
+    try {
+      idToken = (await auth.currentUser?.getIdToken()) ?? null;
+    } catch {
+      idToken = null;
+    }
+
+    const headers: HeadersInit = {};
+    if (idToken) {
+      headers.authorization = `Bearer ${idToken}`;
+    }
+
+    const searchParams = new URLSearchParams();
+    if (params.page !== undefined) searchParams.set('page', String(params.page));
+    if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
+    if (params.minRevenue !== undefined) searchParams.set('minRevenue', String(params.minRevenue));
+    if (params.maxRevenue !== undefined) searchParams.set('maxRevenue', String(params.maxRevenue));
+    if (params.dateFrom) searchParams.set('dateFrom', params.dateFrom);
+    if (params.dateTo) searchParams.set('dateTo', params.dateTo);
+    if (params.hubStatus) searchParams.set('hubStatus', params.hubStatus);
+    if (params.hubId) searchParams.set('hubId', params.hubId);
+
+    const queryString = searchParams.toString();
+    const response = await fetch(
+      `${baseUrl()}/admin-creator/creators${queryString ? `?${queryString}` : ''}`,
+      {
+        method: 'GET',
+        credentials: 'include',
+        cache: 'no-store',
+        headers
+      }
+    );
+
+    const json = (await response
+      .json()
+      .catch(() => null)) as
+      | AdminCreatorListingResponse
+      | {
+          data?: AdminCreatorListingItem[];
+          pagination?: Partial<AdminCreatorListingPagination>;
+          message?: string;
+          error?: string;
+        }
+      | null;
+
+    if (!response.ok) {
+      const errorPayload = json as { message?: string; error?: string } | null;
+      const message = errorPayload?.message ?? errorPayload?.error ?? 'CREATOR_LISTING_FAILED';
+      throw new Error(message);
+    }
+
+    if (!json || typeof json !== 'object') {
+      throw new Error('CREATOR_LISTING_INVALID_RESPONSE');
+    }
+
+    return {
+      data: Array.isArray(json.data) ? json.data : [],
+      pagination: {
+        total: Number(json.pagination?.total ?? 0),
+        page: Number(json.pagination?.page ?? params.page ?? 1),
+        limit: Number(json.pagination?.limit ?? params.limit ?? 20),
+        totalPages: Number(json.pagination?.totalPages ?? 1)
+      }
+    };
   });
 }
 

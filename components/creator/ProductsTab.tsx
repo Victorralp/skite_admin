@@ -6,6 +6,7 @@ import { MoreVertical, CheckCircle2, XCircle } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import ProductDetailModal from '@/components/ProductDetailModal';
 import type { Product } from '@/data/dashboard';
+import DataTableShell from '@/components/layout/DataTableShell';
 
 const StatusBadge = ({ status }: { status: string }) => {
     if (status === 'Active') {
@@ -76,85 +77,79 @@ export default function ProductsTab() {
                 <h3 className="font-sans text-heading-sm text-text-primary">Active Products</h3>
 
                 {/* Table Container */}
-                <div className="w-full bg-surface-secondary rounded-xl p-1 flex flex-col">
-                    {/* Header Row */}
-                    <div className="flex items-center px-4 py-2 gap-6 h-[32px]">
-                        <div className="w-[240px] font-sans text-body-sm text-text-secondary">Product</div>
-                        <div className="flex-1 font-sans text-body-sm text-text-secondary">Type</div>
-                        <div className="flex-1 font-sans text-body-sm text-text-secondary">Price</div>
-                        <div className="flex-1 font-sans text-body-sm text-text-secondary">Sales</div>
-                        <div className="flex-1 font-sans text-body-sm text-text-secondary">Page views</div>
-                        <div className="flex-1 font-sans text-body-sm text-text-secondary">Status</div>
-                        <div className="w-[18px]"></div>
-                    </div>
-
-                    {/* Table Body */}
-                    <div className="bg-white border border-border-primary rounded-lg overflow-hidden">
-                        {/* Rows */}
-                        {creatorProducts.map((product, index) => (
-                            <div
-                                key={product.id}
-                                className={cn(
-                                    "flex items-center px-4 py-3 gap-6 h-[48px] bg-white",
-                                    index !== creatorProducts.length - 1 && "border-b border-border-primary"
-                                )}
-                            >
-                                {/* Product */}
-                                <div className="w-[240px] flex items-center gap-2">
-                                    <img
-                                        src={product.thumbnail}
-                                        alt={product.name}
-                                        className="w-[24px] h-[24px] rounded-[4px] object-cover bg-gray-100"
-                                    />
-                                    <span className="font-sans text-body-sm text-text-primary truncate flex-1">
-                                        {product.name}
-                                    </span>
-                                </div>
-
-                                {/* Type */}
-                                <div className="flex-1 font-sans text-body-sm text-text-primary">
-                                    {product.id.includes('001') || product.id.includes('004') ? 'Course' : 
-                                     product.id.includes('002') || product.id.includes('005') ? 'Template' : 'eBook'}
-                                </div>
-
-                                {/* Price */}
-                                <div className="flex-1 font-sans text-body-sm text-text-primary">
-                                    {formatCurrency(product.price)}
-                                </div>
-
-                                {/* Sales */}
-                                <div className="flex-1 font-sans text-body-sm text-text-primary">
-                                    {product.sales}
-                                </div>
-
-                                {/* Page views */}
-                                <div className="flex-1 font-sans text-body-sm text-text-primary">
-                                    {(product.sales * 230).toLocaleString()}
-                                </div>
-
-                                {/* Status */}
-                                <div className="flex-1">
-                                    <StatusBadge status={product.status} />
-                                </div>
-
-                                {/* Actions */}
-                                <div className="w-[18px] relative" ref={openMenuId === product.id ? menuRef : null}>
-                                    <button 
-                                        onClick={() => setOpenMenuId(openMenuId === product.id ? null : product.id)}
-                                        className="p-0 hover:opacity-70 transition-opacity"
-                                    >
-                                        <MoreVertical className="w-[18px] h-[18px] text-text-secondary" />
-                                    </button>
-                                    {openMenuId === product.id && (
-                                        <ActionMenu 
-                                            onClose={() => setOpenMenuId(null)}
-                                            onViewProduct={() => setSelectedProduct(product)}
-                                        />
-                                    )}
-                                </div>
+                <div className="w-full rounded-xl bg-surface-secondary p-1">
+                    <DataTableShell>
+                        <div className="min-w-[900px]">
+                            <div className="grid grid-cols-[2.4fr_1fr_1fr_1fr_1fr_1fr_auto] items-center gap-6 px-4 py-2">
+                                <div className="font-sans text-body-sm text-text-secondary">Product</div>
+                                <div className="font-sans text-body-sm text-text-secondary">Type</div>
+                                <div className="font-sans text-body-sm text-text-secondary">Price</div>
+                                <div className="font-sans text-body-sm text-text-secondary">Sales</div>
+                                <div className="font-sans text-body-sm text-text-secondary">Page views</div>
+                                <div className="font-sans text-body-sm text-text-secondary">Status</div>
+                                <div className="w-4" />
                             </div>
-                        ))}
-                    </div>
+
+                            <div className="overflow-hidden rounded-lg border border-border-primary bg-white">
+                                {creatorProducts.map((product, index) => (
+                                    <div
+                                        key={product.id}
+                                        className={cn(
+                                            "grid grid-cols-[2.4fr_1fr_1fr_1fr_1fr_1fr_auto] items-center gap-6 bg-white px-4 py-3",
+                                            index !== creatorProducts.length - 1 && "border-b border-border-primary"
+                                        )}
+                                    >
+                                        <div className="flex min-w-0 items-center gap-2">
+                                            <img
+                                                src={product.thumbnail}
+                                                alt={product.name}
+                                                className="h-[24px] w-[24px] rounded-[4px] bg-gray-100 object-cover"
+                                            />
+                                            <span className="flex-1 truncate font-sans text-body-sm text-text-primary">
+                                                {product.name}
+                                            </span>
+                                        </div>
+
+                                        <div className="font-sans text-body-sm text-text-primary">
+                                            {product.id.includes('001') || product.id.includes('004') ? 'Course' :
+                                                product.id.includes('002') || product.id.includes('005') ? 'Template' : 'eBook'}
+                                        </div>
+
+                                        <div className="font-sans text-body-sm text-text-primary">
+                                            {formatCurrency(product.price)}
+                                        </div>
+
+                                        <div className="font-sans text-body-sm text-text-primary">
+                                            {product.sales}
+                                        </div>
+
+                                        <div className="font-sans text-body-sm text-text-primary">
+                                            {(product.sales * 230).toLocaleString()}
+                                        </div>
+
+                                        <div>
+                                            <StatusBadge status={product.status} />
+                                        </div>
+
+                                        <div className="relative w-4" ref={openMenuId === product.id ? menuRef : null}>
+                                            <button
+                                                onClick={() => setOpenMenuId(openMenuId === product.id ? null : product.id)}
+                                                className="p-0 transition-opacity hover:opacity-70"
+                                            >
+                                                <MoreVertical className="h-[18px] w-[18px] text-text-secondary" />
+                                            </button>
+                                            {openMenuId === product.id && (
+                                                <ActionMenu
+                                                    onClose={() => setOpenMenuId(null)}
+                                                    onViewProduct={() => setSelectedProduct(product)}
+                                                />
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </DataTableShell>
                 </div>
             </div>
 

@@ -16,6 +16,7 @@ type UserDetailModalProps = {
 
 export default function UserDetailModal({ user, isOpen, onClose }: UserDetailModalProps) {
   const [activeTab, setActiveTab] = useState<'profile' | 'activity' | 'purchases' | 'subscriptions'>('profile');
+  const [isInitialLoadOverlayVisible, setIsInitialLoadOverlayVisible] = useState(false);
   const [activityLogs, setActivityLogs] = useState<UserLogItem[]>([]);
   const [activitySearch, setActivitySearch] = useState('');
   const [activityPage, setActivityPage] = useState(1);
@@ -371,6 +372,128 @@ export default function UserDetailModal({ user, isOpen, onClose }: UserDetailMod
     setActiveTab('profile');
   }, [isOpen, user?.id]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      setIsInitialLoadOverlayVisible(false);
+      return;
+    }
+    if (!user?.apiId) {
+      setIsInitialLoadOverlayVisible(false);
+      return;
+    }
+
+    let isMounted = true;
+    setIsInitialLoadOverlayVisible(true);
+    setIsActivityLoading(true);
+    setIsTransactionsLoading(true);
+    setIsSubscriptionsLoading(true);
+
+    const activityCacheKey = `${user.apiId}::1`;
+    const purchasesCacheKey = `${user.apiId}:1`;
+    const subscriptionsCacheKey = `${user.apiId}:1`;
+
+    const preloadActivity = async () => {
+      try {
+        const response = await getUserLogs({
+          user: user.apiId,
+          page: 1,
+          limit: 10
+        });
+        if (!isMounted) return;
+        activityCacheRef.current.set(activityCacheKey, { data: response.data, meta: response.meta });
+        setActivityLogs(response.data);
+        setActivityMeta(response.meta);
+        setActivityError(null);
+      } catch (error) {
+        if (!isMounted) return;
+        setActivityLogs([]);
+        setActivityError(
+          error instanceof Error && error.message.trim().length > 0
+            ? error.message
+            : 'Unable to load user activity logs.'
+        );
+      } finally {
+        if (isMounted) {
+          setIsActivityLoading(false);
+        }
+      }
+    };
+
+    const preloadPurchases = async () => {
+      try {
+        const response = await getAdminUserTransactions({
+          customerId: user.apiId,
+          page: 1,
+          limit: 20
+        });
+        if (!isMounted) return;
+        purchasesCacheRef.current.set(purchasesCacheKey, {
+          data: response.transactions,
+          meta: response.pagination
+        });
+        setTransactions(response.transactions);
+        setTransactionMeta(response.pagination);
+        setTransactionsError(null);
+      } catch (error) {
+        if (!isMounted) return;
+        setTransactions([]);
+        setTransactionsError(
+          error instanceof Error && error.message.trim().length > 0
+            ? error.message
+            : 'Unable to load user transactions.'
+        );
+      } finally {
+        if (isMounted) {
+          setIsTransactionsLoading(false);
+        }
+      }
+    };
+
+    const preloadSubscriptions = async () => {
+      try {
+        const response = await getAdminUserTransactions({
+          customerId: user.apiId,
+          page: 1,
+          limit: 20
+        });
+        if (!isMounted) return;
+        subscriptionsCacheRef.current.set(subscriptionsCacheKey, {
+          data: response.transactions,
+          meta: response.pagination
+        });
+        setSubscriptions(response.transactions);
+        setSubscriptionsMeta(response.pagination);
+        setSubscriptionsError(null);
+      } catch (error) {
+        if (!isMounted) return;
+        setSubscriptions([]);
+        setSubscriptionsError(
+          error instanceof Error && error.message.trim().length > 0
+            ? error.message
+            : 'Unable to load user subscriptions.'
+        );
+      } finally {
+        if (isMounted) {
+          setIsSubscriptionsLoading(false);
+        }
+      }
+    };
+
+    void Promise.allSettled([
+      preloadActivity(),
+      preloadPurchases(),
+      preloadSubscriptions()
+    ]).finally(() => {
+      if (isMounted) {
+        setIsInitialLoadOverlayVisible(false);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isOpen, user?.apiId, user?.id]);
+
   if (!isOpen) return null;
 
   return (
@@ -400,7 +523,15 @@ export default function UserDetailModal({ user, isOpen, onClose }: UserDetailMod
         <div className="w-full h-px bg-border-secondary" />
 
         {/* Content */}
-        <div className="flex-1 flex flex-col overflow-y-auto">
+        <div className="flex-1 flex flex-col overflow-y-auto relative">
+          {isInitialLoadOverlayVisible && (
+            <div className="absolute inset-0 z-20 bg-white/75 backdrop-blur-sm flex items-center justify-center">
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-8 h-8 rounded-full border-2 border-border-primary border-t-transparent animate-spin" />
+                <span className="text-caption-lg text-text-secondary">Loading user details...</span>
+              </div>
+            </div>
+          )}
           {/* User Info Section */}
           <div className="flex flex-col px-6 py-6 gap-3">
             {/* User Header */}

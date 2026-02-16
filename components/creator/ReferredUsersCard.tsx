@@ -12,15 +12,15 @@ export default function ReferredUsersCard() {
     const creatorsLen = CIRCUMFERENCE * creatorsPct - GAP_PX;
 
     return (
-        <div className="flex flex-col gap-[8px] w-full">
-            <div className="flex items-center gap-[10px] h-[30px] w-full">
-                <h3 className="w-[267px] h-[19px] font-sans text-heading-sm text-text-primary flex-none order-0 grow">Referred Users</h3>
+        <div className="flex w-full flex-col gap-2">
+            <div className="flex w-full flex-wrap items-center gap-3">
+                <h3 className="flex-1 font-sans text-heading-sm text-text-primary">Referred Users</h3>
                 <CustomDropdown options={['All Time', 'This Year', 'This Month']} defaultLabel="All Time" width="78px" menuWidth="100px" />
             </div>
 
-            <div className="box-border flex flex-col justify-center items-center p-[24px] gap-[12px] w-[355px] h-[271px] bg-white border border-border-primary rounded-[12px] flex-none order-1 self-stretch grow z-0 relative">
-                <div className="w-[197px] h-[197px] flex-none order-0 grow relative">
-                    <svg width="197" height="197" viewBox="0 0 197 197" fill="none" xmlns="http://www.w3.org/2000/svg" className="-rotate-90">
+            <div className="flex min-h-[271px] w-full flex-col items-center justify-center gap-4 rounded-xl border border-border-primary bg-white p-6">
+                <div className="relative aspect-square w-full max-w-[220px]">
+                    <svg viewBox="0 0 197 197" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-full w-full -rotate-90">
                         {/* Blue segment border (1px white) */}
                         <circle
                             cx="98.5"
@@ -63,25 +63,25 @@ export default function ReferredUsersCard() {
                         />
                     </svg>
 
-                    <div className="absolute left-1/2 top-[69px] -translate-x-1/2 flex flex-col items-center p-0 w-[84.18px] h-[36px]">
-                        <span className="w-[84.18px] h-[22px] font-sans font-bold text-[18px] leading-[22px] text-center text-text-primary flex-none order-0 self-stretch grow-0">1,248</span>
-                        <span className="w-[84.18px] h-[14px] font-sans text-caption-lg-regular text-center text-[rgba(0,0,0,0.4)] flex-none order-1 self-stretch grow-0">Users</span>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="font-sans text-[18px] font-bold leading-[22px] text-text-primary">1,248</span>
+                        <span className="font-sans text-caption-lg-regular text-[rgba(0,0,0,0.4)]">Users</span>
                     </div>
                 </div>
 
-                <div className="flex flex-row items-end p-0 gap-[22px] w-[185px] h-[14px] flex-none order-1 grow-0">
-                    <div className="flex flex-row items-center p-0 gap-[4px] w-[76px] h-[14px] flex-none order-0 grow-0">
-                        <div className="w-[12px] h-[12px] bg-[#4682B8] rounded-[4px] flex-none order-0 grow-0" />
-                        <div className="flex flex-row items-center p-0 gap-[5px] w-[60px] h-[14px] flex-none order-1 grow-0">
-                            <span className="w-[31px] h-[14px] font-sans text-caption-lg-regular text-black flex items-center flex-none order-0 grow-0">Users</span>
-                            <span className="w-[24px] h-[14px] font-sans text-caption-lg-regular text-[rgba(0,0,0,0.4)] flex-none order-1 grow-0">86%</span>
+                <div className="flex w-full flex-wrap items-center justify-center gap-4">
+                    <div className="flex items-center gap-1">
+                        <div className="h-3 w-3 rounded bg-[#4682B8]" />
+                        <div className="flex items-center gap-1">
+                            <span className="font-sans text-caption-lg-regular text-black">Users</span>
+                            <span className="font-sans text-caption-lg-regular text-[rgba(0,0,0,0.4)]">86%</span>
                         </div>
                     </div>
-                    <div className="flex flex-row items-center p-0 gap-[4px] w-[87px] h-[14px] flex-none order-1 grow-0">
-                        <div className="w-[12px] h-[12px] bg-[#FC552E] rounded-[4px] flex-none order-0 grow-0" />
-                        <div className="flex flex-row items-center p-0 gap-[5px] w-[71px] h-[14px] flex-none order-1 grow-0">
-                            <span className="w-[45px] h-[14px] font-sans text-caption-lg-regular text-black flex items-center flex-none order-0 grow-0">Creators</span>
-                            <span className="w-[21px] h-[14px] font-sans text-caption-lg-regular text-[rgba(0,0,0,0.4)] flex-none order-1 grow-0">14%</span>
+                    <div className="flex items-center gap-1">
+                        <div className="h-3 w-3 rounded bg-[#FC552E]" />
+                        <div className="flex items-center gap-1">
+                            <span className="font-sans text-caption-lg-regular text-black">Creators</span>
+                            <span className="font-sans text-caption-lg-regular text-[rgba(0,0,0,0.4)]">14%</span>
                         </div>
                     </div>
                 </div>
